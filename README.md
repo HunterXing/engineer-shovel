@@ -5,11 +5,11 @@
   <img src="https://img.shields.io/badge/Claude_Code-Ready-d97706?style=for-the-badge" alt="Claude Code">
 </p>
 
-<h1 align="center">🪖 工兵铲 · Optimal Workflow</h1>
+<h1 align="center">🪖 Engineer Shovel</h1>
 
 <p align="center">
-  <b>多合一 AI 代理开发工具</b><br>
-  <sub>新功能 · Bug修复 · 头脑风暴 · 重构 · 代码审查 · 快速任务 · 复杂项目 · 深度研究</sub>
+  <b>All-in-one AI agent development toolkit</b><br>
+  <sub>New Feature · Bug Fix · Brainstorming · Refactoring · Code Review · Quick Tasks · Complex Projects · Deep Research</sub>
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="#-quick-start">Quick Start</a> •
-  <a href="#-workflow-quick-reference">Workflows</a> •
+  <a href="#-commands--workflows">Commands</a> •
   <a href="#-toolchain">Toolchain</a> •
   <a href="README_zh.md">中文</a>
 </p>
@@ -31,14 +31,14 @@
 
 ## 📖 What is this?
 
-**工兵铲** — 如同一把真正的工兵铲，集铲、镐、锯、量于一身。这个技能将完整开发工具链的最佳实践封装为 **9 个独立斜杠指令**，覆盖开发生命周期全部场景。
+**Engineer Shovel** — like a real entrenching tool, it serves as a shovel, pickaxe, saw, and ruler all in one. Encapsulates the best practices of the full development toolchain into **9 standalone slash commands**, covering the entire development lifecycle.
 
 ```
 OpenCode   + superpowers + ecc + gsd + omo + Caveman + rtk
 Claude Code + superpowers + ecc + gsd      + Caveman + rtk
 ```
 
-每条指令对应一个完整工作流 — 从规划到验证，从修复到发布。
+Each command is a complete workflow — from planning to verification, from bug fix to release.
 
 ---
 
@@ -58,7 +58,7 @@ This auto-installs **ECC**, **GSD**, **superpowers**, **Caveman**, **RTK** and t
 skill(name="engineer-shovel")
 ```
 
-Then navigate to your needed workflow.
+Then pick your scenario — each `/tool-*` command has the full workflow.
 
 ---
 
@@ -66,13 +66,13 @@ Then navigate to your needed workflow.
 
 | Category | Description |
 |----------|------------|
-| 🎯 **8 Scenarios** | New Feature, Bug Fix, Brainstorming, Refactoring, Code Review, Quick Tasks, Complex Projects, Deep Research |
+| 🎯 **9 Commands** | New Feature, Bug Fix, Planning, Refactoring, Code Review, Brainstorming, Quick Tasks, Complex Projects, Deep Research |
 | 🔀 **Dual Environment** | Explicit `[OC]` / `[CC]` command branching |
 | 🧭 **Decision Trees** | Primary router + complexity router |
-| 🛠️ **Skill Loading** | Category + skills tables per feature type |
+| 🛠️ **Self-Contained** | Each command file has env-aware steps, ready to execute |
 | ⚡ **Token Mgmt** | Caveman lite/full/ultra + context preservation |
 | 🌐 **Lang Reference** | Test / Build / Review for 10 languages |
-| 📋 **Quick Lookup** | 17-scenario command summary |
+| 📋 **Quick Lookup** | 9-scenario command summary |
 
 ---
 
@@ -110,11 +110,12 @@ Then navigate to your needed workflow.
 
 ```
 engineer-shovel/
-├── SKILL.md          # Main skill (681 lines)
-├── install.sh        # One-command installer
-├── README.md         # English docs
-├── README_zh.md      # 中文文档
-└── LICENSE           # MIT
+├── commands/          # 9 standalone slash commands
+├── SKILL.md           # Main skill (700+ lines)
+├── install.sh         # One-command bootstrap installer
+├── README.md          # English docs (this file)
+├── README_zh.md       # Chinese docs
+└── LICENSE            # MIT
 ```
 
 ---
