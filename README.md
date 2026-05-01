@@ -42,6 +42,59 @@ Each command is a complete workflow — from planning to verification, from bug 
 
 ---
 
+## 🧭 Task Router
+
+```mermaid
+flowchart TD
+    START["🚀 What do you need?"]
+
+    START --> Q1{"Build something new?"}
+    START --> Q2{"Fix a bug?"}
+    START --> Q3{"Improve code?"}
+    START --> Q4{"Review code?"}
+    START --> Q5{"Not sure?"}
+    START --> Q6{"Research?"}
+
+    Q1 -->|"Yes"| SCALE{"How big?"}
+    SCALE -->|"< 3 files"| QUICK["⚡ /tool-quick"]
+    SCALE -->|"Medium"| PLAN["📐 /tool-plan"]
+    SCALE -->|"Complex"| BP["🏗️ /tool-blueprint"]
+    PLAN --> FEAT["🆕 /tool-feat"]
+    BP --> FEAT
+
+    Q2 -->|"Yes"| FIX["🐛 /tool-fix"]
+
+    Q3 -->|"Yes"| REF["🔧 /tool-refactor"]
+
+    Q4 -->|"Yes"| REV["📋 /tool-review"]
+
+    Q5 -->|"Yes"| BS["💡 /tool-brainstorm"]
+
+    Q6 -->|"Yes"| RS["🔬 /tool-research"]
+
+    QUICK --> DONE["✅ Done"]
+    FEAT --> DONE
+    FIX --> DONE
+    REF --> DONE
+    REV --> DONE
+    BS --> DONE
+    RS --> DONE
+
+    style START fill:#6366f1,color:#fff
+    style DONE fill:#22c55e,color:#fff
+    style QUICK fill:#f59e0b,color:#fff
+    style FEAT fill:#8b5cf6,color:#fff
+    style FIX fill:#ef4444,color:#fff
+    style REF fill:#06b6d4,color:#fff
+    style REV fill:#f97316,color:#fff
+    style BS fill:#ec4899,color:#fff
+    style RS fill:#14b8a6,color:#fff
+    style PLAN fill:#a78bfa,color:#fff
+    style BP fill:#7c3aed,color:#fff
+```
+
+---
+
 ## 🚀 Quick Start
 
 **New user? One command setup:**
