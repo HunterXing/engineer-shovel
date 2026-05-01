@@ -76,20 +76,21 @@ Then navigate to your needed workflow.
 
 ---
 
-## 📋 Workflow Quick Reference
+## 📋 Commands & Workflows
 
-| Scenario | Commands | Env |
-|----------|----------|-----|
-| 🆕 New Feature | `/plan` → `/prp-implement` → `/verify` → commit | OC / CC |
-| 🆕 Complex | `/blueprint` → steps → `/gsd-execute-phase` | Both |
-| 🐛 Bug Fix | `/gsd-debug` → fix → test → commit | Both |
-| 💡 Brainstorming | `/gsd-explore` / `/superpowers:brainstorming` | Both |
-| 🔧 Refactoring | `/refactor` → verify → `/review-work` → commit | Both |
-| 📋 Code Review | `/code-review` / `/review-pr <url>` | Both |
-| 📋 Deep Review | `/review-work` (5 parallel agents) | Both |
-| ⚡ Quick Task | `/gsd-fast` / cavecrew builder | Both |
-| 🏗️ Complex Project | `/blueprint` / GSD phases | Both |
-| 🔬 Deep Research | `/deep-research` | Both |
+| Command | Scenario | Pipeline |
+|---------|----------|----------|
+| `/tool-feat` | 🆕 New Feature | `/plan` → `/prp-implement` → `/verify` → commit |
+| `/tool-fix` | 🐛 Bug Fix | `/gsd-debug` → fix → test → commit |
+| `/tool-plan` | 📐 Planning | `/plan` / `/blueprint` → review → execute |
+| `/tool-refactor` | 🔧 Refactoring | `/refactor` → verify → `/review-work` → commit |
+| `/tool-review` | 📋 Code Review | `/code-review` / `/review-pr` / `/review-work` |
+| `/tool-brainstorm` | 💡 Brainstorming | `/gsd-explore` / `/superpowers:brainstorming` |
+| `/tool-quick` | ⚡ Quick Tasks | `/gsd-fast` / cavecrew builder |
+| `/tool-blueprint` | 🏗️ Complex Projects | `/blueprint` / GSD phases → `/gsd-ship` |
+| `/tool-research` | 🔬 Deep Research | `/deep-research` → synthesize → apply |
+
+> Each `commands/tool-*.md` is self-contained — env-aware steps with OpenCode `[OC]` and Claude Code `[CC]` variants.
 
 ---
 

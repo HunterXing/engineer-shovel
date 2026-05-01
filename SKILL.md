@@ -30,6 +30,24 @@ metadata:
 
 ---
 
+## 🛠️ Command Reference
+
+| Command | Scenario | Pipeline |
+|---------|----------|----------|
+| `/tool-feat` | 🆕 New Feature | 分析 → 规划 → 执行 → 验证 → 提交 |
+| `/tool-fix` | 🐛 Bug Fix | 调试 → 定位 → 修复 → 验证 → 防回归 → 提交 |
+| `/tool-plan` | 📐 Planning | 需求 → 分析 → 蓝图 → 审查 → 执行 |
+| `/tool-refactor` | 🔧 Refactoring | 基线 → `/refactor` → 验证 → `/review-work` → 提交 |
+| `/tool-review` | 📋 Code Review | 代码 → 审查 → 修复 → 重审 → 批准 |
+| `/tool-brainstorm` | 💡 Brainstorming | 想法 → 探索 → 记录 → 评估 → 路由 |
+| `/tool-quick` | ⚡ Quick Tasks | 任务 → `/gsd-fast`/cavecrew → 验证 → 提交 |
+| `/tool-blueprint` | 🏗️ Complex Projects | 目标 → 蓝图 → 分步执行 → 集成 → 验证 → 发布 |
+| `/tool-research` | 🔬 Deep Research | 问题 → 多源搜索 → 综合 → 报告 → 应用 |
+
+Each command is in `commands/tool-*.md` and can be invoked directly in OpenCode or Claude Code.
+
+---
+
 ## Environment Detection
 
 This skill has two variants depending on the running environment:

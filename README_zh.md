@@ -76,21 +76,21 @@ skill(name="optimal-workflow")
 
 ---
 
-## 📋 工作流速查
+## 📋 指令与工作流
 
-| 场景 | 命令 | 环境 |
-|------|------|------|
-| 🆕 新功能开发 | `/plan` → `/prp-implement` → `/verify` → commit | OC / CC |
-| 🆕 复杂新功能 | `/blueprint` → 分步执行 → `/gsd-execute-phase` | 通用 |
-| 🆕 简单功能 | `/gsd-fast "..."` | 通用 |
-| 🐛 Bug 修复 | `/gsd-debug` → 修复 → 测试 → commit | 通用 |
-| 💡 头脑风暴 | `/gsd-explore` / `/superpowers:brainstorming` | 通用 |
-| 🔧 重构 | `/refactor` → 验证 → `/review-work` → commit | 通用 |
-| 📋 代码审查 | `/code-review`（本地）/ `/review-pr <url>`（PR） | 通用 |
-| 📋 深度审查 | `/review-work`（5 个并行代理） | 通用 |
-| ⚡ 快速任务 | `/gsd-fast` / cavecrew builder | 通用 |
-| 🏗️ 复杂项目 | `/blueprint` / GSD 阶段管理 | 通用 |
-| 🔬 深度研究 | `/deep-research` | 通用 |
+| 指令 | 场景 | Pipeline |
+|------|------|----------|
+| `/tool-feat` | 🆕 新功能 | `/plan` → `/prp-implement` → `/verify` → commit |
+| `/tool-fix` | 🐛 Bug修复 | `/gsd-debug` → 修复 → 测试 → commit |
+| `/tool-plan` | 📐 规划 | `/plan` / `/blueprint` → 审查 → 执行 |
+| `/tool-refactor` | 🔧 重构 | `/refactor` → 验证 → `/review-work` → commit |
+| `/tool-review` | 📋 代码审查 | `/code-review` / `/review-pr` / `/review-work` |
+| `/tool-brainstorm` | 💡 头脑风暴 | `/gsd-explore` / `/superpowers:brainstorming` |
+| `/tool-quick` | ⚡ 快速任务 | `/gsd-fast` / cavecrew builder |
+| `/tool-blueprint` | 🏗️ 复杂项目 | `/blueprint` / GSD 阶段 → `/gsd-ship` |
+| `/tool-research` | 🔬 深度研究 | `/deep-research` → 综合 → 应用 |
+
+> 每条 `commands/tool-*.md` 自包含 — 区分 OpenCode `[OC]` 和 Claude Code `[CC]` 环境步骤。
 
 ---
 
