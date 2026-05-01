@@ -1,11 +1,12 @@
 ---
-name: optimal-workflow
+name: 工兵铲
+display_name: optimal-workflow
 description: |
-  Optimal development workflow for the full toolchain — OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk,
-  and Claude Code + superpowers + ecc + gsd + Caveman + rtk.
-  Covers new feature development, bug fixing, brainstorming, refactoring, code review, quick tasks,
-  complex multi-step projects, and deep research with environment-aware tool selection.
-  Includes decision trees, token management, language/framework quick reference, and best practices.
+  工兵铲 (Optimal Workflow) — AI 代理多功能开发工具。
+  基于 OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk 工具链的完整工作流技能。
+  封装为独立指令: /tool-feat /tool-fix /tool-plan /tool-refactor /tool-review /tool-brainstorm /tool-quick /tool-blueprint /tool-research
+  覆盖新功能、Bug修复、头脑风暴、重构、代码审查、快速任务、复杂项目、深度研究 8 大场景。
+  包含决策树、Token 管理、语言参考、命令速查表。
 license: MIT
 metadata:
   version: "1.0.0"
@@ -19,9 +20,13 @@ metadata:
     - rtk
 ---
 
-# Optimal Development Workflow
+# 🪖 工兵铲 — Optimal Workflow
 
-Orchestrate the full toolchain (`superpowers` + `ecc` + `gsd` + `Caveman` + `rtk`) across **OpenCode** and **Claude Code** environments. This skill provides environment-aware workflows for every development scenario.
+**多合一 AI 代理开发工具** — 涵盖 `superpowers` + `ecc` + `gsd` + `Caveman` + `rtk` 完整工具链。
+
+支持 **OpenCode** 和 **Claude Code** 双环境，每个工作流封装为独立斜杠指令。
+
+> 快速命令: `/tool-feat` `/tool-fix` `/tool-plan` `/tool-refactor` `/tool-review` `/tool-brainstorm` `/tool-quick` `/tool-blueprint` `/tool-research`
 
 ---
 

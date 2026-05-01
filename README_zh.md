@@ -5,11 +5,15 @@
   <img src="https://img.shields.io/badge/Claude_Code-支持-d97706?style=for-the-badge" alt="Claude Code">
 </p>
 
-<h1 align="center">🧠 Optimal Workflow（最优开发工作流）</h1>
+<h1 align="center">🪖 工兵铲 · Optimal Workflow</h1>
 
 <p align="center">
-  <b>面向 AI 编码代理的开发工作流技能</b><br>
+  <b>多合一 AI 代理开发工具</b><br>
   <sub>覆盖从需求分析到代码提交的完整开发生命周期</sub>
+</p>
+
+<p align="center">
+  <code>/tool-feat</code> <code>/tool-fix</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-quick</code> <code>/tool-blueprint</code> <code>/tool-research</code>
 </p>
 
 <p align="center">
@@ -27,7 +31,7 @@
 
 ## 📖 这是什么？
 
-一个 **单一技能（Skill）**，将完整工具链的最佳实践编码为可执行的工作流：
+**工兵铲** — 如同一把真正的工兵铲，集铲、镐、锯、量于一身。封装为 **9 个独立斜杠指令**，覆盖全部开发场景：
 
 ```
 OpenCode   + superpowers + ecc + gsd + omo + Caveman + rtk
