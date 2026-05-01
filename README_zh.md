@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="https://img.shields.io/github/stars/HunterXing/optimal-workflow?style=for-the-badge&color=6366f1" alt="Stars">
-  <img src="https://img.shields.io/github/license/HunterXing/optimal-workflow?style=for-the-badge&color=22c55e" alt="License">
+  <img src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=for-the-badge&color=6366f1" alt="Stars">
+  <img src="https://img.shields.io/github/license/HunterXing/engineer-shovel?style=for-the-badge&color=22c55e" alt="License">
   <img src="https://img.shields.io/badge/OpenCode-支持-8b5cf6?style=for-the-badge" alt="OpenCode">
   <img src="https://img.shields.io/badge/Claude_Code-支持-d97706?style=for-the-badge" alt="Claude Code">
 </p>
@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <code>skill(name="optimal-workflow")</code>
+  <code>skill(name="engineer-shovel")</code>
 </p>
 
 ---
@@ -47,15 +47,15 @@ Claude Code + superpowers + ecc + gsd      + Caveman + rtk
 **新用户？一条命令搞定：**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HunterXing/optimal-workflow/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 ```
 
-自动安装 **ECC**、**GSD**、**superpowers**、**Caveman**、**RTK** 和 `optimal-workflow` 技能本身。
+自动安装 **ECC**、**GSD**、**superpowers**、**Caveman**、**RTK** 和 `engineer-shovel` 技能本身。
 
 **在编码会话中使用：**
 
 ```
-skill(name="optimal-workflow")
+skill(name="engineer-shovel")
 ```
 
 然后根据你的任务选择对应场景即可。
@@ -109,7 +109,7 @@ skill(name="optimal-workflow")
 ## 📂 仓库结构
 
 ```
-optimal-workflow/
+engineer-shovel/
 ├── SKILL.md          # 核心技能文件（681 行）
 ├── install.sh        # 一键安装脚本
 ├── README.md         # 英文文档
@@ -140,7 +140,7 @@ optimal-workflow/
 
 此技能设计为**按需加载**，非自动加载：
 
-- 开始新任务时执行 `skill(name="optimal-workflow")`
+- 开始新任务时执行 `skill(name="engineer-shovel")`
 - 技能根据任务类型和环境引导你选择合适工具
 - 与 AGENTS.md（自动加载）不同，技能只在显式请求时才消耗上下文
 

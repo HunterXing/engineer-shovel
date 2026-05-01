@@ -1,6 +1,6 @@
 ---
 name: 工兵铲
-display_name: optimal-workflow
+display_name: engineer-shovel
 description: |
   工兵铲 (Optimal Workflow) — AI 代理多功能开发工具。
   基于 OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk 工具链的完整工作流技能。

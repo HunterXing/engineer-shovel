@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="https://img.shields.io/github/stars/HunterXing/optimal-workflow?style=for-the-badge&color=6366f1" alt="Stars">
-  <img src="https://img.shields.io/github/license/HunterXing/optimal-workflow?style=for-the-badge&color=22c55e" alt="License">
+  <img src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=for-the-badge&color=6366f1" alt="Stars">
+  <img src="https://img.shields.io/github/license/HunterXing/engineer-shovel?style=for-the-badge&color=22c55e" alt="License">
   <img src="https://img.shields.io/badge/OpenCode-Ready-8b5cf6?style=for-the-badge" alt="OpenCode">
   <img src="https://img.shields.io/badge/Claude_Code-Ready-d97706?style=for-the-badge" alt="Claude Code">
 </p>
@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <code>skill(name="optimal-workflow")</code>
+  <code>skill(name="engineer-shovel")</code>
 </p>
 
 ---
@@ -47,15 +47,15 @@ Claude Code + superpowers + ecc + gsd      + Caveman + rtk
 **New user? One command setup:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HunterXing/optimal-workflow/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 ```
 
-This auto-installs **ECC**, **GSD**, **superpowers**, **Caveman**, **RTK** and the `optimal-workflow` skill.
+This auto-installs **ECC**, **GSD**, **superpowers**, **Caveman**, **RTK** and the `engineer-shovel` skill.
 
 **In session:**
 
 ```
-skill(name="optimal-workflow")
+skill(name="engineer-shovel")
 ```
 
 Then navigate to your needed workflow.
@@ -109,7 +109,7 @@ Then navigate to your needed workflow.
 ## 📂 Structure
 
 ```
-optimal-workflow/
+engineer-shovel/
 ├── SKILL.md          # Main skill (681 lines)
 ├── install.sh        # One-command installer
 ├── README.md         # English docs

@@ -26,7 +26,7 @@ header(){ echo -e "\n${BOLD}${BLUE}═══ $1 ═══${NC}\n"; }
 # ── Config ───────────────────────────────────────────────────────────────────
 REPO_RAW="https://raw.githubusercontent.com"
 REPO_OWNER="HunterXing"
-REPO_NAME="optimal-workflow"
+REPO_NAME="engineer-shovel"
 REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
 
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
