@@ -130,7 +130,7 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 
 **GSD** (Get Shit Done) is installed independently via `npx get-shit-done-cc@latest --<target> --<scope>`. It is not bundled with ECC.
 
-**superpowers** refers to the `claude-plugins-official` marketplace. For Claude Code, the marketplace is built-in and pre-registered. For OpenCode, no equivalent exists, so it is skipped.
+**superpowers** is installed per target. For OpenCode, it adds a plugin entry to `~/.config/opencode/opencode.json`. For Claude Code, it uses `claude plugin install superpowers@claude-plugins-official`.
 
 **Caveman** uses the official installer from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman). It auto-detects installed agents and runs their native install method. For Claude Code, it uses `claude plugin marketplace add && claude plugin install`. For OpenCode, it uses `npx skills add`.
 

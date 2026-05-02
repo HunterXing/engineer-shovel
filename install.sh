@@ -545,16 +545,101 @@ install_gsd() {
   fi
 }
 
+SUPERPOWERS_REPO="https://github.com/obra/superpowers.git"
+
+_superpowers_opencode_installed() {
+  local config_file="$HOME/.config/opencode/opencode.json"
+  [[ -f "$config_file" ]] && grep -q "superpowers" "$config_file" 2>/dev/null
+}
+
+install_superpowers_opencode() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: Add superpowers plugin to ~/.config/opencode/opencode.json"
+    return 0
+  fi
+
+  if _superpowers_opencode_installed; then
+    ok "Superpowers already configured for OpenCode"
+    return 0
+  fi
+
+  local config_dir="$HOME/.config/opencode"
+  local config_file="$config_dir/opencode.json"
+  
+  mkdir -p "$config_dir"
+  
+  if [[ ! -f "$config_file" ]]; then
+    # Create new config file with plugin array
+    cat > "$config_file" <<'EOF'
+{
+  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
+}
+EOF
+    ok "Created opencode.json with superpowers plugin"
+    return 0
+  fi
+
+  # Config file exists, try to add superpowers to plugin array
+  if command -v node >/dev/null 2>&1; then
+    # Use node to safely modify JSON
+    node -e "
+      const fs = require('fs');
+      const path = '$config_file';
+      let config = {};
+      try { config = JSON.parse(fs.readFileSync(path, 'utf8')); } catch(e) {}
+      if (!config.plugin) config.plugin = [];
+      if (!Array.isArray(config.plugin)) config.plugin = [config.plugin];
+      const entry = 'superpowers@git+https://github.com/obra/superpowers.git';
+      if (!config.plugin.includes(entry)) {
+        config.plugin.push(entry);
+        fs.writeFileSync(path, JSON.stringify(config, null, 2) + '\n');
+        console.log('Added superpowers to opencode.json');
+      } else {
+        console.log('superpowers already in opencode.json');
+      }
+    "
+    ok "Superpowers plugin added to opencode.json"
+  else
+    # Fallback: append to plugin array manually
+    warn "node not found; attempting manual JSON edit"
+    if grep -q '"plugin"' "$config_file"; then
+      # Plugin array exists, add entry before closing bracket
+      sed -i 's/"plugin":\s*\[/"&"superpowers@git+https:\/\/github.com\/obra\/superpowers.git", /' "$config_file" 2>/dev/null || \
+        warn "Could not auto-add superpowers. Add manually: \"superpowers@git+https://github.com/obra/superpowers.git\""
+    else
+      warn "No plugin array found. Add to opencode.json: \"plugin\": [\"superpowers@git+https://github.com/obra/superpowers.git\"]"
+    fi
+  fi
+}
+
+install_superpowers_claude() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: claude plugin install superpowers@claude-plugins-official"
+    return 0
+  fi
+
+  local out
+  out="$(claude plugin list 2>/dev/null)" || true
+  if echo "$out" | grep -qi superpowers; then
+    ok "Superpowers already installed for Claude Code"
+    return 0
+  fi
+
+  info "Installing superpowers for Claude Code..."
+  if claude plugin install superpowers@claude-plugins-official 2>&1; then
+    ok "Superpowers installed for Claude Code"
+  else
+    local rc=$?
+    record_failure "Superpowers Claude install failed (exit ${rc}). Manually: claude plugin install superpowers@claude-plugins-official"
+  fi
+}
+
 install_superpowers() {
   local target
   for target in "${TARGETS[@]}"; do
     case "$target" in
-      opencode)
-        info "superpowers (claude-plugins-official marketplace) is Claude-only; skipped for OpenCode"
-        ;;
-      claude-code)
-        info "claude-plugins-official marketplace is built-in to Claude Code; no install needed"
-        ;;
+      opencode) install_superpowers_opencode ;;
+      claude-code) install_superpowers_claude ;;
     esac
   done
 }
