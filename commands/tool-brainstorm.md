@@ -16,15 +16,13 @@ when-to-use: Use when an idea is not implementation-ready and needs assumptions,
 
 Use this when the idea is not yet implementation-ready.
 
-Compression: use `/caveman lite` for ideation readability; use `/caveman full` when options, tradeoffs, or captured notes become long.
+Compression: follow `docs/token-cost.md`; use lite for readability and full when options/tradeoffs get long.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--fast` | capture and rough route | `/gsd-note` + short options |
-| `--standard` or default | clarify product/technical direction | `/gsd-explore` or brainstorming |
-| `--deep` | multiple viable paths or go/no-go decision | `/council` after options are clear |
+- `--fast`: capture and rough route → `/gsd-note` + short options.
+- `--standard` or default: clarify product/technical direction → `/gsd-explore` or brainstorming.
+- `--deep`: multiple viable paths or go/no-go decision → `/council` after options are clear.
 
 ## Flow
 

@@ -16,14 +16,12 @@ when-to-use: Use for multi-step or multi-session projects that cannot safely fit
 
 Use this only when the work cannot fit safely in a single small plan or PR.
 
-Compression: use `/caveman full` by default; use `/caveman ultra` for GSD phases or multi-agent summaries. Use RTK for repository scans and verification logs when available.
+Compression: follow `docs/token-cost.md`; use full by default, ultra for GSD/multi-agent summaries, and RTK for scans/logs.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--standard` or default | multi-step but clear project | `/blueprint` with dependency graph |
-| `--deep` | milestone-scale or long-running work | GSD project → discuss/plan/execute phases |
+- `--standard` or default: multi-step but clear project → `/blueprint` with dependency graph.
+- `--deep`: milestone-scale or long-running work → GSD project → discuss/plan/execute phases.
 
 ## Flow
 

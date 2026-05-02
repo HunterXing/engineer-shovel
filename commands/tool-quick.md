@@ -16,14 +16,12 @@ when-to-use: Use for obvious low-risk work such as typos, tiny config edits, or 
 
 Use this for obvious, low-risk work. Do not run planning, deep research, or broad review for quick tasks.
 
-Compression: use `/caveman lite`; use RTK-wrapped shell output when available for git/test/build noise.
+Compression: follow `docs/token-cost.md`; use `/caveman lite` and RTK for git/test/build noise when available.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--fast` or default | typo, config tweak, 1-line fix | direct edit or `/gsd-fast` |
-| `--standard` | 1-2 file surgical change | cavecrew-builder or targeted edit + tests |
+- `--fast` or default: typo, config tweak, 1-line fix → direct edit or `/gsd-fast`.
+- `--standard`: 1-2 file surgical change → cavecrew-builder or targeted edit + tests.
 
 ## Flow
 

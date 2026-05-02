@@ -16,15 +16,13 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 
 Use planning when execution order, risks, or verification criteria are not obvious.
 
-Compression: use `/caveman lite` for short plans, `/caveman full` for file-backed or multi-step plans, and RTK for any shell evidence gathered during planning.
+Compression: follow `docs/token-cost.md`; use lite for short plans, full for file-backed plans, and RTK for shell evidence.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--fast` | small task, clear scope | short inline plan |
-| `--standard` or default | medium work | `/plan` or `/prp-plan` with verification criteria |
-| `--deep` | multi-session, ambiguous, many dependencies | `/blueprint` or GSD planning |
+- `--fast`: small task, clear scope → short inline plan.
+- `--standard` or default: medium work → `/plan` or `/prp-plan` with verification criteria.
+- `--deep`: multi-session, ambiguous, many dependencies → `/blueprint` or GSD planning.
 
 ## Flow
 
