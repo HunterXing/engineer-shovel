@@ -3,7 +3,7 @@ name: 工兵铲
 display_name: engineer-shovel
 description: |
   工兵铲 (Engineer Shovel) — token-aware AI agent development workflow router.
-  Provides 10 slash commands for feature work, bug fixing, planning, refactoring,
+  Provides 12 slash commands for feature work, bug fixing, branch workflow, planning, refactoring,
   review, brainstorming, quick tasks, complex projects, research, and token statistics.
 license: MIT
 metadata:

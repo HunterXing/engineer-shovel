@@ -12,6 +12,7 @@
 - `docs/workflows.md`, `docs/token-cost.md`, `docs/install.md`, and `docs/language-reference.md`.
 - CI guardrails for command frontmatter, token-efficiency footers, skill size, docs presence, and shell syntax.
 - `/tool-statistic` command for measured Caveman/RTK session token statistics when available.
+- `/tool-branch` command for feature branch workflow management with squash merge and diff review.
 
 ---
 

@@ -16,7 +16,7 @@ Engineer Shovel is a lightweight skill + slash-command router for OpenCode and C
 The project uses a small router architecture:
 
 - `SKILL.md` is the always-loaded routing layer and intentionally stays short.
-- `commands/tool-*.md` contains 10 slash-command workflows loaded on demand.
+- `commands/tool-*.md` contains 12 slash-command workflows loaded on demand.
 - `docs/` stores long-form guidance kept out of the routine context path.
 - `install.sh` handles environment detection, installation, optional plugin staging, and verification.
 - `scripts/*.py` and `.github/workflows/ci.yml` form the validation layer.
@@ -40,12 +40,13 @@ python3 scripts/validate-markdown-links.py
 ## 2. Functionality
 
 ### Current State
-The public functionality consists of 10 `/tool-*` commands and three installer modes.
+The public functionality consists of 12 `/tool-*` commands and three installer modes.
 
 Public commands:
 - `/tool-quick`
 - `/tool-fix`
 - `/tool-feat`
+- `/tool-branch`
 - `/tool-plan`
 - `/tool-refactor`
 - `/tool-review`

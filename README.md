@@ -2,11 +2,11 @@
 
 <p align="center">
   <b>Token-aware AI agent development workflow router</b><br>
-  <sub>Quick Tasks · Bug Fix · Feature · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Statistics · Sync</sub>
+  <sub>Quick Tasks · Bug Fix · Feature · Branch · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Statistics · Sync</sub>
 </p>
 
 <p align="center">
-  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code> <code>/tool-update</code>
+  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-branch</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code> <code>/tool-update</code>
 </p>
 
 ---
@@ -46,7 +46,7 @@ The installer verifies pinned external repository SHAs before staging optional d
 This optimization cycle keeps the public interface stable:
 
 - `skill(name="engineer-shovel")` is unchanged.
-- All 11 `/tool-*` commands remain installed with the same names.
+- All 12 `/tool-*` commands remain installed with the same names.
 - `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
 - `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
 
@@ -88,6 +88,7 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 | `/tool-quick` | Obvious small edits |
 | `/tool-fix` | Bugs, failing tests, regressions |
 | `/tool-feat` | New functionality |
+| `/tool-branch` | Branch workflow: create, review, merge, abort |
 | `/tool-plan` | Requirements and implementation planning |
 | `/tool-refactor` | Behavior-preserving cleanup |
 | `/tool-review` | Local diff, PR, or deep review |
@@ -101,7 +102,7 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 
 ```text
 engineer-shovel/
-├── commands/          # 11 executable slash commands
+├── commands/          # 12 executable slash commands
 ├── docs/              # long-form references kept out of runtime context
 ├── scripts/           # sync and validation utilities
 ├── SKILL.md           # lightweight router

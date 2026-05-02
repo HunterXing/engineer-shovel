@@ -1,6 +1,6 @@
 # Engineer Shovel Workflows
 
-This document is the long-form reference for the 10 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
+This document is the long-form reference for the 12 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
 
 ## `/tool-quick`
 
@@ -25,6 +25,26 @@ Cost routing:
 - `--fast`: small feature in known location.
 - `--standard`: targeted exploration, plan, implement, test/build.
 - `--deep`: multi-component or ambiguous feature; use blueprint/GSD phases.
+
+## `/tool-branch`
+
+Use for managing feature branch lifecycle with squash merge and diff review.
+
+Subcommands:
+- `create [type] <description>`: Create branch from current with auto-detected type (feat/fix/refactor/docs).
+- `status`: Show branch info and diff stats vs source.
+- `review`: Show full diff for review before merge.
+- `merge`: Squash merge to source branch, prompt for commit message, delete branch.
+- `abort`: Discard branch and return to source.
+
+Auto-detection rules:
+- fix/bug/error/broken/crash/issue/problem → `fix`
+- add/new/feature/implement/support/create → `feat`
+- refactor/clean/optimize/improve/restructure → `refactor`
+- doc/readme/comment/typo/docs → `docs`
+- Default → `feat`
+
+Branch naming: `{type}/{slugified-description}`
 
 ## `/tool-plan`
 

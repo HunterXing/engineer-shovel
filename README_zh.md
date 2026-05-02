@@ -2,7 +2,7 @@
 
 **面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。**
 
-它提供 11 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、规划、重构、审查、头脑风暴、复杂项目、研究、token 统计和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
+它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、token 统计和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
 
 ## 快速开始
 
@@ -33,7 +33,7 @@ bash install.sh --target all
 这轮优化保持了公开接口不变：
 
 - `skill(name="engineer-shovel")` 不变。
-- 11 个 `/tool-*` 指令名称不变。
+- 12 个 `/tool-*` 指令名称不变。
 - `--minimal`、`--recommended`、`--full`、`--dry-run` 不变。
 - 新增 `--target opencode|claude|all|auto`，新机器可以明确选择安装到 OpenCode、Claude Code 或两者都装。
 
@@ -70,7 +70,7 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 
 ## 指令
 
-`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-brainstorm`、`/tool-blueprint`、`/tool-research`、`/tool-statistic`、`/tool-update`。
+`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-branch`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-brainstorm`、`/tool-blueprint`、`/tool-research`、`/tool-statistic`、`/tool-update`。
 
 ## 文档
 
