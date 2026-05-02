@@ -1,66 +1,31 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+---
+description: Complex multi-step project workflow — blueprint, execute, integrate, verify, ship
+argument-hint: [--standard|--deep] [project-name] [goal description]
+---
 
 # /tool-blueprint — Complex Multi-Step Projects
 
-**工兵铲 · 复杂项目工作流**
+**Input**: $ARGUMENTS
 
-## Pipeline
-```
-目标 → 蓝图 → 分步执行 → 集成 → 验证 → 发布
-```
+Use this only when the work cannot fit safely in a single small plan or PR.
 
-## Steps
+Compression: use `/caveman full` by default; use `/caveman ultra` for GSD phases or multi-agent summaries. Use RTK for repository scans and verification logs when available.
 
-### 1. 创建蓝图
-```bash
-/blueprint project-name "migrate database from SQLite to PostgreSQL"
-# 产出 plans/PLAN.md:
-#   - 分步拆解（1 PR/步）
-#   - 依赖关系图
-#   - 并行/串行安排
-#   - 每步回滚策略
-```
+## Cost Modes
 
-### 2. GSD 替代方案
-```bash
-/gsd-new-project "项目描述"
-/gsd-plan-phase      # 规划各阶段
-/gsd-execute-phase   # 执行各阶段
-```
+| Mode | Use when | Path |
+|---|---|---|
+| `--standard` or default | multi-step but clear project | `/blueprint` with dependency graph |
+| `--deep` | milestone-scale or long-running work | GSD project → discuss/plan/execute phases |
 
-### 3. 分步执行
-每步使用对应的工作流:
-- 新功能 → `/tool-feat`
-- 重构 → `/tool-refactor`
-- Bug修复 → `/tool-fix`
+## Flow
 
-### 4. 跨阶段集成检查
-```bash
-/gsd-verify-work   # 对话式 UAT
-/gsd-audit-uat     # 跨阶段 UAT 审计
-```
+1. Create a blueprint with independently verifiable steps.
+2. Mark dependencies and parallelizable work.
+3. Execute each step with the matching `/tool-*` workflow.
+4. Run integration verification after dependent steps connect.
+5. Use deep review/ship flow only after verification passes.
 
-### 5. 最终审查
-```bash
-/review-work
-```
+## Guardrail
 
-### 6. 发布
-```bash
-/gsd-pr-branch     # 创建干净的 PR 分支
-/gsd-ship          # PR + 审查 + 合并
-/gsd-complete-milestone  # 归档里程碑
-```
-
-## Blueprint 结构
-```
-plans/$PROJECT-$FEATURE.md
-  每步包含:
-  ├── Context Brief（新鲜 agent 可直接执行）
-  ├── Task Checklist
-  ├── Verification Commands
-    └── Exit Criteria
-```
-
----
-> Load the skill first: `skill(name="engineer-shovel")`
+If the task is under 3 files and requirements are clear, use `/tool-quick` or `/tool-feat` instead.
