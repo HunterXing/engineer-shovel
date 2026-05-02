@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-research — Deep Research
 
 **工兵铲 · 深度研究工作流**
@@ -38,3 +40,6 @@ ecc_github_search_code(q="$TECHNIQUE language:typescript")
 - 原型: `/gsd-fast "build poc"`
 - 完整功能: `/tool-plan` → `/tool-feat`
 - 先研究: 继续 `/deep-research`
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

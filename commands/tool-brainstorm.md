@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-brainstorm — Brainstorming & Exploration
 
 **工兵铲 · 头脑风暴工作流**
@@ -50,3 +52,6 @@
 | 有没有现成方案 | `/search-first` / `/deep-research` |
 | 快速捕捉 | `/gsd-note` |
 | 多选项决策 | `/council` |
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

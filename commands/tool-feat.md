@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-feat — New Feature Development
 
 **工兵铲 · 新功能开发工作流**
@@ -50,3 +52,6 @@ git add . && git commit -m "feat: $DESCRIPTION"
 | Backend | `deep` | backend-patterns, api-design |
 | Full Stack | `deep` | fullstack-dev, tdd-workflow |
 | Data/DB | `deep` | postgres-patterns, database-migrations |
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

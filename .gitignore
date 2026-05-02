@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# OpenCode session data
+.git/opencode/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

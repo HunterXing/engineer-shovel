@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-review — Code Review
 
 **工兵铲 · 代码审查工作流**
@@ -46,3 +48,6 @@
 | 重大实现 | `/review-work` |
 | 安全敏感 | `/security-review` → `/security-scan` |
 | 快速检查 | `/caveman:caveman-review` |
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-fix — Bug Fixing
 
 **工兵铲 · Bug 修复工作流**
@@ -52,3 +54,6 @@ git add . && git commit -m "fix: $ROOT_CAUSE"
 | 单函数 | 直接修复 → test |
 | 跨文件 | /gsd-debug → task(deep) → test |
 | 安全漏洞 | /security-review → fix → /security-scan |
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-refactor — Refactoring
 
 **工兵铲 · 重构工作流**
@@ -53,3 +55,6 @@ git add . && git commit -m "refactor: $SCOPE"
 3. 不混入新功能 — refactor + feature 分开
 4. 性能不降 — 对比基准
 5. 必须有审查 — 重构容易引入隐蔽 bug
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

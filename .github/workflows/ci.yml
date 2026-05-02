@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh; do
+            test -f "$f" && echo "✅ $f" || { echo "❌ $f missing"; exit 1; }
+          done
+
+      - name: Check commands directory
+        run: |
+          for f in commands/tool-{feat,fix,plan,refactor,review,brainstorm,quick,blueprint,research}.md; do
+            test -f "$f" && echo "✅ $f" || echo "⚠️  $f missing"
+          done
+
+      - name: Lint shell scripts
+        run: |
+          if command -v shellcheck &>/dev/null; then
+            shellcheck install.sh && echo "✅ shellcheck passed"
+          else
+            echo "⚠️  shellcheck not available, skipping"
+          fi
+        shell: bash

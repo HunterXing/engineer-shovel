@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-plan — Planning & Blueprint
 
 **工兵铲 · 规划工作流**
@@ -45,3 +47,6 @@
 | 中等 (3-8 files) | `/plan` → `/prp-implement` |
 | 复杂 (多组件) | `/blueprint` → 分步执行 |
 | 不确定方案 | `/deep-research` → `/gsd-explore` → `/plan` |
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

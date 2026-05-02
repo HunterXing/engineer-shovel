@@ -1,3 +1,5 @@
+> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+
 # /tool-blueprint — Complex Multi-Step Projects
 
 **工兵铲 · 复杂项目工作流**
@@ -57,5 +59,8 @@ plans/$PROJECT-$FEATURE.md
   ├── Context Brief（新鲜 agent 可直接执行）
   ├── Task Checklist
   ├── Verification Commands
-  └── Exit Criteria
+    └── Exit Criteria
 ```
+
+---
+> Load the skill first: `skill(name="engineer-shovel")`

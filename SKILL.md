@@ -3,7 +3,7 @@ name: 工兵铲
 display_name: engineer-shovel
 description: |
   工兵铲 (Engineer Shovel) — AI 代理多功能开发工具。
-  基于 OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk 工具链的完整工作流技能。
+  基于 OpenCode + superpowers + ecc + gsd + + Caveman + rtk 工具链的完整工作流技能。
   封装为独立指令: /tool-feat /tool-fix /tool-plan /tool-refactor /tool-review /tool-brainstorm /tool-quick /tool-blueprint /tool-research
   覆盖新功能、Bug修复、头脑风暴、重构、代码审查、快速任务、复杂项目、深度研究 8 大场景。
   包含决策树、Token 管理、语言参考、命令速查表。
@@ -699,6 +699,6 @@ skill(name="engineer-shovel")
 
 ---
 
-*Generated for OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk toolchain*
+*Generated for OpenCode + superpowers + ecc + gsd + + Caveman + rtk toolchain*
 *Claude Code variant: superpowers + ecc + gsd + Caveman + rtk*
 *Last updated: 2026-05-01*
