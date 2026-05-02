@@ -1,6 +1,13 @@
 ---
 description: Complex multi-step project workflow — blueprint, execute, integrate, verify, ship
 argument-hint: [--standard|--deep] [project-name] [goal description]
+cost-profile: high
+risk-level: high
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Bash, Task]
+escalates-to: [/blueprint, GSD]
+depends-on: [/tool-plan, /tool-research]
+when-to-use: Use for multi-step or multi-session projects that cannot safely fit in a single small plan or PR.
 ---
 
 # /tool-blueprint — Complex Multi-Step Projects

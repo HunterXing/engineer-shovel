@@ -1,6 +1,13 @@
 ---
 description: Brainstorming workflow — refine ideas and route to action
 argument-hint: [--fast|--standard|--deep] [idea or topic]
+cost-profile: variable
+risk-level: low
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Task]
+escalates-to: [/tool-plan, /tool-research, /tool-blueprint]
+depends-on: []
+when-to-use: Use when an idea is not implementation-ready and needs assumptions, options, or routing clarified first.
 ---
 
 # /tool-brainstorm — Brainstorming & Exploration

@@ -1,6 +1,13 @@
 ---
 description: Planning workflow — choose the right planning depth before execution
 argument-hint: [--fast|--standard|--deep] [goal description]
+cost-profile: medium
+risk-level: medium
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Bash, Task]
+escalates-to: [/tool-blueprint, /tool-research]
+depends-on: []
+when-to-use: Use when execution order, affected files, risks, or verification criteria are not obvious.
 ---
 
 # /tool-plan — Planning
