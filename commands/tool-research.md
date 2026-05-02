@@ -16,15 +16,13 @@ when-to-use: Use when a decision needs local, official, current, or multi-source
 
 Start narrow. Add sources only when the answer needs current or external evidence.
 
-Compression: use `/caveman full` for normal research and `/caveman ultra` for deep multi-source synthesis. RTK only helps shell/tool outputs, not web summaries.
+Compression: follow `docs/token-cost.md`; use full for normal research, ultra for deep synthesis, and RTK only for shell/tool output.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--quick` or default | local docs, known library, simple comparison | targeted docs/search |
-| `--web` | current facts or official docs needed | web/docs search + concise synthesis |
-| `--deep` | strategic decision, conflicting evidence, unfamiliar ecosystem | multi-source research + examples + tradeoff report |
+- `--quick` or default: local docs, known library, simple comparison → targeted docs/search.
+- `--web`: current facts or official docs needed → web/docs search + concise synthesis.
+- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → multi-source research + examples + tradeoff report.
 
 ## Flow
 

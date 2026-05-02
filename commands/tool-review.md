@@ -16,15 +16,13 @@ when-to-use: Use for local diffs, pull requests, or post-implementation review w
 
 Choose the cheapest review mode that can catch the relevant failure class.
 
-Compression: `--fast` should use Caveman review style; default to `/caveman full`; use `/caveman ultra` for deep review summaries. Use RTK for diff/log-producing shell commands.
+Compression: follow `docs/token-cost.md`; use Caveman review style for `--fast`, full by default, ultra for deep summaries, and RTK for diffs/logs.
 
 ## Cost Modes
 
-| Mode | Use when | Command |
-|---|---|---|
-| `--fast` | quick sanity check or small local diff | `/caveman:caveman-review` |
-| `--standard` or default | local diff or normal PR | `/code-review` or `/review-pr $ARGUMENTS` |
-| `--deep` | major implementation, security, broad refactor | `/review-work` |
+- `--fast`: quick sanity check or small local diff → `/caveman:caveman-review`.
+- `--standard` or default: local diff or normal PR → `/code-review` or `/review-pr $ARGUMENTS`.
+- `--deep`: major implementation, security, broad refactor → `/review-work`.
 
 ## Flow
 
