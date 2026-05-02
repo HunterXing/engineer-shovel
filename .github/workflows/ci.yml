@@ -15,28 +15,24 @@ jobs:
       - name: Check required files
         run: |
           set -euo pipefail
-          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh docs/workflows.md docs/token-cost.md docs/install.md docs/language-reference.md; do
+          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh scripts/inventory.py scripts/validate-command-schema.py scripts/validate-references.py scripts/validate-markdown-links.py scripts/token-benchmark.py scripts/validate-installer-sources.py docs/workflows.md docs/token-cost.md docs/install.md docs/language-reference.md; do
             test -f "$f" || { echo "missing: $f"; exit 1; }
           done
 
-      - name: Validate command files
-        run: |
-          set -euo pipefail
-          expected=(feat fix plan refactor review brainstorm quick blueprint research statistic)
-          count=0
-          for name in "${expected[@]}"; do
-            file="commands/tool-${name}.md"
-            test -f "$file" || { echo "missing: $file"; exit 1; }
-            count=$((count + 1))
-            first_line=$(sed -n '1p' "$file")
-            third_line=$(sed -n '3p' "$file")
-            grep -q '^description:' "$file" || { echo "missing description: $file"; exit 1; }
-            grep -q '^argument-hint:' "$file" || { echo "missing argument-hint: $file"; exit 1; }
-            test "$first_line" = "---" || { echo "bad frontmatter start: $file"; exit 1; }
-            test "$third_line" != "---" || { echo "argument-hint should precede closing frontmatter: $file"; exit 1; }
-          done
-          actual=$(find commands -maxdepth 1 -name 'tool-*.md' | wc -l | tr -d ' ')
-          test "$actual" = "$count" || { echo "unexpected command count: $actual"; exit 1; }
+      - name: Validate command schema
+        run: python3 scripts/validate-command-schema.py
+
+      - name: Validate command references
+        run: python3 scripts/validate-references.py
+
+      - name: Validate markdown links
+        run: python3 scripts/validate-markdown-links.py
+
+      - name: Validate installer source pins
+        run: python3 scripts/validate-installer-sources.py
+
+      - name: Compile validation scripts
+        run: python3 -m py_compile scripts/*.py
 
       - name: Check token-efficiency guardrails
         run: |
@@ -54,12 +50,23 @@ jobs:
       - name: Check shell syntax
         run: bash -n install.sh
 
-      - name: Lint shell script when shellcheck is available
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Lint shell script
         run: |
           set -euo pipefail
-          if command -v shellcheck >/dev/null 2>&1; then
-            shellcheck install.sh
-          else
-            echo "shellcheck not available, skipped"
-          fi
+          shellcheck install.sh
         shell: bash
+
+      - name: Validate installer dry-run
+        run: bash install.sh --minimal --dry-run
+
+      - name: Validate recommended installer dry-run
+        run: bash install.sh --recommended --dry-run
+
+      - name: Validate full installer dry-run
+        run: bash install.sh --full --dry-run
+
+      - name: Generate static token benchmark
+        run: python3 scripts/token-benchmark.py
