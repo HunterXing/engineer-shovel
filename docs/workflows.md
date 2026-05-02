@@ -1,0 +1,80 @@
+# Engineer Shovel Workflows
+
+This document is the long-form reference for the 9 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
+
+## `/tool-quick`
+
+Use for obvious, low-risk work: typo fixes, config changes, simple renames, or 1-2 file edits.
+
+Default path: execute inline, run targeted verification, then commit only if the user explicitly asked for a commit.
+
+## `/tool-fix`
+
+Use for broken behavior, failing tests, or regressions.
+
+Cost routing:
+- `--fast`: known file/function, clear cause, direct fix.
+- `--standard`: reproduce, inspect related code, add or run regression tests.
+- `--deep`: cross-file, flaky, security-sensitive, or not reproducible; use GSD debugging and optionally Oracle.
+
+## `/tool-feat`
+
+Use for new functionality.
+
+Cost routing:
+- `--fast`: small feature in known location.
+- `--standard`: targeted exploration, plan, implement, test/build.
+- `--deep`: multi-component or ambiguous feature; use blueprint/GSD phases.
+
+## `/tool-plan`
+
+Use before implementation when requirements, dependencies, or verification criteria are unclear.
+
+Planning depth:
+- Simple: short inline plan.
+- Medium: file-backed plan with risks and verification.
+- Complex: blueprint or GSD project phase plan.
+
+## `/tool-refactor`
+
+Use when external behavior must remain unchanged.
+
+Required pattern:
+1. Establish baseline tests/build.
+2. Make one logical refactor at a time.
+3. Re-run verification.
+4. Review using the cheapest mode that fits risk.
+
+Use `/review-work` only for broad or high-risk refactors.
+
+## `/tool-review`
+
+Modes:
+- `--fast`: Caveman-compressed review for routine local diffs.
+- default: local or PR review using normal review tools.
+- `--deep`: post-implementation review for significant, risky, or security-sensitive work.
+
+## `/tool-brainstorm`
+
+Use when the idea is not implementation-ready. Capture the decision and route to quick, feature, plan, research, or backlog.
+
+## `/tool-blueprint`
+
+Use for multi-step projects, multi-session work, or changes that need dependency ordering. Prefer one independently verifiable step per PR.
+
+## `/tool-research`
+
+Modes:
+- `--quick`: local docs and known references.
+- `--web`: add current web/docs search.
+- `--deep`: multi-source research, code examples, synthesis, and conflict analysis.
+
+## `/tool-statistic`
+
+Use when you want to know how many tokens the current session saved.
+
+Reporting rules:
+- Prefer `/caveman-stats` for real Caveman session numbers.
+- Use RTK's own statistics only if the installed RTK integration exposes them.
+- Keep Caveman and RTK numbers separate unless both are measured.
+- Never invent exact savings from estimates.
