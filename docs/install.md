@@ -2,6 +2,8 @@
 
 `install.sh` supports interactive setup plus explicit non-interactive flags. In a terminal, running `./install.sh` asks whether to install for OpenCode, Claude Code, both, or auto-detection, then asks for the install mode. Use `--dry-run` with any mode to preview target paths and pinned external sources without writing files.
 
+**Default mode is `--full`** which installs all components: ECC, GSD, superpowers, Caveman, RTK, engineer-shovel skill, and commands.
+
 ## Sync & Update
 
 Use the `/tool-update` command or `scripts/sync.py` to check and update your installation:
@@ -34,10 +36,16 @@ Or use the slash command:
 Choose where the skill and slash commands are installed:
 
 ```bash
-./install.sh --target opencode --recommended
-./install.sh --target claude --recommended
-./install.sh --target all --recommended
-./install.sh --target auto --recommended
+# Default: full mode with all components
+./install.sh --target opencode
+./install.sh --target claude
+./install.sh --target all
+./install.sh --target auto
+
+# Explicit mode selection
+./install.sh --target opencode --full        # Same as default
+./install.sh --target opencode --recommended # Skill + commands + Caveman
+./install.sh --target opencode --minimal     # Skill + commands only
 ```
 
 - `opencode` installs the skill to `~/.agents/skills/engineer-shovel/` and commands to `~/.config/opencode/commands/`.

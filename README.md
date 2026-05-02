@@ -20,25 +20,23 @@ The runtime `SKILL.md` is intentionally small; long-form documentation lives in 
 ## Quick Start
 
 ```bash
-# Recommended: download, inspect, then run
+# Download, inspect, then run (default: full mode with all components)
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh
 bash install.sh
 
-# Non-interactive OpenCode install
-bash install.sh --target opencode --recommended
+# Non-interactive: full install for OpenCode (default)
+bash install.sh --target opencode
 
-# Install for both OpenCode and Claude Code
-bash install.sh --target all --recommended
+# Non-interactive: full install for both OpenCode and Claude Code
+bash install.sh --target all
 
 # Shortcut if you already trust the source:
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
-# Minimal: only engineer-shovel skill and slash commands
-./install.sh --target opencode --minimal
-
-# Full: ECC, GSD, superpowers, Caveman, RTK, engineer-shovel
-./install.sh --target opencode --full
+# Other modes
+./install.sh --target opencode --recommended  # Skill + commands + Caveman
+./install.sh --target opencode --minimal      # Skill + commands only
 ```
 
 The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.

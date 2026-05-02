@@ -7,25 +7,23 @@
 ## 快速开始
 
 ```bash
-# 推荐：先下载、检查，再运行
+# 下载、检查、运行（默认：全量安装所有组件）
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh
 bash install.sh
 
-# 非交互安装到 OpenCode
-bash install.sh --target opencode --recommended
+# 非交互安装：OpenCode 全量（默认）
+bash install.sh --target opencode
 
-# 同时安装到 OpenCode 和 Claude Code
-bash install.sh --target all --recommended
+# 非交互安装：同时安装到 OpenCode 和 Claude Code
+bash install.sh --target all
 
 # 如果你已经信任来源，也可以使用快捷方式：
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
-# 最小安装：只安装 engineer-shovel skill 和命令
-./install.sh --target opencode --minimal
-
-# 全量安装：ECC, GSD, superpowers, Caveman, RTK, engineer-shovel
-./install.sh --target opencode --full
+# 其他模式
+./install.sh --target opencode --recommended  # Skill + 命令 + Caveman
+./install.sh --target opencode --minimal      # 只安装 Skill + 命令
 ```
 
 安装器会在 staging 可选依赖前校验外部仓库的 pinned SHA。相比直接 pipe 到 Bash，先下载再执行更安全，因为你可以检查脚本内容，也能避免服务端根据 pipe 场景返回不同内容。
