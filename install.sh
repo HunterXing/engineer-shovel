@@ -9,23 +9,20 @@ REPO_NAME="engineer-shovel"
 REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
 
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
-CAVEMAN_REPO="https://github.com/JuliusBrussee/caveman"
-SUPERPOWERS_REPO="https://github.com/anthropics/claude-plugins-official.git"
 RTK_REPO="https://github.com/rtk-ai/rtk"
 
 ECC_SHA="841beea45cb25ba51f29fa45b7e272938d19b80a"
-CAVEMAN_SHA="ef6050c5e1848b6880ff47c32ade1a608a64f85e"
-SUPERPOWERS_SHA="b392f51899343f35a203260a4b344803de236d13"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
 
-MODE="recommended"
+MODE="full"
 MODE_SET=0
 TARGET="auto"
 TARGET_SET=0
+SCOPE="global"
+SCOPE_SET=0
 ENV="opencode"
 SKILL_DIR="$HOME/.agents/skills"
 COMMAND_DIR="$HOME/.config/opencode/commands"
-PLUGIN_MARKETPLACE_DIR="$HOME/.claude/plugins/marketplaces"
 PLUGIN_CACHE_DIR="$HOME/.claude/plugins/cache"
 DRY_RUN=0
 FAILURES=0
@@ -39,12 +36,13 @@ err() { printf '✘ %s\n' "$1" >&2; }
 
 usage() {
   cat <<'USAGE'
-Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|all|auto]
+Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|all|auto] [--scope global|local]
 
 Modes:
   --minimal      Install only engineer-shovel skill and slash commands.
-  --recommended Install skill, commands, and Caveman plugin staging. Default.
-  --full         Install/stage ECC, superpowers, Caveman, RTK, skill, commands.
+  --recommended Install skill, commands, and Caveman plugin.
+  --full         Install ECC, GSD, superpowers, Caveman, RTK, engineer-shovel skill, and commands.
+                  Interactive default.
   --dry-run      Print planned actions without writing files or cloning repos.
 
 Targets:
@@ -53,7 +51,14 @@ Targets:
   --target claude    Install Claude Code skill and slash commands.
   --target all       Install both OpenCode and Claude Code skill/commands.
 
-When run in a terminal without an explicit mode or target, the installer prompts interactively.
+Scope:
+  --scope global  Install to home directory (~/.agents/skills, ~/.config/opencode/, ~/.claude/).
+                  Default for non-interactive use.
+  --scope local   Install to project directory (./.agents/skills, ./.opencode/, ./.claude/).
+                  ECC skipped (no project-scope support). RTK is system-wide and stays global.
+
+When run in a terminal without explicit mode/target/scope, the installer prompts interactively
+in order: target → mode → scope.
 USAGE
 }
 
@@ -77,6 +82,19 @@ parse_args() {
       --opencode) TARGET="opencode"; TARGET_SET=1 ;;
       --claude|--claude-code) TARGET="claude"; TARGET_SET=1 ;;
       --all) TARGET="all"; TARGET_SET=1 ;;
+      --scope)
+        if [[ $# -lt 2 ]]; then
+          err "Missing value for --scope"
+          usage
+          exit 1
+        fi
+        SCOPE="$2"
+        SCOPE_SET=1
+        shift
+        ;;
+      --scope=*) SCOPE="${1#--scope=}"; SCOPE_SET=1 ;;
+      --global) SCOPE="global"; SCOPE_SET=1 ;;
+      --local) SCOPE="local"; SCOPE_SET=1 ;;
       --dry-run) DRY_RUN=1 ;;
       -h|--help) usage; exit 0 ;;
       *) err "Unknown option: $1"; usage; exit 1 ;;
@@ -113,17 +131,33 @@ prompt_mode() {
   local choice
   cat <<'PROMPT'
 Select install mode:
-  1) Recommended: skill + commands + Caveman staging
-  2) Minimal: skill + commands only
-  3) Full: ECC/GSD + superpowers + Caveman + RTK + skill + commands
+   1) Full: ECC, GSD, superpowers, Caveman, RTK, engineer-shovel skill, and commands (default)
+  2) Recommended: skill + commands + Caveman
+  3) Minimal: skill + commands only
 PROMPT
   printf 'Mode [1]: '
   read -r choice
   case "${choice:-1}" in
-    1|recommended|Recommended) MODE="recommended" ;;
-    2|minimal|Minimal) MODE="minimal" ;;
-    3|full|Full) MODE="full" ;;
+    1|full|Full) MODE="full" ;;
+    2|recommended|Recommended) MODE="recommended" ;;
+    3|minimal|Minimal) MODE="minimal" ;;
     *) err "Invalid mode selection: ${choice}"; exit 1 ;;
+  esac
+}
+
+prompt_scope() {
+  local choice
+  cat <<'PROMPT'
+Select install scope:
+  1) Global: install to home directory (~/.agents/skills, ~/.claude/, etc.) (default)
+  2) Local: install to project directory (./.agents/skills, ./.opencode/, etc.)
+PROMPT
+  printf 'Scope [1]: '
+  read -r choice
+  case "${choice:-1}" in
+    1|global|Global) SCOPE="global" ;;
+    2|local|Local) SCOPE="local" ;;
+    *) err "Invalid scope selection: ${choice}"; exit 1 ;;
   esac
 }
 
@@ -134,6 +168,9 @@ configure_interactive_choices() {
     fi
     if [[ "$MODE_SET" -eq 0 ]]; then
       prompt_mode
+    fi
+    if [[ "$SCOPE_SET" -eq 0 ]]; then
+      prompt_scope
     fi
   fi
 }
@@ -240,18 +277,35 @@ resolve_targets() {
   esac
 }
 
+validate_scope() {
+  case "$SCOPE" in
+    global|local) ;;
+    *) err "Invalid scope: ${SCOPE}. Must be 'global' or 'local'."; usage; exit 1 ;;
+  esac
+}
+
 set_target_paths() {
   local target="$1"
   case "$target" in
     opencode)
       ENV="opencode"
-      SKILL_DIR="$HOME/.agents/skills"
-      COMMAND_DIR="$HOME/.config/opencode/commands"
+      if [[ "$SCOPE" == "local" ]]; then
+        SKILL_DIR="./.agents/skills"
+        COMMAND_DIR="./.opencode/commands"
+      else
+        SKILL_DIR="$HOME/.agents/skills"
+        COMMAND_DIR="$HOME/.config/opencode/commands"
+      fi
       ;;
     claude-code)
       ENV="claude-code"
-      SKILL_DIR="$HOME/.claude/skills"
-      COMMAND_DIR="$HOME/.claude/commands"
+      if [[ "$SCOPE" == "local" ]]; then
+        SKILL_DIR="./.claude/skills"
+        COMMAND_DIR="./.claude/commands"
+      else
+        SKILL_DIR="$HOME/.claude/skills"
+        COMMAND_DIR="$HOME/.claude/commands"
+      fi
       ;;
     *) err "Unknown resolved target: ${target}"; exit 1 ;;
   esac
@@ -261,7 +315,7 @@ prepare_target_dirs() {
   local target="$1"
   set_target_paths "$target"
   run_or_print mkdir -p "$SKILL_DIR" "$COMMAND_DIR"
-  ok "Mode: ${MODE}; target: ${ENV}; skill_dir: ${SKILL_DIR}; command_dir: ${COMMAND_DIR}"
+  ok "Mode: ${MODE}; target: ${ENV}; scope: ${SCOPE}; skill_dir: ${SKILL_DIR}; command_dir: ${COMMAND_DIR}"
 }
 
 copy_or_download_file() {
@@ -302,26 +356,112 @@ install_commands() {
   ok "Installed ${count} slash commands → ${COMMAND_DIR}/"
 }
 
-stage_caveman() {
-  local plugin_dir="$PLUGIN_MARKETPLACE_DIR/caveman"
+# ---------- Caveman: OpenCode (native) ----------
 
-  if [[ -d "$PLUGIN_CACHE_DIR/caveman/caveman" ]]; then
-    ok "Caveman already installed"
+_caveman_opencode_installed() {
+  local out
+  out="$(npx -y skills list 2>/dev/null)" || true
+  echo "$out" | grep -qi caveman
+}
+
+install_caveman_opencode() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$SCOPE" == "local" ]]; then
+      warn "DRY-RUN: Local OpenCode Caveman scope is not natively supported by npx skills add."
+      warn "  Would install globally via: npx skills add JuliusBrussee/caveman -a opencode"
+      warn "  OpenCode discovers skills from ~/.agents/skills/ regardless of project scope."
+    fi
+    info "DRY-RUN: npx skills add JuliusBrussee/caveman -a opencode"
     return 0
   fi
 
-  ensure_tmp_root
-  local checkout_dir="$TMP_ROOT/caveman"
-  if clone_pinned_repo "$CAVEMAN_REPO" "$CAVEMAN_SHA" "$checkout_dir"; then
-    run_or_print mkdir -p "$plugin_dir"
-    run_or_print cp -r "$checkout_dir/." "$plugin_dir/"
-    ok "Staged Caveman plugin → ${plugin_dir}"
+  if _caveman_opencode_installed; then
+    ok "Caveman already installed for OpenCode"
+    return 0
+  fi
+
+  if [[ "$SCOPE" == "local" ]]; then
+    warn "Local OpenCode Caveman scope: npx skills add does not have a native project-scope flag."
+    warn "  Installing globally. OpenCode discovers skills from ~/.agents/skills/ regardless."
+  fi
+
+  if npx -y skills add JuliusBrussee/caveman -a opencode; then
+    ok "Caveman installed for OpenCode via npx skills add"
   else
-    record_failure "Could not stage Caveman. Install manually: /plugin install caveman@caveman"
+    local rc=$?
+    record_failure "Caveman OpenCode install failed (exit ${rc}). Install manually: npx skills add JuliusBrussee/caveman -a opencode"
   fi
 }
 
+# ---------- Caveman: Claude Code (native) ----------
+
+_caveman_claude_installed() {
+  local out
+  out="$(claude plugin list 2>/dev/null)" || true
+  echo "$out" | grep -qi caveman
+}
+
+install_caveman_claude() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$SCOPE" == "local" ]]; then
+      warn "DRY-RUN: Project-scope Claude plugin install is provisional."
+      warn "  Would attempt: claude plugin install caveman@caveman --scope project"
+      warn "  If --scope project unsupported, fall back to global: claude plugin install caveman@caveman --scope user"
+    fi
+    info "DRY-RUN: claude plugin marketplace add JuliusBrussee/caveman"
+    local scope_flag="--scope user"
+    if [[ "$SCOPE" == "local" ]]; then
+      scope_flag="--scope project"
+    fi
+    info "DRY-RUN: claude plugin install caveman@caveman ${scope_flag}"
+    return 0
+  fi
+
+  if _caveman_claude_installed; then
+    ok "Caveman already installed for Claude Code"
+    return 0
+  fi
+
+  if [[ "$SCOPE" == "local" ]]; then
+    warn "Project-scope Claude plugin install is provisional (upstream may not fully support --scope project)."
+    warn "  Attempting project-scope install. If this fails, retry globally:"
+    warn "    claude plugin install caveman@caveman --scope user"
+  fi
+
+  claude plugin marketplace add JuliusBrussee/caveman || \
+    warn "Caveman marketplace may already be registered (non-zero exit is harmless)"
+
+  local scope_flag="--scope user"
+  if [[ "$SCOPE" == "local" ]]; then
+    scope_flag="--scope project"
+  fi
+
+  if claude plugin install caveman@caveman $scope_flag; then
+    ok "Caveman installed for Claude Code via claude plugin install ${scope_flag}"
+  else
+    local rc=$?
+    record_failure "Caveman Claude install failed (exit ${rc}). Manually: claude plugin install caveman@caveman ${scope_flag}"
+  fi
+}
+
+# ---------- Caveman: target dispatcher ----------
+
+_install_caveman_for_targets() {
+  local target
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      opencode) install_caveman_opencode ;;
+      claude-code) install_caveman_claude ;;
+    esac
+  done
+}
+
 install_ecc() {
+  if [[ "$SCOPE" == "local" ]]; then
+    info "ECC does not support local (project-scoped) installation. Skipping ECC."
+    info "Use --scope global or install ECC separately."
+    return 0
+  fi
   if [[ -d "$PLUGIN_CACHE_DIR/ecc/ecc" || -d "$HOME/.claude/ecc" || -d "${OPENCODE_HOME:-$HOME/.config/opencode}/ecc" ]]; then
     ok "ECC already installed"
     return 0
@@ -355,26 +495,87 @@ install_ecc() {
   fi
 }
 
-stage_superpowers() {
-  local plugin_dir="$PLUGIN_MARKETPLACE_DIR/claude-plugins-official"
+_gsd_provisioned() {
+  local target check_dir
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      opencode)
+        if [[ "$SCOPE" == "local" ]]; then
+          check_dir="./.opencode/commands"
+        else
+          check_dir="$HOME/.config/opencode/commands"
+        fi
+        ;;
+      claude-code)
+        if [[ "$SCOPE" == "local" ]]; then
+          check_dir="./.claude/commands"
+        else
+          check_dir="$HOME/.claude/commands"
+        fi
+        ;;
+      *) return 1 ;;
+    esac
+    ls "$check_dir"/gsd-* >/dev/null 2>&1 || return 1
+  done
+  return 0
+}
 
-  if [[ -d "$PLUGIN_CACHE_DIR/claude-plugins-official/superpowers" ]]; then
-    ok "superpowers already installed"
+install_gsd() {
+  local gsd_target=""
+  case "$TARGET" in
+    opencode) gsd_target="--opencode" ;;
+    claude|claude-code) gsd_target="--claude" ;;
+    all) gsd_target="--both" ;;
+  esac
+
+  local gsd_scope=""
+  case "$SCOPE" in
+    global) gsd_scope="--global" ;;
+    local) gsd_scope="--local" ;;
+  esac
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: npx -y get-shit-done-cc@latest ${gsd_target} ${gsd_scope}"
     return 0
   fi
 
-  ensure_tmp_root
-  local checkout_dir="$TMP_ROOT/superpowers"
-  if clone_pinned_repo "$SUPERPOWERS_REPO" "$SUPERPOWERS_SHA" "$checkout_dir"; then
-    run_or_print mkdir -p "$plugin_dir"
-    run_or_print cp -r "$checkout_dir/." "$plugin_dir/"
-    ok "Staged superpowers marketplace → ${plugin_dir}"
+  if _gsd_provisioned; then
+    ok "GSD already installed for ${TARGET} / ${SCOPE}"
+    return 0
+  fi
+
+  info "Installing GSD via official installer (npx get-shit-done-cc@latest)..."
+  local gsd_output
+  if gsd_output="$(npx -y get-shit-done-cc@latest "${gsd_target}" "${gsd_scope}" 2>&1)"; then
+    printf '%s\n' "$gsd_output"
+    ok "GSD installed"
   else
-    record_failure "Could not stage pinned superpowers source. Install manually: /plugin install superpowers@claude-plugins-official"
+    local gsd_rc=$?
+    printf '%s\n' "$gsd_output" >&2
+    record_failure "GSD installer exited with code ${gsd_rc}; run manually: npx -y get-shit-done-cc@latest ${gsd_target} ${gsd_scope}"
   fi
 }
 
+install_superpowers() {
+  local target
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      opencode)
+        info "superpowers (claude-plugins-official marketplace) is Claude-only; skipped for OpenCode"
+        ;;
+      claude-code)
+        info "claude-plugins-official marketplace is built-in to Claude Code; no install needed"
+        ;;
+    esac
+  done
+}
+
 install_rtk() {
+  if [[ "$SCOPE" == "local" ]]; then
+    info "RTK is a system tool — installs globally regardless of scope selection."
+    info "Binary will be installed to ~/.local/bin/ or ~/.cargo/bin/."
+  fi
+
   if command -v rtk >/dev/null 2>&1; then
     ok "RTK already installed"
     return 0
@@ -389,10 +590,18 @@ install_rtk() {
 
 configure_memory_hint() {
   local file=""
-  if [[ "$ENV" == "opencode" && -f "$HOME/.config/opencode/AGENTS.md" ]]; then
-    file="$HOME/.config/opencode/AGENTS.md"
-  elif [[ "$ENV" == "claude-code" && -f "$HOME/.claude/CLAUDE.md" ]]; then
-    file="$HOME/.claude/CLAUDE.md"
+  if [[ "$ENV" == "opencode" ]]; then
+    if [[ "$SCOPE" == "local" ]]; then
+      file="./AGENTS.md"
+    elif [[ -f "$HOME/.config/opencode/AGENTS.md" ]]; then
+      file="$HOME/.config/opencode/AGENTS.md"
+    fi
+  elif [[ "$ENV" == "claude-code" ]]; then
+    if [[ "$SCOPE" == "local" ]]; then
+      file="./CLAUDE.md"
+    elif [[ -f "$HOME/.claude/CLAUDE.md" ]]; then
+      file="$HOME/.claude/CLAUDE.md"
+    fi
   fi
 
   if [[ -n "$file" && -f "$file" ]] && ! grep -q "engineer-shovel" "$file" 2>/dev/null; then
@@ -445,6 +654,7 @@ main() {
   trap cleanup_tmp EXIT
   parse_args "$@"
   configure_interactive_choices
+  validate_scope
   check_prereqs
   resolve_targets
 
@@ -452,12 +662,13 @@ main() {
     minimal)
       ;;
     recommended)
-      stage_caveman
+      _install_caveman_for_targets
       ;;
     full)
       install_ecc
-      stage_superpowers
-      stage_caveman
+      install_gsd
+      install_superpowers
+      _install_caveman_for_targets
       install_rtk
       ;;
   esac
@@ -467,7 +678,7 @@ main() {
     install_core_for_target "$target"
   done
 
-  info "Installed targets: ${TARGETS[*]}"
+  info "Installed targets: ${TARGETS[*]}  scope: ${SCOPE}  mode: ${MODE}"
   for target in "${TARGETS[@]}"; do
     set_target_paths "$target"
     info "${ENV}: skill=${SKILL_DIR}/engineer-shovel/SKILL.md commands=${COMMAND_DIR}/tool-*.md"
