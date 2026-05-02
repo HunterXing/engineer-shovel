@@ -12,6 +12,13 @@ Thumbs.db
 # OpenCode session data
 .git/opencode/
 
+# Environment
+.env
+.env.*
+
+# Local overrides
+*.local
+
 # Editor
 .vscode/
 .idea/
