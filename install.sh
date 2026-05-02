@@ -356,91 +356,80 @@ install_commands() {
   ok "Installed ${count} slash commands → ${COMMAND_DIR}/"
 }
 
-# ---------- Caveman: OpenCode (native) ----------
+# ---------- Caveman: Official installer ----------
 
-_caveman_opencode_installed() {
-  local out
-  out="$(npx -y skills list 2>/dev/null)" || true
-  echo "$out" | grep -qi caveman
+CAVEMAN_INSTALLER_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+
+_caveman_installed() {
+  local target="$1"
+  case "$target" in
+    opencode)
+      # Check multiple possible locations for caveman skill
+      [[ -d "$HOME/.agents/skills/caveman" ]] && return 0
+      [[ -d "$HOME/.agents/skills/JuliusBrussee-caveman" ]] && return 0
+      # Check if caveman command exists in OpenCode commands
+      [[ -f "$HOME/.config/opencode/commands/caveman.md" ]] && return 0
+      # Try npx skills list as fallback
+      local out
+      out="$(npx -y skills list 2>/dev/null)" || true
+      echo "$out" | grep -qi caveman && return 0
+      return 1
+      ;;
+    claude-code)
+      # Check if caveman plugin is installed for Claude Code
+      local out
+      out="$(claude plugin list 2>/dev/null)" || true
+      echo "$out" | grep -qi caveman && return 0
+      # Also check if plugin directory exists
+      [[ -d "$HOME/.claude/plugins/caveman" ]] && return 0
+      return 1
+      ;;
+    *)
+      return 1
+      ;;
+  esac
 }
 
-install_caveman_opencode() {
+install_caveman_for_target() {
+  local target="$1"
+  local agent_flag=""
+
+  # Map target to Caveman's --only flag
+  case "$target" in
+    opencode) agent_flag="--only opencode" ;;
+    claude-code) agent_flag="--only claude" ;;
+    *) record_failure "Unknown target for Caveman: ${target}"; return 1 ;;
+  esac
+
   if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: Caveman official installer for ${target}"
+    info "  curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} --minimal"
     if [[ "$SCOPE" == "local" ]]; then
-      warn "DRY-RUN: Local OpenCode Caveman scope is not natively supported by npx skills add."
-      warn "  Would install globally via: npx skills add JuliusBrussee/caveman -a opencode"
-      warn "  OpenCode discovers skills from ~/.agents/skills/ regardless of project scope."
+      warn "DRY-RUN: Caveman does not support project-scoped installation."
+      warn "  Will install globally. Agent discovers skills from home directory."
     fi
-    info "DRY-RUN: npx skills add JuliusBrussee/caveman -a opencode"
     return 0
   fi
 
-  if _caveman_opencode_installed; then
-    ok "Caveman already installed for OpenCode"
+  if _caveman_installed "$target"; then
+    ok "Caveman already installed for ${target}"
     return 0
   fi
 
   if [[ "$SCOPE" == "local" ]]; then
-    warn "Local OpenCode Caveman scope: npx skills add does not have a native project-scope flag."
-    warn "  Installing globally. OpenCode discovers skills from ~/.agents/skills/ regardless."
+    warn "Caveman does not support project-scoped installation."
+    warn "  Installing globally. Agent discovers skills from home directory."
   fi
 
-  if npx -y skills add JuliusBrussee/caveman -a opencode; then
-    ok "Caveman installed for OpenCode via npx skills add"
+  info "Installing Caveman for ${target} via official installer..."
+  local caveman_output
+  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- ${agent_flag} --minimal 2>&1)"; then
+    printf '%s\n' "$caveman_output"
+    ok "Caveman installed for ${target}"
   else
     local rc=$?
-    record_failure "Caveman OpenCode install failed (exit ${rc}). Install manually: npx skills add JuliusBrussee/caveman -a opencode"
-  fi
-}
-
-# ---------- Caveman: Claude Code (native) ----------
-
-_caveman_claude_installed() {
-  local out
-  out="$(claude plugin list 2>/dev/null)" || true
-  echo "$out" | grep -qi caveman
-}
-
-install_caveman_claude() {
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    if [[ "$SCOPE" == "local" ]]; then
-      warn "DRY-RUN: Project-scope Claude plugin install is provisional."
-      warn "  Would attempt: claude plugin install caveman@caveman --scope project"
-      warn "  If --scope project unsupported, fall back to global: claude plugin install caveman@caveman --scope user"
-    fi
-    info "DRY-RUN: claude plugin marketplace add JuliusBrussee/caveman"
-    local scope_flag="--scope user"
-    if [[ "$SCOPE" == "local" ]]; then
-      scope_flag="--scope project"
-    fi
-    info "DRY-RUN: claude plugin install caveman@caveman ${scope_flag}"
-    return 0
-  fi
-
-  if _caveman_claude_installed; then
-    ok "Caveman already installed for Claude Code"
-    return 0
-  fi
-
-  if [[ "$SCOPE" == "local" ]]; then
-    warn "Project-scope Claude plugin install is provisional (upstream may not fully support --scope project)."
-    warn "  Attempting project-scope install. If this fails, retry globally:"
-    warn "    claude plugin install caveman@caveman --scope user"
-  fi
-
-  claude plugin marketplace add JuliusBrussee/caveman || \
-    warn "Caveman marketplace may already be registered (non-zero exit is harmless)"
-
-  local scope_flag="--scope user"
-  if [[ "$SCOPE" == "local" ]]; then
-    scope_flag="--scope project"
-  fi
-
-  if claude plugin install caveman@caveman $scope_flag; then
-    ok "Caveman installed for Claude Code via claude plugin install ${scope_flag}"
-  else
-    local rc=$?
-    record_failure "Caveman Claude install failed (exit ${rc}). Manually: claude plugin install caveman@caveman ${scope_flag}"
+    printf '%s\n' "$caveman_output" >&2
+    record_failure "Caveman install failed for ${target} (exit ${rc}). Install manually: curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag}"
   fi
 }
 
@@ -449,10 +438,7 @@ install_caveman_claude() {
 _install_caveman_for_targets() {
   local target
   for target in "${TARGETS[@]}"; do
-    case "$target" in
-      opencode) install_caveman_opencode ;;
-      claude-code) install_caveman_claude ;;
-    esac
+    install_caveman_for_target "$target"
   done
 }
 

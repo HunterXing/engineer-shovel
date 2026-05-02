@@ -132,7 +132,7 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 
 **superpowers** refers to the `claude-plugins-official` marketplace. For Claude Code, the marketplace is built-in and pre-registered. For OpenCode, no equivalent exists, so it is skipped.
 
-**Caveman** uses native installation per target. OpenCode: `npx skills add JuliusBrussee/caveman -a opencode`. Claude Code: `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman`.
+**Caveman** uses the official installer from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman). It auto-detects installed agents and runs their native install method. For Claude Code, it uses `claude plugin marketplace add && claude plugin install`. For OpenCode, it uses `npx skills add`.
 
 **RTK** (Rust Token Killer) is installed as a system binary via `cargo install --git <repo>`, then initialized with `rtk init -g` for hooks. The binary always installs to `~/.local/bin/` or `~/.cargo/bin/`, not to the selected scope path.
 
