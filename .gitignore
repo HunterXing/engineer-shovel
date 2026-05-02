@@ -1,7 +1,9 @@
 # Dependencies
 node_modules/
 .pnpm-store/
-.sisyphus/
+.sisyphus/tmp/
+.sisyphus/cache/
+.sisyphus/logs/
 
 # OS
 .DS_Store
