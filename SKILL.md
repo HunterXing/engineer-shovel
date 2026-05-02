@@ -30,6 +30,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 | `/tool-quick` | Typos, config edits, 1-2 file surgical changes | Low |
 | `/tool-fix` | Bug reports, failing tests, regressions | Low → High by scope |
 | `/tool-feat` | New functionality | Medium |
+| `/tool-branch` | Branch workflow: create, review, merge, abort | Low |
 | `/tool-plan` | Requirements and implementation planning | Medium |
 | `/tool-refactor` | Behavior-preserving cleanup | Medium |
 | `/tool-review` | Local diff, PR, or post-implementation review | Low → High by mode |
@@ -43,8 +44,9 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 - If the change is obvious and touches at most 2 files, use `/tool-quick`.
 - If something is broken, use `/tool-fix`; only escalate to GSD debugging when the cause crosses files or is not reproducible locally.
 - If you need to build a feature, use `/tool-feat`; use `/tool-plan` first when requirements are unclear.
+- If starting any non-trivial task, use `/tool-branch create` first to isolate changes in a feature branch.
 - If behavior must remain identical, use `/tool-refactor` and verify before/after.
-- If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work.
+- If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work. Use `/tool-branch review` to see diff before merging.
 - If the work spans phases, milestones, or multiple PRs, use `/tool-blueprint`.
 - If you need external/current information, use `/tool-research`; start with `--quick` and escalate only when evidence is insufficient.
 - If you need session token usage or savings, use `/tool-statistic`; it reports measured Caveman/RTK data when available and avoids fake precision.
