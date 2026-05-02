@@ -339,7 +339,7 @@ install_skill() {
 
 install_commands() {
   local src_dir="$(dirname "$0")/commands"
-  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic)
+  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic update)
   local count=0
 
   run_or_print mkdir -p "$COMMAND_DIR"
@@ -631,7 +631,7 @@ verify_install() {
   local missing=0
   [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing=1
 
-  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic)
+  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic update)
   for name in "${names[@]}"; do
     [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing=1
   done

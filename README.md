@@ -2,11 +2,11 @@
 
 <p align="center">
   <b>Token-aware AI agent development workflow router</b><br>
-  <sub>Quick Tasks · Bug Fix · Feature · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Statistics</sub>
+  <sub>Quick Tasks · Bug Fix · Feature · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Statistics · Sync</sub>
 </p>
 
 <p align="center">
-  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code>
+  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code> <code>/tool-update</code>
 </p>
 
 ---
@@ -48,7 +48,7 @@ The installer verifies pinned external repository SHAs before staging optional d
 This optimization cycle keeps the public interface stable:
 
 - `skill(name="engineer-shovel")` is unchanged.
-- All 10 `/tool-*` commands remain installed with the same names.
+- All 11 `/tool-*` commands remain installed with the same names.
 - `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
 - `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
 
@@ -97,13 +97,15 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 | `/tool-blueprint` | Multi-step or multi-session projects |
 | `/tool-research` | Evidence gathering and synthesis |
 | `/tool-statistic` | Session token usage and savings report |
+| `/tool-update` | Sync and update installation |
 
 ## Structure
 
 ```text
 engineer-shovel/
-├── commands/          # 10 executable slash commands
+├── commands/          # 11 executable slash commands
 ├── docs/              # long-form references kept out of runtime context
+├── scripts/           # sync and validation utilities
 ├── SKILL.md           # lightweight router
 ├── install.sh         # minimal/recommended/full installer
 ├── README.md

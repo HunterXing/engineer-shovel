@@ -2,6 +2,33 @@
 
 `install.sh` supports interactive setup plus explicit non-interactive flags. In a terminal, running `./install.sh` asks whether to install for OpenCode, Claude Code, both, or auto-detection, then asks for the install mode. Use `--dry-run` with any mode to preview target paths and pinned external sources without writing files.
 
+## Sync & Update
+
+Use the `/tool-update` command or `scripts/sync.py` to check and update your installation:
+
+```bash
+# Check installation status
+python3 scripts/sync.py check
+
+# Check specific target
+python3 scripts/sync.py check --target opencode
+
+# Sync all files to latest version
+python3 scripts/sync.py sync
+
+# Dry-run sync (preview changes)
+python3 scripts/sync.py sync --dry-run
+
+# Sync specific target
+python3 scripts/sync.py sync --target claude --scope global
+```
+
+Or use the slash command:
+```
+/tool-update check
+/tool-update sync --target opencode
+```
+
 ## Targets
 
 Choose where the skill and slash commands are installed:
