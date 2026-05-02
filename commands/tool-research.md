@@ -1,45 +1,32 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
-
-# /tool-research — Deep Research
-
-**工兵铲 · 深度研究工作流**
-
-## Pipeline
-```
-问题 → 多源搜索 → 综合 → 报告 → 应用
-```
-
-## Steps
-
-### 1. 多源研究
-```bash
-/deep-research "How to implement $TECHNOLOGY for $USE_CASE"
-# 搜索: web, docs, GitHub, academic sources
-# 返回: 有来源引用的报告
-```
-
-### 2. 代码/模式搜索
-```bash
-# 库文档:
-task(subagent_type="librarian", load_skills=[], prompt="Find examples of $PATTERN")
-
-# 网页搜索:
-MiniMax_web_search(query="$TOPIC best practices 2026")
-
-# GitHub 搜索:
-ecc_github_search_code(q="$TECHNIQUE language:typescript")
-```
-
-### 3. 综合发现
-```bash
-# 有冲突建议时:
-/council "Option A vs Option B for $DECISION"
-```
-
-### 4. 路由到实现
-- 原型: `/gsd-fast "build poc"`
-- 完整功能: `/tool-plan` → `/tool-feat`
-- 先研究: 继续 `/deep-research`
-
 ---
-> Load the skill first: `skill(name="engineer-shovel")`
+description: Research workflow — quick, web, or deep evidence gathering
+argument-hint: [--quick|--web|--deep] [research topic or question]
+---
+
+# /tool-research — Research
+
+**Input**: $ARGUMENTS
+
+Start narrow. Add sources only when the answer needs current or external evidence.
+
+Compression: use `/caveman full` for normal research and `/caveman ultra` for deep multi-source synthesis. RTK only helps shell/tool outputs, not web summaries.
+
+## Cost Modes
+
+| Mode | Use when | Path |
+|---|---|---|
+| `--quick` or default | local docs, known library, simple comparison | targeted docs/search |
+| `--web` | current facts or official docs needed | web/docs search + concise synthesis |
+| `--deep` | strategic decision, conflicting evidence, unfamiliar ecosystem | multi-source research + examples + tradeoff report |
+
+## Flow
+
+1. Define the exact decision the research should inform.
+2. Search the smallest source set likely to answer it.
+3. Cite or name sources when facts are current/external.
+4. Highlight conflicts and confidence.
+5. Route findings to `/tool-plan`, `/tool-feat`, `/tool-quick`, or documentation.
+
+## Avoid
+
+Do not run deep multi-source research for questions answerable from local code or official docs.
