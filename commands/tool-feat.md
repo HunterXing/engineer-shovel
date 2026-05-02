@@ -1,57 +1,35 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+---
+description: New feature development workflow — explore, plan, implement, verify
+argument-hint: [--fast|--standard|--deep] [feature description | path/to/plan.md]
+---
 
 # /tool-feat — New Feature Development
 
-**工兵铲 · 新功能开发工作流**
+**Input**: $ARGUMENTS
 
-## Pipeline
-```
-需求 → 规划 → 执行 → 验证 → 提交
-```
+Build the smallest feature slice that can be verified. Use deep workflows only for unclear or multi-component work.
 
-## Steps
+Compression: use `/caveman full` by default; use `/caveman lite` for `--fast`; use RTK-wrapped shell output for git/test/build output when available.
 
-### 1. 复杂度判断
-- 单文件改动 → 直接用 `/gsd-fast`
-- 3-8 文件 → `/plan` → `/prp-implement`
-- 多组件/不确定 → `/blueprint` → 分步执行
+## Cost Modes
 
-### 2. OpenCode 环境
-```bash
-# 分析 + 规划
-/plan "实现 $FEATURE"
-# 或复杂场景:
-/blueprint project-name "实现 $FEATURE"
-# 执行
-/prp-implement plan.md
-```
+| Mode | Use when | Path |
+|---|---|---|
+| `--fast` | known area, small feature | targeted search → implement → tests |
+| `--standard` or default | normal feature, 3-8 files | explore patterns → plan → implement → verify |
+| `--deep` | ambiguous, external deps, multi-system | librarian/explore → `/tool-plan` or `/tool-blueprint` |
 
-### 3. Claude Code 环境
-```bash
-# 规划
-task(category="deep", load_skills=["search-first", "tdd-workflow"], prompt="...")
-# 或
-/blueprint project-name "实现 $FEATURE"
-```
+## Flow
 
-### 4. 验证
-```bash
-/verify
-bun test && bun run build  # 或对应语言命令
-```
+1. Search existing code for matching patterns before adding new structure.
+2. Decide the smallest useful increment and verification target.
+3. Implement using project conventions.
+4. Run diagnostics, related tests, typecheck/build when applicable.
+5. Use `/tool-review --fast` or default review by risk.
 
-### 5. 提交
-```bash
-git add . && git commit -m "feat: $DESCRIPTION"
-```
+## Skill Hints
 
-## Skill Loading
-| 类型 | Category | Skills |
-|------|----------|--------|
-| Frontend | `visual-engineering` | frontend-dev, frontend-design |
-| Backend | `deep` | backend-patterns, api-design |
-| Full Stack | `deep` | fullstack-dev, tdd-workflow |
-| Data/DB | `deep` | postgres-patterns, database-migrations |
-
----
-> Load the skill first: `skill(name="engineer-shovel")`
+- Frontend/UI: visual-engineering + frontend/UI skills.
+- Backend/API: backend-patterns, api-design.
+- Full stack: fullstack-dev, tdd-workflow.
+- Data/DB: database-migrations, postgres-patterns.

@@ -1,42 +1,32 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+---
+description: Quick task execution — surgical changes with minimal overhead
+argument-hint: [--fast|--standard] [task description]
+---
 
 # /tool-quick — Quick Tasks
 
-**工兵铲 · 快速任务工作流**
+**Input**: $ARGUMENTS
 
-## Pipeline
-```
-任务 → 执行 → 验证 → 提交
-```
+Use this for obvious, low-risk work. Do not run planning, deep research, or broad review for quick tasks.
 
-## Options
+Compression: use `/caveman lite`; use RTK-wrapped shell output when available for git/test/build noise.
 
-### 选项 A: GSD Quick（通用）
-```bash
-/gsd-fast "fix typo in README.md"
-/gsd-fast "update dependency version to 2.0"
-/gsd-fast "rename variable x to y in file.ts"
-```
+## Cost Modes
 
-### 选项 B: Caveman Builder（最省 token）
-```bash
-# 1-2 文件精确编辑 — 使用 cavecrew-builder
-# subagent 输出 caveman 压缩 (~60% 省 token)
-```
+| Mode | Use when | Path |
+|---|---|---|
+| `--fast` or default | typo, config tweak, 1-line fix | direct edit or `/gsd-fast` |
+| `--standard` | 1-2 file surgical change | cavecrew-builder or targeted edit + tests |
 
-### 选项 C: 直接 task()
-```bash
-task(category="quick", load_skills=[], prompt="Change X to Y in file.ts")
-```
+## Flow
 
-## Choice
-| 任务类型 | 最佳工具 | 原因 |
-|----------|----------|------|
-| Typo, 1 行 | `/gsd-fast` | 零开销 |
-| 1-2 文件编辑 | Cavecrew builder | ~60% token 节省 |
-| 配置修改 | `/gsd-fast` | 快速安全 |
-| 简单重命名 | `/gsd-fast` 或 LSP rename | 内置工具 |
-| 非平凡任务 | 走完整工作流 | 不能跳过规划 |
+1. Confirm the target file or symbol from context.
+2. Make the smallest safe change.
+3. Run the nearest useful verification: formatter/lint/test/build as applicable.
+4. Report what changed and what passed.
 
----
-> Load the skill first: `skill(name="engineer-shovel")`
+## Avoid
+
+- No `/blueprint`.
+- No `/deep-research`.
+- No `/review-work` unless the change unexpectedly becomes high risk.

@@ -1,59 +1,34 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+---
+description: Bug fix workflow — reproduce, isolate, fix, verify, and prevent regression
+argument-hint: [--fast|--standard|--deep] [bug description | error message]
+---
 
 # /tool-fix — Bug Fixing
 
-**工兵铲 · Bug 修复工作流**
+**Input**: $ARGUMENTS
 
-## Pipeline
-```
-Bug报告 → 定位 → 修复 → 验证 → 防止回归 → 提交
-```
+Start with the cheapest path that can prove the bug is fixed. Escalate only when reproduction or root cause is unclear.
 
-## Steps
+Compression: use `/caveman full` by default; use `/caveman lite` for `--fast`; use RTK-wrapped shell output for logs, tests, and stack traces when available.
 
-### 1. 系统调试
-```bash
-/gsd-debug "$BUG_DESCRIPTION"
-# 1. 复现 Bug
-# 2. 隔离根因
-# 3. 形成假设
-# 4. 修复
-# 5. 验证修复
-```
+## Cost Modes
 
-### 2. 修复（最小改动）
-```bash
-# 根据调试结果直接修复，或通过 subagent:
-task(session_id="$SESSION_ID", prompt="Fix: $ROOT_CAUSE")
-```
+| Mode | Use when | Path |
+|---|---|---|
+| `--fast` | known file/function, obvious cause | direct fix + targeted test |
+| `--standard` or default | reproducible bug, local scope | reproduce → inspect related code → fix → regression test |
+| `--deep` | flaky, cross-module, security, or unknown root cause | `/gsd-debug` and optional Oracle after failed attempts |
 
-### 3. 验证
-```bash
-/go-test          # Go
-/rust-test        # Rust  
-/cpp-test         # C++
-/flutter-test     # Flutter
-/kotlin-test      # Kotlin
-bun test          # JS/TS
-```
+## Flow
 
-### 4. 防回归
-```bash
-/ai-regression-testing
-```
+1. Reproduce or identify the failing assertion/log.
+2. Find the smallest root cause, not just the symptom.
+3. Apply a surgical fix.
+4. Run the failing test first, then related tests/build.
+5. Add regression coverage when the project has a suitable test pattern.
 
-### 5. 提交
-```bash
-git add . && git commit -m "fix: $ROOT_CAUSE"
-```
+## Escalation Rules
 
-## Scope Decision
-| Scope | 方式 |
-|-------|------|
-| 单行/typo | cavecrew builder |
-| 单函数 | 直接修复 → test |
-| 跨文件 | /gsd-debug → task(deep) → test |
-| 安全漏洞 | /security-review → fix → /security-scan |
-
----
-> Load the skill first: `skill(name="engineer-shovel")`
+- Single-line typo: use `/tool-quick` instead.
+- Cross-file state or architecture issue: use `--deep`.
+- Security vulnerability: add `/security-review` and `/security-scan` before finalizing.
