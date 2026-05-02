@@ -521,12 +521,15 @@ _gsd_provisioned() {
 }
 
 install_gsd() {
-  local gsd_target=""
-  case "$TARGET" in
-    opencode) gsd_target="--opencode" ;;
-    claude|claude-code) gsd_target="--claude" ;;
-    all) gsd_target="--both" ;;
-  esac
+  # Resolve GSD target flag from the already-resolved TARGETS array
+  if [[ ${#TARGETS[@]} -eq 2 ]]; then
+    gsd_target="--both"
+  elif [[ ${#TARGETS[@]} -eq 1 ]]; then
+    case "${TARGETS[0]}" in
+      opencode) gsd_target="--opencode" ;;
+      claude-code) gsd_target="--claude" ;;
+    esac
+  fi
 
   local gsd_scope=""
   case "$SCOPE" in
