@@ -59,12 +59,13 @@ Recommended wording:
 - Prefer targeted verification before broad review.
 - Prefer Caveman compression before escalating to broader agents.
 - Prefer RTK-wrapped shell output for commands likely to produce noisy logs or large diffs.
+- Command files should keep only compact mode-specific routing hints; this document remains the canonical detailed Caveman/RTK policy.
 
 ## Practical Savings
 
 The runtime skill is now a lightweight router. Long-form workflow explanations live in docs and are not required in every session.
 
-Use `scripts/token-benchmark.py` for static size estimates before and after command or skill edits. Static estimates are not the same as live session savings; label live Caveman/RTK data as measured only when the tools report it.
+Use `scripts/token-benchmark.py` for static size estimates before and after command or skill edits. Its `static_markdown` source is a proxy estimate (`ceil(character_count / 4)`), not measured session savings. Label live Caveman/RTK data as measured only when those tools report it; otherwise keep those fields as `unknown`.
 
 ## Session Statistics
 

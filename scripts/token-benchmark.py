@@ -31,15 +31,32 @@ def main() -> int:
     report = {
         "measurement_kind": "static_proxy",
         "precision": "estimate",
-        "note": "Counts static Markdown size only; live model/session savings remain unknown unless Caveman/RTK provide measured data.",
+        "measurement_sources": {
+            "static_markdown": {
+                "kind": "static_proxy",
+                "precision": "estimate",
+                "method": "ceil(character_count / 4)",
+            },
+            "caveman_session": {
+                "kind": "measured_session",
+                "status": "unknown",
+                "source": "/caveman-stats",
+            },
+            "rtk_project": {
+                "kind": "measured_tool_output",
+                "status": "unknown",
+                "source": "rtk gain --project --format json",
+            },
+        },
+        "note": "Counts static Markdown size only; live Caveman/RTK savings remain unknown until those tools report measured data.",
         "skill": file_stats(ROOT / "SKILL.md"),
         "commands": command_stats,
         "commands_total_estimated_tokens": sum(int(item["estimated_tokens"]) for item in command_stats),
         "average_command_estimated_tokens": round(
             sum(int(item["estimated_tokens"]) for item in command_stats) / max(len(command_stats), 1), 2
         ),
-        "caveman_session": "unknown",
-        "rtk_project": "unknown",
+        "caveman_session": {"status": "unknown", "measured_tokens_saved": None},
+        "rtk_project": {"status": "unknown", "measured_tokens_saved": None},
     }
     print(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True))
     return 0
