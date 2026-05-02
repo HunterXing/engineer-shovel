@@ -38,6 +38,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 | `/tool-blueprint` | Multi-step, multi-session projects | High |
 | `/tool-research` | Current-state technical research | Low → High by mode |
 | `/tool-statistic` | Session token usage and savings report | Low |
+| `/tool-update` | Sync and update installation | Low |
 
 ## Router
 

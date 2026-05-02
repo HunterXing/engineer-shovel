@@ -37,7 +37,16 @@ is_feature_branch() {
 }
 
 slugify() {
-    echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//'
+    local input="$1"
+    local slug
+    slug=$(python3 -c "
+import sys
+s = sys.argv[1].lower()
+slug = ''.join('-' if not (c.isalnum() and ord(c) < 128) else c for c in s)
+slug = slug.replace('--', '-').strip('-')[:50]
+print(slug if slug else 'branch-' + str(int(__import__('time').time())))
+" "$input")
+    echo "$slug"
 }
 
 detect_type() {

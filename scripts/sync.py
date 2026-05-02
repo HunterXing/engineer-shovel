@@ -14,13 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 TRACKED_FILES = {
     "skill": ["SKILL.md"],
     "commands": [f"tool-{name}.md" for name in [
-        "feat", "fix", "plan", "refactor", "review",
+        "branch", "feat", "fix", "plan", "refactor", "review",
         "brainstorm", "quick", "blueprint", "research", "statistic", "update"
     ]],
-    "hooks": [
-        ".claude/hooks/pre-tool-use/10-caveman-output-compress.sh",
-        ".claude/hooks/pre-tool-use/00-engineer-shovel-gate.sh",
-    ]
 }
 
 # Standard installation locations
@@ -113,28 +109,27 @@ def compare_files(installed: list[Path], repo: list[Path], repo_root: Path) -> d
     return result
 
 
-def sync_files(comparisons: dict, dry_run: bool = False) -> int:
+def sync_files(comparisons: dict, target: str = "opencode", scope: str = "global", dry_run: bool = False) -> int:
     """Sync installed files with repo versions. Returns count of updated files."""
     updated = 0
-    
-    # Copy missing files
+    skill_dir = INSTALL_PATHS[target][scope]["skill"]
+    command_dir = INSTALL_PATHS[target][scope]["commands"]
+
     for repo_path in comparisons["missing"]:
         if dry_run:
             print(f"  DRY-RUN: Would copy {repo_path.name}")
             continue
-        # Determine target based on repo structure
         if repo_path.parent.name == "commands":
-            target_dir = Path.home() / ".config/opencode/commands"
+            target_dir = command_dir
         else:
-            target_dir = Path.home() / ".agents/skills/engineer-shovel"
-        
+            target_dir = skill_dir
+
         target_dir.mkdir(parents=True, exist_ok=True)
         target_path = target_dir / repo_path.name
         target_path.write_bytes(repo_path.read_bytes())
         print(f"  + Added {repo_path.name}")
         updated += 1
-    
-    # Update outdated files
+
     for entry in comparisons["outdated"]:
         installed_path = entry["installed"]
         repo_path = entry["repo"]
@@ -144,7 +139,7 @@ def sync_files(comparisons: dict, dry_run: bool = False) -> int:
         installed_path.write_bytes(repo_path.read_bytes())
         print(f"  ~ Updated {installed_path.name}")
         updated += 1
-    
+
     return updated
 
 
@@ -268,7 +263,7 @@ def main() -> int:
                 repo = get_repo_files(file_type)
                 comparison = compare_files(installed, repo, ROOT)
                 
-                updated = sync_files(comparison, dry_run=args.dry_run)
+                updated = sync_files(comparison, target=target, scope=args.scope, dry_run=args.dry_run)
                 total_updated += updated
         
         if args.dry_run:

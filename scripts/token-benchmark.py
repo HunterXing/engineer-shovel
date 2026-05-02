@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def estimate_tokens(text: str) -> int:
-    # Conservative static proxy: 1 token ~= 4 UTF-8 chars for English-heavy docs.
-    return math.ceil(len(text) / 4)
+    cjk_count = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+    ascii_count = len(text) - cjk_count
+    return math.ceil(ascii_count / 4 + cjk_count / 1.5)
 
 
 def file_stats(path: Path) -> dict[str, int | str]:

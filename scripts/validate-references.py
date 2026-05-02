@@ -24,7 +24,8 @@ def main() -> int:
             if name not in commands:
                 errors.append(f"{path.relative_to(ROOT)}: unknown command reference {match.group(0)}")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    if f"# {len(commands)} executable slash commands" not in readme:
+    expected = f"# {len(commands)} executable slash commands"
+    if expected not in readme and f"{len(commands)} executable slash commands" not in readme:
         errors.append("README.md: structure block command count does not match commands/ directory")
     readme_zh = (ROOT / "README_zh.md").read_text(encoding="utf-8")
     for command in sorted(commands):

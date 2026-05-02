@@ -339,7 +339,7 @@ install_skill() {
 
 install_commands() {
   local src_dir="$(dirname "$0")/commands"
-  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic update)
+  local names=(branch feat fix plan refactor review brainstorm quick blueprint research statistic update)
   local count=0
 
   run_or_print mkdir -p "$COMMAND_DIR"
@@ -501,7 +501,7 @@ _gsd_provisioned() {
         ;;
       *) return 1 ;;
     esac
-    ls "$check_dir"/gsd-* >/dev/null 2>&1 || return 1
+    ls "$check_dir"/gsd-*.md >/dev/null 2>&1 || return 1
   done
   return 0
 }
@@ -600,15 +600,24 @@ EOF
     "
     ok "Superpowers plugin added to opencode.json"
   else
-    # Fallback: append to plugin array manually
-    warn "node not found; attempting manual JSON edit"
-    if grep -q '"plugin"' "$config_file"; then
-      # Plugin array exists, add entry before closing bracket
-      sed -i 's/"plugin":\s*\[/"&"superpowers@git+https:\/\/github.com\/obra\/superpowers.git", /' "$config_file" 2>/dev/null || \
+    # Fallback: use Python to safely modify JSON
+    python3 -c "
+import json, sys
+path = sys.argv[1]
+with open(path) as f:
+    data = json.load(f)
+entry = 'superpowers@git+https://github.com/obra/superpowers.git'
+if 'plugin' not in data:
+    data['plugin'] = []
+if isinstance(data['plugin'], str):
+    data['plugin'] = [data['plugin']]
+if entry not in data['plugin']:
+    data['plugin'].insert(0, entry)
+with open(path, 'w') as f:
+    json.dump(data, f, indent=2)
+    f.write('\n')
+" "$config_file" || \
         warn "Could not auto-add superpowers. Add manually: \"superpowers@git+https://github.com/obra/superpowers.git\""
-    else
-      warn "No plugin array found. Add to opencode.json: \"plugin\": [\"superpowers@git+https://github.com/obra/superpowers.git\"]"
-    fi
   fi
 }
 
@@ -702,7 +711,7 @@ verify_install() {
   local missing=0
   [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing=1
 
-  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic update)
+  local names=(branch feat fix plan refactor review brainstorm quick blueprint research statistic update)
   for name in "${names[@]}"; do
     [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing=1
   done
