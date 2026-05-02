@@ -23,16 +23,22 @@ The runtime `SKILL.md` is intentionally small; long-form documentation lives in 
 # Recommended: download, inspect, then run
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh
-bash install.sh --recommended
+bash install.sh
+
+# Non-interactive OpenCode install
+bash install.sh --target opencode --recommended
+
+# Install for both OpenCode and Claude Code
+bash install.sh --target all --recommended
 
 # Shortcut if you already trust the source:
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # Minimal: only engineer-shovel skill and slash commands
-./install.sh --minimal
+./install.sh --target opencode --minimal
 
 # Full: ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
-./install.sh --full
+./install.sh --target opencode --full
 ```
 
 The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.
@@ -44,6 +50,7 @@ This optimization cycle keeps the public interface stable:
 - `skill(name="engineer-shovel")` is unchanged.
 - All 10 `/tool-*` commands remain installed with the same names.
 - `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
+- `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
 
 New guardrails added:
 

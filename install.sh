@@ -19,14 +19,18 @@ SUPERPOWERS_SHA="b392f51899343f35a203260a4b344803de236d13"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
 
 MODE="recommended"
-ENV="standalone"
+MODE_SET=0
+TARGET="auto"
+TARGET_SET=0
+ENV="opencode"
 SKILL_DIR="$HOME/.agents/skills"
-COMMAND_DIR="$HOME/.claude/commands"
+COMMAND_DIR="$HOME/.config/opencode/commands"
 PLUGIN_MARKETPLACE_DIR="$HOME/.claude/plugins/marketplaces"
 PLUGIN_CACHE_DIR="$HOME/.claude/plugins/cache"
 DRY_RUN=0
 FAILURES=0
 TMP_ROOT=""
+TARGETS=()
 
 info() { printf 'ℹ %s\n' "$1"; }
 ok() { printf '✔ %s\n' "$1"; }
@@ -35,28 +39,103 @@ err() { printf '✘ %s\n' "$1" >&2; }
 
 usage() {
   cat <<'USAGE'
-Usage: ./install.sh [--minimal|--recommended|--full]
+Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|all|auto]
 
 Modes:
   --minimal      Install only engineer-shovel skill and slash commands.
   --recommended Install skill, commands, and Caveman plugin staging. Default.
   --full         Install/stage ECC, superpowers, Caveman, RTK, skill, commands.
   --dry-run      Print planned actions without writing files or cloning repos.
+
+Targets:
+  --target auto      Auto-detect OpenCode or Claude Code. Default for non-interactive use.
+  --target opencode  Install OpenCode skill and slash commands.
+  --target claude    Install Claude Code skill and slash commands.
+  --target all       Install both OpenCode and Claude Code skill/commands.
+
+When run in a terminal without an explicit mode or target, the installer prompts interactively.
 USAGE
 }
 
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --minimal) MODE="minimal" ;;
-      --recommended) MODE="recommended" ;;
-      --full) MODE="full" ;;
+      --minimal) MODE="minimal"; MODE_SET=1 ;;
+      --recommended) MODE="recommended"; MODE_SET=1 ;;
+      --full) MODE="full"; MODE_SET=1 ;;
+      --target)
+        if [[ $# -lt 2 ]]; then
+          err "Missing value for --target"
+          usage
+          exit 1
+        fi
+        TARGET="$2"
+        TARGET_SET=1
+        shift
+        ;;
+      --target=*) TARGET="${1#--target=}"; TARGET_SET=1 ;;
+      --opencode) TARGET="opencode"; TARGET_SET=1 ;;
+      --claude|--claude-code) TARGET="claude"; TARGET_SET=1 ;;
+      --all) TARGET="all"; TARGET_SET=1 ;;
       --dry-run) DRY_RUN=1 ;;
       -h|--help) usage; exit 0 ;;
       *) err "Unknown option: $1"; usage; exit 1 ;;
     esac
     shift
   done
+}
+
+is_interactive() {
+  [[ -t 0 && -t 1 ]]
+}
+
+prompt_target() {
+  local choice
+  cat <<'PROMPT'
+Select install target:
+  1) OpenCode (recommended for ~/.config/opencode users)
+  2) Claude Code
+  3) Both OpenCode and Claude Code
+  4) Auto-detect
+PROMPT
+  printf 'Target [1]: '
+  read -r choice
+  case "${choice:-1}" in
+    1|opencode|OpenCode) TARGET="opencode" ;;
+    2|claude|claude-code|Claude|ClaudeCode) TARGET="claude" ;;
+    3|all|both|All|Both) TARGET="all" ;;
+    4|auto|Auto) TARGET="auto" ;;
+    *) err "Invalid target selection: ${choice}"; exit 1 ;;
+  esac
+}
+
+prompt_mode() {
+  local choice
+  cat <<'PROMPT'
+Select install mode:
+  1) Recommended: skill + commands + Caveman staging
+  2) Minimal: skill + commands only
+  3) Full: ECC/GSD + superpowers + Caveman + RTK + skill + commands
+PROMPT
+  printf 'Mode [1]: '
+  read -r choice
+  case "${choice:-1}" in
+    1|recommended|Recommended) MODE="recommended" ;;
+    2|minimal|Minimal) MODE="minimal" ;;
+    3|full|Full) MODE="full" ;;
+    *) err "Invalid mode selection: ${choice}"; exit 1 ;;
+  esac
+}
+
+configure_interactive_choices() {
+  if is_interactive; then
+    if [[ "$TARGET_SET" -eq 0 ]]; then
+      prompt_target
+    fi
+    if [[ "$MODE_SET" -eq 0 ]]; then
+      prompt_mode
+    fi
+  fi
 }
 
 record_failure() {
@@ -141,19 +220,48 @@ check_prereqs() {
   fi
 }
 
-detect_env() {
-  if command -v opencode >/dev/null 2>&1; then
-    ENV="opencode"
-    SKILL_DIR="$HOME/.agents/skills"
-    COMMAND_DIR="$HOME/.config/opencode/commands"
-  elif command -v claude >/dev/null 2>&1; then
-    ENV="claude-code"
-    SKILL_DIR="$HOME/.claude/skills"
-    COMMAND_DIR="$HOME/.claude/commands"
-  fi
+resolve_targets() {
+  TARGETS=()
+  case "$TARGET" in
+    opencode) TARGETS=(opencode) ;;
+    claude|claude-code) TARGETS=(claude-code) ;;
+    all|both) TARGETS=(opencode claude-code) ;;
+    auto)
+      if command -v opencode >/dev/null 2>&1; then
+        TARGETS=(opencode)
+      elif command -v claude >/dev/null 2>&1; then
+        TARGETS=(claude-code)
+      else
+        warn "Neither opencode nor claude was found; defaulting to OpenCode target paths."
+        TARGETS=(opencode)
+      fi
+      ;;
+    *) err "Unknown target: ${TARGET}"; usage; exit 1 ;;
+  esac
+}
 
+set_target_paths() {
+  local target="$1"
+  case "$target" in
+    opencode)
+      ENV="opencode"
+      SKILL_DIR="$HOME/.agents/skills"
+      COMMAND_DIR="$HOME/.config/opencode/commands"
+      ;;
+    claude-code)
+      ENV="claude-code"
+      SKILL_DIR="$HOME/.claude/skills"
+      COMMAND_DIR="$HOME/.claude/commands"
+      ;;
+    *) err "Unknown resolved target: ${target}"; exit 1 ;;
+  esac
+}
+
+prepare_target_dirs() {
+  local target="$1"
+  set_target_paths "$target"
   run_or_print mkdir -p "$SKILL_DIR" "$COMMAND_DIR"
-  ok "Mode: ${MODE}; environment: ${ENV}"
+  ok "Mode: ${MODE}; target: ${ENV}; skill_dir: ${SKILL_DIR}; command_dir: ${COMMAND_DIR}"
 }
 
 copy_or_download_file() {
@@ -324,35 +432,47 @@ verify_install() {
   fi
 }
 
+install_core_for_target() {
+  local target="$1"
+  prepare_target_dirs "$target"
+  install_skill
+  install_commands
+  configure_memory_hint
+  verify_install
+}
+
 main() {
   trap cleanup_tmp EXIT
   parse_args "$@"
+  configure_interactive_choices
   check_prereqs
-  detect_env
+  resolve_targets
 
   case "$MODE" in
     minimal)
-      install_skill
-      install_commands
       ;;
     recommended)
       stage_caveman
-      install_skill
-      install_commands
       ;;
     full)
       install_ecc
       stage_superpowers
       stage_caveman
       install_rtk
-      install_skill
-      install_commands
-      configure_memory_hint
       ;;
   esac
 
-  verify_install
-  info "Done. Use skill(name=\"engineer-shovel\") or run /tool-* commands."
+  local target
+  for target in "${TARGETS[@]}"; do
+    install_core_for_target "$target"
+  done
+
+  info "Installed targets: ${TARGETS[*]}"
+  for target in "${TARGETS[@]}"; do
+    set_target_paths "$target"
+    info "${ENV}: skill=${SKILL_DIR}/engineer-shovel/SKILL.md commands=${COMMAND_DIR}/tool-*.md"
+  done
+  info "Next: restart your agent session, then use skill(name=\"engineer-shovel\") or run /tool-* commands."
 }
 
 main "$@"
