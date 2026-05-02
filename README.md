@@ -20,8 +20,13 @@ The runtime `SKILL.md` is intentionally small; long-form documentation lives in 
 ## Quick Start
 
 ```bash
-# Default: recommended mode (skill + commands + Caveman staging)
-curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
+# Recommended: download, inspect, then run
+curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
+less install.sh
+bash install.sh --recommended
+
+# Shortcut if you already trust the source:
+# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # Minimal: only engineer-shovel skill and slash commands
 ./install.sh --minimal
@@ -29,6 +34,22 @@ curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/ins
 # Full: ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
 ./install.sh --full
 ```
+
+The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.
+
+## Compatibility Notes
+
+This optimization cycle keeps the public interface stable:
+
+- `skill(name="engineer-shovel")` is unchanged.
+- All 10 `/tool-*` commands remain installed with the same names.
+- `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
+
+New guardrails added:
+
+- Download-first installation is now the recommended documented path.
+- The installer keeps SHA pin verification and now surfaces clearer failure behavior around external installer execution.
+- Validation scripts now have lightweight pytest regression coverage.
 
 Then use either:
 
@@ -89,6 +110,7 @@ engineer-shovel/
 - Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
 - Installation modes: [`docs/install.md`](docs/install.md)
 - Language reference: [`docs/language-reference.md`](docs/language-reference.md)
+- Repository assessment: [`docs/assessment.md`](docs/assessment.md)
 
 ## License
 

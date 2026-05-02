@@ -7,8 +7,13 @@
 ## 快速开始
 
 ```bash
-# 默认 recommended：安装 skill、commands，并尽量 staging Caveman
-curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
+# 推荐：先下载、检查，再运行
+curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
+less install.sh
+bash install.sh --recommended
+
+# 如果你已经信任来源，也可以使用快捷方式：
+# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # 最小安装：只安装 engineer-shovel skill 和命令
 ./install.sh --minimal
@@ -16,6 +21,22 @@ curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/ins
 # 全量安装：ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
 ./install.sh --full
 ```
+
+安装器会在 staging 可选依赖前校验外部仓库的 pinned SHA。相比直接 pipe 到 Bash，先下载再执行更安全，因为你可以检查脚本内容，也能避免服务端根据 pipe 场景返回不同内容。
+
+## 兼容性说明
+
+这轮优化保持了公开接口不变：
+
+- `skill(name="engineer-shovel")` 不变。
+- 10 个 `/tool-*` 指令名称不变。
+- `--minimal`、`--recommended`、`--full`、`--dry-run` 不变。
+
+新增的 guardrail：
+
+- 文档层面默认推荐“先下载、检查、再执行”。
+- 安装器保留 SHA 校验，并对外部 installer 失败给出更清晰的边界。
+- Python 校验脚本新增了轻量 pytest 回归测试。
 
 会话中使用：
 
@@ -52,6 +73,7 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 - Token 成本模型：[`docs/token-cost.md`](docs/token-cost.md)
 - 安装模式：[`docs/install.md`](docs/install.md)
 - 语言命令参考：[`docs/language-reference.md`](docs/language-reference.md)
+- 仓库评估报告：[`docs/assessment.md`](docs/assessment.md)
 
 ## License
 
