@@ -1,6 +1,13 @@
 ---
 description: Research workflow — quick, web, or deep evidence gathering
 argument-hint: [--quick|--web|--deep] [research topic or question]
+cost-profile: variable
+risk-level: medium
+recommended-mode: --quick
+allowed-tools: [Read, Grep, Glob, WebFetch, Task]
+escalates-to: [/tool-plan, /tool-feat, /tool-blueprint]
+depends-on: []
+when-to-use: Use when a decision needs local, official, current, or multi-source evidence before planning or implementation.
 ---
 
 # /tool-research — Research

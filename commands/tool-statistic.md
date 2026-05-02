@@ -1,6 +1,13 @@
 ---
 description: Token statistics workflow — report session token usage and savings from Caveman/RTK where available
 argument-hint: [--fast|--full]
+cost-profile: low
+risk-level: low
+recommended-mode: --fast
+allowed-tools: [Bash]
+escalates-to: []
+depends-on: []
+when-to-use: Use when reporting measured session token usage or Caveman/RTK savings without inventing precision.
 ---
 
 # /tool-statistic — Token Statistics

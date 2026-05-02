@@ -1,6 +1,13 @@
 ---
 description: Refactoring workflow — preserve behavior, verify before and after
 argument-hint: [--fast|--standard|--deep] [refactoring goal]
+cost-profile: medium
+risk-level: medium
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
+escalates-to: [/review-work, /tool-fix, /tool-review]
+depends-on: []
+when-to-use: Use for behavior-preserving cleanup where baseline and post-change verification can prove equivalence.
 ---
 
 # /tool-refactor — Refactoring

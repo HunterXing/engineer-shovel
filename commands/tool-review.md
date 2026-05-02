@@ -1,6 +1,13 @@
 ---
 description: Code review workflow — fast, standard, or deep review by risk
 argument-hint: [--fast|--standard|--deep] [pr-number | pr-url | blank for local review]
+cost-profile: variable
+risk-level: variable
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Bash, Task]
+escalates-to: [/review-work, /security-review, /security-scan]
+depends-on: []
+when-to-use: Use for local diffs, pull requests, or post-implementation review where risk determines review depth.
 ---
 
 # /tool-review — Code Review
