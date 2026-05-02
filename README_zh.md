@@ -24,7 +24,7 @@ bash install.sh --target all --recommended
 # 最小安装：只安装 engineer-shovel skill 和命令
 ./install.sh --target opencode --minimal
 
-# 全量安装：ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
+# 全量安装：ECC, GSD, superpowers, Caveman, RTK, engineer-shovel
 ./install.sh --target opencode --full
 ```
 

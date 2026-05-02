@@ -37,7 +37,7 @@ bash install.sh --target all --recommended
 # Minimal: only engineer-shovel skill and slash commands
 ./install.sh --target opencode --minimal
 
-# Full: ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
+# Full: ECC, GSD, superpowers, Caveman, RTK, engineer-shovel
 ./install.sh --target opencode --full
 ```
 
