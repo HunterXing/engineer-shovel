@@ -1,53 +1,31 @@
-> ⚠️ Reference doc — commands are not executable. Follow the steps manually.
+---
+description: Code review workflow — fast, standard, or deep review by risk
+argument-hint: [--fast|--standard|--deep] [pr-number | pr-url | blank for local review]
+---
 
 # /tool-review — Code Review
 
-**工兵铲 · 代码审查工作流**
+**Input**: $ARGUMENTS
 
-## Pipeline
-```
-代码 → 审查 → 修复 → 重新审查 → 批准
-```
+Choose the cheapest review mode that can catch the relevant failure class.
 
-## Modes
+Compression: `--fast` should use Caveman review style; default to `/caveman full`; use `/caveman ultra` for deep review summaries. Use RTK for diff/log-producing shell commands.
 
-### Mode 1: 本地改动
-```bash
-/code-review
-# 审查 staged/unstaged diff
-```
+## Cost Modes
 
-### Mode 2: GitHub PR
-```bash
-/review-pr https://github.com/user/repo/pull/123
-```
+| Mode | Use when | Command |
+|---|---|---|
+| `--fast` | quick sanity check or small local diff | `/caveman:caveman-review` |
+| `--standard` or default | local diff or normal PR | `/code-review` or `/review-pr $ARGUMENTS` |
+| `--deep` | major implementation, security, broad refactor | `/review-work` |
 
-### Mode 3: 深度审查（实现完成后）
-```bash
-/review-work
-# 5 个并行审查代理:
-#   - 目标/约束验证 (Oracle)
-#   - 代码质量 (Oracle)
-#   - 安全审计 (Oracle)
-#   - 手动 QA (unspecified-high)
-#   - 上下文挖掘 (unspecified-high)
-# 全部通过才算审查通过
-```
+## Flow
 
-### Mode 4: 压缩审查（省 token）
-```bash
-/caveman:caveman-review
-# 一行一条: path:line: severity: problem. fix.
-```
+1. Select local, PR, or post-implementation mode from the input.
+2. Review for correctness, regressions, security, and maintainability.
+3. Fix critical/high findings surgically.
+4. Re-run the same or stronger review mode until clean.
 
-## Decision
-| 场景 | 命令 |
-|------|------|
-| 本地 diff (< 10 files) | `/code-review` 或 `/caveman:caveman-review` |
-| GitHub PR | `/review-pr <url>` |
-| 重大实现 | `/review-work` |
-| 安全敏感 | `/security-review` → `/security-scan` |
-| 快速检查 | `/caveman:caveman-review` |
+## Security-Sensitive Code
 
----
-> Load the skill first: `skill(name="engineer-shovel")`
+Add `/security-review` and `/security-scan` before approval.
