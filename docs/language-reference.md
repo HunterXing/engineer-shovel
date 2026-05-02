@@ -14,3 +14,11 @@ Use the project-native command when available.
 | Django | `/django-tdd` | project-specific | `/django-verification` |
 | Spring Boot | `/springboot-tdd` | Maven/Gradle build | `/springboot-verification` |
 | TypeScript/JS | `bun test` / `npm test` | `bun run build` / `npm run build` | `/code-review` |
+
+## Skill Routing Hints
+
+- Frontend/UI: use `visual-engineering` plus frontend/UI skills only when visual implementation matters.
+- Backend/API: prefer `backend-patterns` and `api-design` for API/service work.
+- Full stack: use `fullstack-dev` and `tdd-workflow` when frontend-backend integration is part of the task.
+- Data/DB: use `database-migrations` and `postgres-patterns` for schema or query changes.
+- Keep skill loading narrow; broad skill sets are a token cost and should match actual task scope.

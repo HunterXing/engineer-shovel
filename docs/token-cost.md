@@ -64,6 +64,8 @@ Recommended wording:
 
 The runtime skill is now a lightweight router. Long-form workflow explanations live in docs and are not required in every session.
 
+Use `scripts/token-benchmark.py` for static size estimates before and after command or skill edits. Static estimates are not the same as live session savings; label live Caveman/RTK data as measured only when the tools report it.
+
 ## Session Statistics
 
 Use `/tool-statistic` to report current-session token usage and savings.

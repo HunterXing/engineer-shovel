@@ -74,7 +74,7 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 
 ```text
 engineer-shovel/
-├── commands/          # 9 executable slash commands
+├── commands/          # 10 executable slash commands
 ├── docs/              # long-form references kept out of runtime context
 ├── SKILL.md           # lightweight router
 ├── install.sh         # minimal/recommended/full installer

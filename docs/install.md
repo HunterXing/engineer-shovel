@@ -1,6 +1,6 @@
 # Installation Modes
 
-`install.sh` supports three modes so users do not need to install the entire ecosystem by default.
+`install.sh` supports three modes so users do not need to install the entire ecosystem by default. Use `--dry-run` with any mode to preview target paths and pinned external sources without writing files.
 
 ## Minimal
 
@@ -25,6 +25,23 @@ Installs the full toolchain: ECC/GSD, superpowers, Caveman, RTK, Engineer Shovel
 ```bash
 ./install.sh --full
 ```
+
+## Dry Run
+
+Preview the selected mode without copying files, cloning repositories, or appending memory hints:
+
+```bash
+./install.sh --recommended --dry-run
+```
+
+Dry run output includes the detected environment, target directories, and pinned external sources that would be used.
+
+## Supply Chain Notes
+
+- External helper repositories are pinned to explicit commit SHAs in `install.sh`.
+- Pinned clones are checked out in a temporary directory and verified with `git rev-parse HEAD` before files are staged or external installers are attempted.
+- `--full` may still invoke upstream installer behavior for ECC after the pinned checkout is verified. Use `--dry-run` first when bootstrapping unfamiliar machines.
+- If an optional dependency cannot be staged, the installer reports the specific failure and exits non-zero during final verification.
 
 ## Non-interactive Default
 
