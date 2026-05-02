@@ -12,23 +12,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check required files exist
+      - name: Check required files
         run: |
-          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh; do
-            test -f "$f" && echo "✅ $f" || { echo "❌ $f missing"; exit 1; }
+          set -euo pipefail
+          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh docs/workflows.md docs/token-cost.md docs/install.md docs/language-reference.md; do
+            test -f "$f" || { echo "missing: $f"; exit 1; }
           done
 
-      - name: Check commands directory
+      - name: Validate command files
         run: |
-          for f in commands/tool-{feat,fix,plan,refactor,review,brainstorm,quick,blueprint,research}.md; do
-            test -f "$f" && echo "✅ $f" || echo "⚠️  $f missing"
+          set -euo pipefail
+          expected=(feat fix plan refactor review brainstorm quick blueprint research statistic)
+          count=0
+          for name in "${expected[@]}"; do
+            file="commands/tool-${name}.md"
+            test -f "$file" || { echo "missing: $file"; exit 1; }
+            count=$((count + 1))
+            first_line=$(sed -n '1p' "$file")
+            third_line=$(sed -n '3p' "$file")
+            grep -q '^description:' "$file" || { echo "missing description: $file"; exit 1; }
+            grep -q '^argument-hint:' "$file" || { echo "missing argument-hint: $file"; exit 1; }
+            test "$first_line" = "---" || { echo "bad frontmatter start: $file"; exit 1; }
+            test "$third_line" != "---" || { echo "argument-hint should precede closing frontmatter: $file"; exit 1; }
           done
+          actual=$(find commands -maxdepth 1 -name 'tool-*.md' | wc -l | tr -d ' ')
+          test "$actual" = "$count" || { echo "unexpected command count: $actual"; exit 1; }
 
-      - name: Lint shell scripts
+      - name: Check token-efficiency guardrails
         run: |
-          if command -v shellcheck &>/dev/null; then
-            shellcheck install.sh && echo "✅ shellcheck passed"
+          set -euo pipefail
+          if grep -R "Load skill first" commands SKILL.md docs README.md README_zh.md; then
+            echo "redundant skill-loading footer found"
+            exit 1
+          fi
+          skill_lines=$(wc -l < SKILL.md)
+          if [ "$skill_lines" -gt 260 ]; then
+            echo "SKILL.md too large: ${skill_lines} lines"
+            exit 1
+          fi
+
+      - name: Check shell syntax
+        run: bash -n install.sh
+
+      - name: Lint shell script when shellcheck is available
+        run: |
+          set -euo pipefail
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck install.sh
           else
-            echo "⚠️  shellcheck not available, skipping"
+            echo "shellcheck not available, skipped"
           fi
         shell: bash

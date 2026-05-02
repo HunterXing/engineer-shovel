@@ -1,29 +1,8 @@
 #!/usr/bin/env bash
-# ============================================================================
-# engineer-shovel — One-command bootstrap installer
-# ============================================================================
-# Installs the full development toolchain for OpenCode / Claude Code:
-#   ECC + GSD + superpowers + Caveman + RTK + engineer-shovel skill
-#
-# Usage:
-#   curl -fsSL https://raw.githubusercontent.com/<user>/engineer-shovel/main/install.sh | bash
-#   # or after cloning:
-#   ./install.sh
-# ============================================================================
+# engineer-shovel — token-aware installer
 
 set -euo pipefail
 
-# ── Colors ──────────────────────────────────────────────────────────────────
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
-
-info()  { echo -e "${CYAN}ℹ${NC} $1"; }
-ok()    { echo -e "${GREEN}✔${NC} $1"; }
-warn()  { echo -e "${YELLOW}⚠${NC} $1"; }
-err()   { echo -e "${RED}✘${NC} $1"; }
-header(){ echo -e "\n${BOLD}${BLUE}═══ $1 ═══${NC}\n"; }
-
-# ── Config ───────────────────────────────────────────────────────────────────
 REPO_RAW="https://raw.githubusercontent.com"
 REPO_OWNER="HunterXing"
 REPO_NAME="engineer-shovel"
@@ -31,358 +10,240 @@ REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
 
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 CAVEMAN_REPO="https://github.com/JuliusBrussee/caveman"
+SUPERPOWERS_REPO="https://github.com/anthropics/claude-plugins-official.git"
 RTK_REPO="https://github.com/rtk-ai/rtk"
-SUPERPOWERS_MARKETPLACE="claude-plugins-official"
 
-# ── Step 0: Prerequisites ───────────────────────────────────────────────────
+MODE="recommended"
+ENV="standalone"
+SKILL_DIR="$HOME/.agents/skills"
+COMMAND_DIR="$HOME/.claude/commands"
+
+info() { printf 'ℹ %s\n' "$1"; }
+ok() { printf '✔ %s\n' "$1"; }
+warn() { printf '⚠ %s\n' "$1"; }
+err() { printf '✘ %s\n' "$1" >&2; }
+
+usage() {
+  cat <<'USAGE'
+Usage: ./install.sh [--minimal|--recommended|--full]
+
+Modes:
+  --minimal      Install only engineer-shovel skill and slash commands.
+  --recommended Install skill, commands, and Caveman plugin staging. Default.
+  --full         Install/stage ECC, superpowers, Caveman, RTK, skill, commands.
+USAGE
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --minimal) MODE="minimal" ;;
+      --recommended) MODE="recommended" ;;
+      --full) MODE="full" ;;
+      -h|--help) usage; exit 0 ;;
+      *) err "Unknown option: $1"; usage; exit 1 ;;
+    esac
+    shift
+  done
+}
+
 check_prereqs() {
-  header "Checking Prerequisites"
-
   local missing=()
   for cmd in git curl; do
-    if ! command -v "$cmd" &>/dev/null; then
+    if ! command -v "$cmd" >/dev/null 2>&1; then
       missing+=("$cmd")
     fi
   done
 
   if [[ ${#missing[@]} -gt 0 ]]; then
     err "Missing required tools: ${missing[*]}"
-    echo "  Install them first:"
-    echo "    apt install -y git curl    # Debian/Ubuntu"
-    echo "    brew install git curl      # macOS"
     exit 1
   fi
-  ok "git and curl are installed"
-
-  # Check for Rust (needed for RTK)
-  if command -v cargo &>/dev/null; then
-    HAS_CARGO=true
-    ok "cargo is installed (can build RTK from source)"
-  else
-    HAS_CARGO=false
-    warn "cargo not found — RTK will need manual installation (see docs)"
-  fi
 }
 
-# ── Step 1: Detect environment ──────────────────────────────────────────────
 detect_env() {
-  header "Detecting Environment"
-
-  if command -v opencode &>/dev/null; then
+  if command -v opencode >/dev/null 2>&1; then
     ENV="opencode"
-    CONFIG_DIR="$HOME/.config/opencode"
     SKILL_DIR="$HOME/.agents/skills"
-    ok "Detected: OpenCode (OhMyOpenCode)"
-  elif command -v claude &>/dev/null; then
+    COMMAND_DIR="$HOME/.config/opencode/commands"
+  elif command -v claude >/dev/null 2>&1; then
     ENV="claude-code"
-    CONFIG_DIR="$HOME/.claude"
     SKILL_DIR="$HOME/.claude/skills"
-    ok "Detected: Claude Code"
+    COMMAND_DIR="$HOME/.claude/commands"
+  fi
+
+  mkdir -p "$SKILL_DIR" "$COMMAND_DIR"
+  ok "Mode: ${MODE}; environment: ${ENV}"
+}
+
+copy_or_download_file() {
+  local local_path="$1"
+  local remote_path="$2"
+  local target_path="$3"
+
+  if [[ -f "$local_path" ]]; then
+    cp "$local_path" "$target_path"
   else
-    ENV="standalone"
-    SKILL_DIR="$HOME/.agents/skills"
-    warn "No AI coding tool detected — installing skill files only"
-    warn "Install Claude Code or OpenCode first, then re-run this script"
+    curl -fsSL "${REPO_URL}/${remote_path}" -o "$target_path"
   fi
-
-  mkdir -p "$SKILL_DIR"
 }
 
-# ── Step 2: Install ECC (Everything Claude Code) ────────────────────────────
-install_ecc() {
-  header "Installing ECC (Everything Claude Code)"
-
-  if [[ -d "$HOME/.claude/plugins/cache/ecc/ecc" ]]; then
-    ok "ECC is already installed"
-    return 0
-  fi
-
-  info "Cloning ECC from ${ECC_REPO}..."
-  git clone --depth 1 "$ECC_REPO" /tmp/everything-claude-code 2>/dev/null || {
-    warn "Could not clone ECC. You can install it manually later:"
-    echo "  /plugin install ecc@ecc"
-    return 0
-  }
-
-  # Install via the ECC installer
-  if [[ -f /tmp/everything-claude-code/install.sh ]]; then
-    bash /tmp/everything-claude-code/install.sh 2>/dev/null && ok "ECC installed" || warn "ECC installation skipped"
-  else
-    # Manual install: copy skills and rules
-    mkdir -p "$HOME/.claude/skills" "$HOME/.claude/rules" "$HOME/.claude/agents"
-    cp -r /tmp/everything-claude-code/.agents/skills/* "$HOME/.claude/skills/" 2>/dev/null || true
-    ok "ECC skills copied"
-  fi
-
-  rm -rf /tmp/everything-claude-code
-}
-
-# ── Step 3: Install superpowers plugin ──────────────────────────────────────
-install_superpowers() {
-  header "Installing superpowers plugin"
-
-  if [[ -d "$HOME/.claude/plugins/cache/claude-plugins-official/superpowers" ]]; then
-    ok "superpowers is already installed"
-    return 0
-  fi
-
-  # Try plugin install via Claude Code
-  if command -v claude &>/dev/null; then
-    info "Installing via /plugin install..."
-    claude /plugin install "superpowers@${SUPERPOWERS_MARKETPLACE}" 2>/dev/null && {
-      ok "superpowers plugin installed"
-      return 0
-    }
-  fi
-
-  # Fallback: clone marketplace and install manually
-  info "Cloning official plugins marketplace..."
-  MARKETPLACE_DIR="$HOME/.claude/plugins/marketplaces/${SUPERPOWERS_MARKETPLACE}"
-  git clone --depth 1 "https://github.com/anthropics/claude-plugins-official.git" \
-    /tmp/claude-plugins-official 2>/dev/null || {
-    warn "Could not clone plugin marketplace. Install manually:"
-    echo "  /plugin install superpowers@claude-plugins-official"
-    return 0
-  }
-
-  mkdir -p "$MARKETPLACE_DIR"
-  cp -r /tmp/claude-plugins-official/* "$MARKETPLACE_DIR/" 2>/dev/null || true
-  rm -rf /tmp/claude-plugins-official
-  ok "superpowers plugin files staged (may need Claude Code restart)"
-}
-
-# ── Step 4: Install Caveman plugin ──────────────────────────────────────────
-install_caveman() {
-  header "Installing Caveman plugin"
-
-  if [[ -d "$HOME/.claude/plugins/cache/caveman/caveman" ]]; then
-    ok "Caveman is already installed"
-    return 0
-  fi
-
-  git clone --depth 1 "$CAVEMAN_REPO" /tmp/caveman 2>/dev/null || {
-    warn "Could not clone Caveman repo. Install manually:"
-    echo "  /plugin install caveman@caveman"
-    return 0
-  }
-
-  MARKETPLACE_DIR="$HOME/.claude/plugins/marketplaces/caveman"
-  mkdir -p "$MARKETPLACE_DIR"
-  cp -r /tmp/caveman/* "$MARKETPLACE_DIR/" 2>/dev/null || true
-
-  # Register the marketplace if not already registered
-  local known="$HOME/.claude/plugins/known_marketplaces.json"
-  if [[ -f "$known" ]]; then
-    python3 -c "
-import json
-with open('$known') as f: d = json.load(f)
-if 'caveman' not in d:
-    d['caveman'] = {'source': {'source': 'github', 'repo': 'JuliusBrussee/caveman'}, 'installLocation': '$MARKETPLACE_DIR'}
-    with open('$known', 'w') as f: json.dump(d, f, indent=2)
-" 2>/dev/null || true
-  fi
-
-  rm -rf /tmp/caveman
-  ok "Caveman plugin staged (run '/plugin install caveman@caveman' in Claude Code to activate)"
-}
-
-# ── Step 5: Install RTK (Rust Token Killer) ─────────────────────────────────
-install_rtk() {
-  header "Installing RTK (Rust Token Killer)"
-
-  if command -v rtk &>/dev/null; then
-    ok "RTK $(rtk --version 2>/dev/null || echo '')is already installed"
-    return 0
-  fi
-
-  if [[ "$HAS_CARGO" == true ]]; then
-    info "Building RTK from source (this may take a few minutes)..."
-    cargo install rtk --git "$RTK_REPO" 2>/dev/null && {
-      ok "RTK installed via cargo"
-      # Add ~/.cargo/bin to PATH if not already
-      if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
-        echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$HOME/.bashrc"
-        echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$HOME/.zshrc" 2>/dev/null || true
-        warn "Added ~/.cargo/bin to PATH in .bashrc/.zshrc (restart shell or run: export PATH=\"\$HOME/.cargo/bin:\$PATH\")"
-      fi
-      return 0
-    }
-    warn "Cargo build failed"
-  fi
-
-  warn "RTK requires manual installation:"
-  echo "  1. With cargo: cargo install rtk --git ${RTK_REPO}"
-  echo "  2. Or download a binary from: ${RTK_REPO}/releases"
-}
-
-# ── Step 6: Install engineer-shovel skill ──────────────────────────────────
 install_skill() {
-  header "Installing engineer-shovel Skill"
-
   local target="$SKILL_DIR/engineer-shovel"
   mkdir -p "$target"
-
-  # Try to get SKILL.md from local repo first, then from GitHub
-  if [[ -f "$(dirname "$0")/SKILL.md" ]]; then
-    cp "$(dirname "$0")/SKILL.md" "$target/SKILL.md"
-    info "Installed from local repo"
-  elif curl -fsSL "${REPO_URL}/SKILL.md" -o "$target/SKILL.md" 2>/dev/null; then
-    info "Downloaded from GitHub"
-  else
-    err "Could not find SKILL.md. Clone the repo manually:"
-    echo "  git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
-    echo "  cd ${REPO_NAME} && ./install.sh"
-    exit 1
-  fi
-
-  ok "engineer-shovel skill installed → ${target}/SKILL.md"
+  copy_or_download_file "$(dirname "$0")/SKILL.md" "SKILL.md" "$target/SKILL.md"
+  ok "Installed skill → ${target}/SKILL.md"
 }
 
-# ── Step 7: Configure AGENTS.md (OpenCode only) ─────────────────────────────
-configure_agents() {
-  header "Configuring AGENTS.md"
+install_commands() {
+  local src_dir="$(dirname "$0")/commands"
+  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic)
+  local count=0
 
-  local agents_file
-  if [[ "$ENV" == "opencode" && -f "$HOME/.config/opencode/AGENTS.md" ]]; then
-    agents_file="$HOME/.config/opencode/AGENTS.md"
-  elif [[ "$ENV" == "claude-code" && -f "$HOME/.claude/AGENTS.md" ]]; then
-    agents_file="$HOME/.claude/AGENTS.md"
-  else
-    # Download default AGENTS.md from repo
-    if [[ "$ENV" == "opencode" ]]; then
-      agents_file="$HOME/.config/opencode/AGENTS.md"
-      mkdir -p "$HOME/.config/opencode"
-    elif [[ "$ENV" == "claude-code" ]]; then
-      agents_file="$HOME/.claude/AGENTS.md"
+  mkdir -p "$COMMAND_DIR"
+  for name in "${names[@]}"; do
+    local target="$COMMAND_DIR/tool-${name}.md"
+    if [[ -d "$src_dir" && -f "$src_dir/tool-${name}.md" ]]; then
+      cp "$src_dir/tool-${name}.md" "$target"
     else
-      return 0
+      curl -fsSL "${REPO_URL}/commands/tool-${name}.md" -o "$target"
     fi
-    curl -fsSL "${REPO_URL}/AGENTS.md" -o "$agents_file" 2>/dev/null || return 0
+    count=$((count + 1))
+  done
+
+  ok "Installed ${count} slash commands → ${COMMAND_DIR}/"
+}
+
+stage_caveman() {
+  local plugin_dir="$HOME/.claude/plugins/marketplaces/caveman"
+
+  if [[ -d "$HOME/.claude/plugins/cache/caveman/caveman" ]]; then
+    ok "Caveman already installed"
+    return 0
   fi
 
-  # Add engineer-shovel reference if not already present
-  if [[ -f "$agents_file" ]] && ! grep -q "engineer-shovel" "$agents_file" 2>/dev/null; then
-    cat >> "$agents_file" << 'EOF'
+  if git clone --depth 1 --single-branch "$CAVEMAN_REPO" /tmp/engineer-shovel-caveman >/dev/null 2>&1; then
+    mkdir -p "$plugin_dir"
+    cp -r /tmp/engineer-shovel-caveman/. "$plugin_dir/"
+    rm -rf /tmp/engineer-shovel-caveman
+    ok "Staged Caveman plugin → ${plugin_dir}"
+  else
+    warn "Could not stage Caveman. Install manually: /plugin install caveman@caveman"
+  fi
+}
+
+install_ecc() {
+  if [[ -d "$HOME/.claude/plugins/cache/ecc/ecc" || -d "$HOME/.claude/ecc" ]]; then
+    ok "ECC already installed"
+    return 0
+  fi
+
+  if git clone --depth 1 --single-branch "$ECC_REPO" /tmp/engineer-shovel-ecc >/dev/null 2>&1; then
+    if [[ -f /tmp/engineer-shovel-ecc/install.sh ]]; then
+      bash /tmp/engineer-shovel-ecc/install.sh >/dev/null 2>&1 || warn "ECC installer returned non-zero; check manually"
+    fi
+    rm -rf /tmp/engineer-shovel-ecc
+    ok "ECC install attempted"
+  else
+    warn "Could not clone ECC. Install manually: /plugin install ecc@ecc"
+  fi
+}
+
+stage_superpowers() {
+  local plugin_dir="$HOME/.claude/plugins/marketplaces/claude-plugins-official"
+
+  if [[ -d "$HOME/.claude/plugins/cache/claude-plugins-official/superpowers" ]]; then
+    ok "superpowers already installed"
+    return 0
+  fi
+
+  if git clone --depth 1 --single-branch "$SUPERPOWERS_REPO" /tmp/engineer-shovel-superpowers >/dev/null 2>&1; then
+    mkdir -p "$plugin_dir"
+    cp -r /tmp/engineer-shovel-superpowers/. "$plugin_dir/"
+    rm -rf /tmp/engineer-shovel-superpowers
+    ok "Staged superpowers marketplace → ${plugin_dir}"
+  else
+    warn "Could not stage superpowers. Install manually: /plugin install superpowers@claude-plugins-official"
+  fi
+}
+
+install_rtk() {
+  if command -v rtk >/dev/null 2>&1; then
+    ok "RTK already installed"
+    return 0
+  fi
+
+  if command -v cargo >/dev/null 2>&1; then
+    warn "RTK not installed. To avoid surprise compile time, install manually when needed: cargo install rtk --git ${RTK_REPO}"
+  else
+    warn "RTK not installed and cargo not found. Install RTK manually if needed."
+  fi
+}
+
+configure_memory_hint() {
+  local file=""
+  if [[ "$ENV" == "opencode" && -f "$HOME/.config/opencode/AGENTS.md" ]]; then
+    file="$HOME/.config/opencode/AGENTS.md"
+  elif [[ "$ENV" == "claude-code" && -f "$HOME/.claude/CLAUDE.md" ]]; then
+    file="$HOME/.claude/CLAUDE.md"
+  fi
+
+  if [[ -n "$file" && -f "$file" ]] && ! grep -q "engineer-shovel" "$file" 2>/dev/null; then
+    cat >> "$file" <<'EOF'
 
 ## engineer-shovel
-- Load with: `skill(name="engineer-shovel")`
-- Covers: New Feature, Bug Fix, Brainstorming, Refactoring, Code Review, Quick Tasks, Complex Projects, Deep Research
+- Load on demand with: `skill(name="engineer-shovel")`
+- Prefer cost modes: `--fast`, `--standard`, `--deep`.
 EOF
-    ok "AGENTS.md updated with engineer-shovel reference"
-  else
-    ok "AGENTS.md already references engineer-shovel"
+    ok "Added engineer-shovel hint → ${file}"
   fi
 }
 
-# ── Step 8: Verify installation ─────────────────────────────────────────────
-verify() {
-  header "Verification Report"
-  local all_ok=true
+verify_install() {
+  local missing=0
+  [[ -f "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing=1
 
-  echo ""
-  echo -e "${BOLD}Component                Status${NC}"
-  echo "──────────────────────────────────────────"
+  local names=(feat fix plan refactor review brainstorm quick blueprint research statistic)
+  for name in "${names[@]}"; do
+    [[ -f "$COMMAND_DIR/tool-${name}.md" ]] || missing=1
+  done
 
-  # ECC
-  if ls "$HOME/.claude/plugins/cache/ecc/"* 1>/dev/null 2>&1 || [[ -d "$HOME/.claude/ecc" ]]; then
-    echo -e "  ECC                     ${GREEN}installed${NC}"
+  if [[ "$missing" -eq 0 ]]; then
+    ok "Verification passed"
   else
-    echo -e "  ECC                     ${YELLOW}not detected (run: /plugin install ecc@ecc)${NC}"; all_ok=false
-  fi
-
-  # GSD
-  if command -v gsd &>/dev/null || [[ -f "$HOME/.claude/get-shit-done/gsd.sh" ]]; then
-    echo -e "  GSD                     ${GREEN}installed${NC}"
-  else
-    echo -e "  GSD                     ${YELLOW}part of ECC — install ECC first${NC}"; all_ok=false
-  fi
-
-  # superpowers
-  if ls "$HOME/.claude/plugins/cache/claude-plugins-official/superpowers/"* 1>/dev/null 2>&1; then
-    echo -e "  superpowers             ${GREEN}installed${NC}"
-  else
-    echo -e "  superpowers             ${YELLOW}not detected (run: /plugin install superpowers@claude-plugins-official)${NC}"; all_ok=false
-  fi
-
-  # Caveman
-  if ls "$HOME/.claude/plugins/cache/caveman/"* 1>/dev/null 2>&1; then
-    echo -e "  Caveman                 ${GREEN}installed${NC}"
-  else
-    echo -e "  Caveman                 ${YELLOW}not detected (run: /plugin install caveman@caveman)${NC}"; all_ok=false
-  fi
-
-  # RTK
-  if command -v rtk &>/dev/null; then
-    echo -e "  RTK                     ${GREEN}installed ($(rtk --version 2>/dev/null))${NC}"
-  else
-    echo -e "  RTK                     ${YELLOW}not detected (run: cargo install rtk --git ${RTK_REPO})${NC}"; all_ok=false
-  fi
-
-  # engineer-shovel skill
-  if [[ -f "$SKILL_DIR/engineer-shovel/SKILL.md" ]]; then
-    local lines=$(wc -l < "$SKILL_DIR/engineer-shovel/SKILL.md")
-    echo -e "  engineer-shovel skill  ${GREEN}installed (${lines} lines)${NC}"
-  else
-    echo -e "  engineer-shovel skill  ${RED}NOT FOUND — install failed${NC}"; all_ok=false
-  fi
-
-  echo "──────────────────────────────────────────"
-
-  if [[ "$all_ok" == true ]]; then
-    echo -e "\n${GREEN}${BOLD}✅ All components installed successfully!${NC}"
-  else
-    echo -e "\n${YELLOW}${BOLD}⚠️  Some components need manual steps (see above)${NC}"
+    err "Verification failed: missing installed files"
+    exit 1
   fi
 }
 
-# ── Summary ──────────────────────────────────────────────────────────────────
-print_summary() {
-  header "🎯 Setup Complete!"
-
-  echo -e "${BOLD}To start using the engineer-shovel:${NC}"
-  echo ""
-  echo "  1. In OpenCode or Claude Code, load the skill:"
-  echo "     skill(name=\"engineer-shovel\")"
-  echo ""
-  echo "  2. Then choose your workflow:"
-  echo "     /plan → /prp-implement    # New feature"
-  echo "     /gsd-debug                # Bug fixing"
-  echo "     /refactor → /review-work  # Refactoring"
-  echo "     /gsd-fast                 # Quick tasks"
-  echo "     /gsd-explore              # Brainstorming"
-  echo ""
-  echo -e "${BOLD}Token-saving tips:${NC}"
-  echo "     /caveman full        # Compress communication (~75% savings)"
-  echo "     /caveman-stats       # Check real token usage"
-  echo "     /strategic-compact   # Compact context mid-session"
-  echo ""
-  echo -e "${BOLD}📖 Full documentation:${NC}"
-  echo "     https://github.com/${REPO_OWNER}/${REPO_NAME}"
-  echo ""
-  echo -e "${BOLD}Happy coding! 🚀${NC}"
-}
-
-# ── Main ─────────────────────────────────────────────────────────────────────
 main() {
-  echo ""
-  echo -e "${BOLD}${BLUE}╔══════════════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${BLUE}║   engineer-shovel — Full Toolchain Installer    ║${NC}"
-  echo -e "${BOLD}${BLUE}╚══════════════════════════════════════════════════╝${NC}"
-  echo ""
-  echo "This script will install: ECC, GSD, superpowers, Caveman, RTK,"
-  echo "and the engineer-shovel skill for your AI coding environment."
-  echo ""
-
+  parse_args "$@"
   check_prereqs
   detect_env
-  install_ecc
-  install_superpowers
-  install_caveman
-  install_rtk
-  install_skill
-  configure_agents
-  verify
-  print_summary
+
+  case "$MODE" in
+    minimal)
+      install_skill
+      install_commands
+      ;;
+    recommended)
+      stage_caveman
+      install_skill
+      install_commands
+      ;;
+    full)
+      install_ecc
+      stage_superpowers
+      stage_caveman
+      install_rtk
+      install_skill
+      install_commands
+      configure_memory_hint
+      ;;
+  esac
+
+  verify_install
+  info "Done. Use skill(name=\"engineer-shovel\") or run /tool-* commands."
 }
 
 main "$@"
