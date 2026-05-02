@@ -1,6 +1,13 @@
 ---
 description: New feature development workflow — explore, plan, implement, verify
 argument-hint: [--fast|--standard|--deep] [feature description | path/to/plan.md]
+cost-profile: medium
+risk-level: medium
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
+escalates-to: [/tool-plan, /tool-blueprint, /tool-review]
+depends-on: [/tool-research]
+when-to-use: Use for adding new functionality after choosing the smallest verifiable feature slice.
 ---
 
 # /tool-feat — New Feature Development
@@ -27,9 +34,6 @@ Compression: use `/caveman full` by default; use `/caveman lite` for `--fast`; u
 4. Run diagnostics, related tests, typecheck/build when applicable.
 5. Use `/tool-review --fast` or default review by risk.
 
-## Skill Hints
+## Skill Routing
 
-- Frontend/UI: visual-engineering + frontend/UI skills.
-- Backend/API: backend-patterns, api-design.
-- Full stack: fullstack-dev, tdd-workflow.
-- Data/DB: database-migrations, postgres-patterns.
+Use project-native skills and commands from `docs/language-reference.md` instead of loading broad skill sets by default.

@@ -1,6 +1,13 @@
 ---
 description: Quick task execution — surgical changes with minimal overhead
 argument-hint: [--fast|--standard] [task description]
+cost-profile: low
+risk-level: low
+recommended-mode: --fast
+allowed-tools: [Read, Grep, Glob, Edit, Bash]
+escalates-to: [/tool-fix, /tool-feat, /tool-review]
+depends-on: []
+when-to-use: Use for obvious low-risk work such as typos, tiny config edits, or one to two file surgical changes.
 ---
 
 # /tool-quick — Quick Tasks

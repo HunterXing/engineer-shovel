@@ -1,6 +1,13 @@
 ---
 description: Bug fix workflow — reproduce, isolate, fix, verify, and prevent regression
 argument-hint: [--fast|--standard|--deep] [bug description | error message]
+cost-profile: variable
+risk-level: variable
+recommended-mode: --standard
+allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
+escalates-to: [/gsd-debug, /security-review, /tool-review]
+depends-on: []
+when-to-use: Use when behavior is broken, tests fail, logs show regressions, or root cause must be proven before fixing.
 ---
 
 # /tool-fix — Bug Fixing
