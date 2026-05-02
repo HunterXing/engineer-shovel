@@ -106,8 +106,15 @@ clone_pinned_repo() {
     return 0
   fi
 
-  git clone --no-tags --filter=blob:none "$repo_url" "$target_dir" >/dev/null 2>&1
-  git -C "$target_dir" checkout --detach "$commit_sha" >/dev/null 2>&1
+  local clone_err
+  clone_err="$(git clone --no-tags --filter=blob:none "$repo_url" "$target_dir" 2>&1)" || {
+    err "Clone failed for ${repo_url}: ${clone_err}"
+    return 1
+  }
+  git -C "$target_dir" checkout --detach "$commit_sha" >/dev/null 2>&1 || {
+    err "Checkout failed for ${repo_url} at ${commit_sha}"
+    return 1
+  }
   local actual_sha
   actual_sha="$(git -C "$target_dir" rev-parse HEAD)"
   if [[ "$actual_sha" != "$commit_sha" ]]; then
@@ -217,9 +224,21 @@ install_ecc() {
   if clone_pinned_repo "$ECC_REPO" "$ECC_SHA" "$checkout_dir"; then
     if [[ -f "$checkout_dir/install.sh" ]]; then
       if [[ "$DRY_RUN" -eq 1 ]]; then
-        info "DRY-RUN: bash ${checkout_dir}/install.sh"
-      elif ! bash "$checkout_dir/install.sh"; then
-        record_failure "ECC installer returned non-zero; check manually"
+        info "DRY-RUN: timeout 600 bash ${checkout_dir}/install.sh"
+      else
+        local ecc_output
+        local ecc_rc
+        if ecc_output="$(timeout 600 bash "$checkout_dir/install.sh" 2>&1)"; then
+          printf '%s\n' "$ecc_output"
+        else
+          ecc_rc=$?
+          printf '%s\n' "$ecc_output" >&2
+          if [[ "$ecc_rc" -eq 124 ]]; then
+            record_failure "ECC installer timed out after 600 seconds; retry manually if needed"
+          else
+            record_failure "ECC installer exited with code ${ecc_rc}; run manually to diagnose"
+          fi
+        fi
       fi
     fi
     ok "ECC install attempted"
