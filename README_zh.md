@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-支持-d97706?style=for-the-badge" alt="Claude Code">
 </p>
 
-<h1 align="center">🪖 工兵铲 · Optimal Workflow</h1>
+<h1 align="center">🪖 工兵铲 · Engineer Shovel</h1>
 
 <p align="center">
   <b>多合一 AI 代理开发工具</b><br>

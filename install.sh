@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ============================================================================
-# optimal-workflow — One-command bootstrap installer
+# engineer-shovel — One-command bootstrap installer
 # ============================================================================
 # Installs the full development toolchain for OpenCode / Claude Code:
-#   ECC + GSD + superpowers + Caveman + RTK + optimal-workflow skill
+#   ECC + GSD + superpowers + Caveman + RTK + engineer-shovel skill
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/<user>/optimal-workflow/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/<user>/engineer-shovel/main/install.sh | bash
 #   # or after cloning:
 #   ./install.sh
 # ============================================================================
@@ -215,11 +215,11 @@ install_rtk() {
   echo "  2. Or download a binary from: ${RTK_REPO}/releases"
 }
 
-# ── Step 6: Install optimal-workflow skill ──────────────────────────────────
+# ── Step 6: Install engineer-shovel skill ──────────────────────────────────
 install_skill() {
-  header "Installing optimal-workflow Skill"
+  header "Installing engineer-shovel Skill"
 
-  local target="$SKILL_DIR/optimal-workflow"
+  local target="$SKILL_DIR/engineer-shovel"
   mkdir -p "$target"
 
   # Try to get SKILL.md from local repo first, then from GitHub
@@ -235,7 +235,7 @@ install_skill() {
     exit 1
   fi
 
-  ok "optimal-workflow skill installed → ${target}/SKILL.md"
+  ok "engineer-shovel skill installed → ${target}/SKILL.md"
 }
 
 # ── Step 7: Configure AGENTS.md (OpenCode only) ─────────────────────────────
@@ -260,17 +260,17 @@ configure_agents() {
     curl -fsSL "${REPO_URL}/AGENTS.md" -o "$agents_file" 2>/dev/null || return 0
   fi
 
-  # Add optimal-workflow reference if not already present
-  if [[ -f "$agents_file" ]] && ! grep -q "optimal-workflow" "$agents_file" 2>/dev/null; then
+  # Add engineer-shovel reference if not already present
+  if [[ -f "$agents_file" ]] && ! grep -q "engineer-shovel" "$agents_file" 2>/dev/null; then
     cat >> "$agents_file" << 'EOF'
 
-## optimal-workflow
-- Load with: `skill(name="optimal-workflow")`
+## engineer-shovel
+- Load with: `skill(name="engineer-shovel")`
 - Covers: New Feature, Bug Fix, Brainstorming, Refactoring, Code Review, Quick Tasks, Complex Projects, Deep Research
 EOF
-    ok "AGENTS.md updated with optimal-workflow reference"
+    ok "AGENTS.md updated with engineer-shovel reference"
   else
-    ok "AGENTS.md already references optimal-workflow"
+    ok "AGENTS.md already references engineer-shovel"
   fi
 }
 
@@ -318,12 +318,12 @@ verify() {
     echo -e "  RTK                     ${YELLOW}not detected (run: cargo install rtk --git ${RTK_REPO})${NC}"; all_ok=false
   fi
 
-  # optimal-workflow skill
-  if [[ -f "$SKILL_DIR/optimal-workflow/SKILL.md" ]]; then
-    local lines=$(wc -l < "$SKILL_DIR/optimal-workflow/SKILL.md")
-    echo -e "  optimal-workflow skill  ${GREEN}installed (${lines} lines)${NC}"
+  # engineer-shovel skill
+  if [[ -f "$SKILL_DIR/engineer-shovel/SKILL.md" ]]; then
+    local lines=$(wc -l < "$SKILL_DIR/engineer-shovel/SKILL.md")
+    echo -e "  engineer-shovel skill  ${GREEN}installed (${lines} lines)${NC}"
   else
-    echo -e "  optimal-workflow skill  ${RED}NOT FOUND — install failed${NC}"; all_ok=false
+    echo -e "  engineer-shovel skill  ${RED}NOT FOUND — install failed${NC}"; all_ok=false
   fi
 
   echo "──────────────────────────────────────────"
@@ -339,10 +339,10 @@ verify() {
 print_summary() {
   header "🎯 Setup Complete!"
 
-  echo -e "${BOLD}To start using the optimal-workflow:${NC}"
+  echo -e "${BOLD}To start using the engineer-shovel:${NC}"
   echo ""
   echo "  1. In OpenCode or Claude Code, load the skill:"
-  echo "     skill(name=\"optimal-workflow\")"
+  echo "     skill(name=\"engineer-shovel\")"
   echo ""
   echo "  2. Then choose your workflow:"
   echo "     /plan → /prp-implement    # New feature"
@@ -366,11 +366,11 @@ print_summary() {
 main() {
   echo ""
   echo -e "${BOLD}${BLUE}╔══════════════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${BLUE}║   optimal-workflow — Full Toolchain Installer    ║${NC}"
+  echo -e "${BOLD}${BLUE}║   engineer-shovel — Full Toolchain Installer    ║${NC}"
   echo -e "${BOLD}${BLUE}╚══════════════════════════════════════════════════╝${NC}"
   echo ""
   echo "This script will install: ECC, GSD, superpowers, Caveman, RTK,"
-  echo "and the optimal-workflow skill for your AI coding environment."
+  echo "and the engineer-shovel skill for your AI coding environment."
   echo ""
 
   check_prereqs

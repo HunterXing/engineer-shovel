@@ -679,20 +679,20 @@ Caveman compresses communication by ~75%, drastically extending context window l
 
 This skill is installed at:
 ```
-/root/.agents/skills/optimal-workflow/SKILL.md
+/root/.agents/skills/engineer-shovel/SKILL.md
 ```
 
 **Verify it's loaded:**
 ```bash
-# Check that optimal-workflow appears in available skills
+# Check that engineer-shovel appears in available skills
 # via the `skill` tool or look for it in the directory:
-ls /root/.agents/skills/optimal-workflow/
+ls /root/.agents/skills/engineer-shovel/
 ```
 
 **Usage:**
 ```bash
 # Load this skill when starting a new development task
-skill(name="optimal-workflow")
+skill(name="engineer-shovel")
 
 # Then follow the appropriate workflow from the sections above
 ```
