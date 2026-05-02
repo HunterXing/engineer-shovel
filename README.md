@@ -1,182 +1,95 @@
-<p align="center">
-  <img src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=for-the-badge&color=6366f1" alt="Stars">
-  <img src="https://img.shields.io/github/license/HunterXing/engineer-shovel?style=for-the-badge&color=22c55e" alt="License">
-  <img src="https://img.shields.io/badge/OpenCode-Ready-8b5cf6?style=for-the-badge" alt="OpenCode">
-  <img src="https://img.shields.io/badge/Claude_Code-Ready-d97706?style=for-the-badge" alt="Claude Code">
-</p>
-
 <h1 align="center">🪖 Engineer Shovel</h1>
 
 <p align="center">
-  <b>All-in-one AI agent development toolkit</b><br>
-  <sub>New Feature · Bug Fix · Brainstorming · Refactoring · Code Review · Quick Tasks · Complex Projects · Deep Research</sub>
+  <b>Token-aware AI agent development workflow router</b><br>
+  <sub>Quick Tasks · Bug Fix · Feature · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Statistics</sub>
 </p>
 
 <p align="center">
-  <code>/tool-feat</code> <code>/tool-fix</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-quick</code> <code>/tool-blueprint</code> <code>/tool-research</code>
-</p>
-
-<p align="center">
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-commands--workflows">Commands</a> •
-  <a href="#-toolchain">Toolchain</a> •
-  <a href="README_zh.md">中文</a>
-</p>
-
-<p align="center">
-  <code>skill(name="engineer-shovel")</code>
+  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code>
 </p>
 
 ---
 
-## 📖 What is this?
+## What is this?
 
-**Engineer Shovel** — like a real entrenching tool, it serves as a shovel, pickaxe, saw, and ruler all in one. Encapsulates the best practices of the full development toolchain into **9 standalone slash commands**, covering the entire development lifecycle.
+Engineer Shovel is a lightweight skill + slash-command pack for OpenCode and Claude Code. It routes development work to the cheapest workflow that can still verify the outcome, then escalates to deeper agent workflows only when risk requires it.
 
-```
-OpenCode   + superpowers + ecc + gsd + Caveman + rtk
-Claude Code + superpowers + ecc + gsd      + Caveman + rtk
-```
+The runtime `SKILL.md` is intentionally small; long-form documentation lives in `docs/` so routine sessions do not pay for the full manual.
 
-Each command is a complete workflow — from planning to verification, from bug fix to release.
-
----
-
-## 🧭 Task Router
-
-```mermaid
-flowchart TD
-    START["🚀 What do you need?"]
-
-    START --> Q1{"Build something new?"}
-    START --> Q2{"Fix a bug?"}
-    START --> Q3{"Improve code?"}
-    START --> Q4{"Review code?"}
-    START --> Q5{"Not sure?"}
-    START --> Q6{"Research?"}
-
-    Q1 -->|"Yes"| SCALE{"How big?"}
-    SCALE -->|"< 3 files"| QUICK["⚡ /tool-quick"]
-    SCALE -->|"Medium"| PLAN["📐 /tool-plan"]
-    SCALE -->|"Complex"| BP["🏗️ /tool-blueprint"]
-    PLAN --> FEAT["🆕 /tool-feat"]
-    BP --> FEAT
-
-    Q2 -->|"Yes"| FIX["🐛 /tool-fix"]
-
-    Q3 -->|"Yes"| REF["🔧 /tool-refactor"]
-
-    Q4 -->|"Yes"| REV["📋 /tool-review"]
-
-    Q5 -->|"Yes"| BS["💡 /tool-brainstorm"]
-
-    Q6 -->|"Yes"| RS["🔬 /tool-research"]
-
-    QUICK --> DONE["✅ Done"]
-    FEAT --> DONE
-    FIX --> DONE
-    REF --> DONE
-    REV --> DONE
-    BS --> DONE
-    RS --> DONE
-
-    style START fill:#6366f1,color:#fff
-    style DONE fill:#22c55e,color:#fff
-    style QUICK fill:#f59e0b,color:#fff
-    style FEAT fill:#8b5cf6,color:#fff
-    style FIX fill:#ef4444,color:#fff
-    style REF fill:#06b6d4,color:#fff
-    style REV fill:#f97316,color:#fff
-    style BS fill:#ec4899,color:#fff
-    style RS fill:#14b8a6,color:#fff
-    style PLAN fill:#a78bfa,color:#fff
-    style BP fill:#7c3aed,color:#fff
-```
-
----
-
-## 🚀 Quick Start
-
-**New user? One command setup:**
+## Quick Start
 
 ```bash
+# Default: recommended mode (skill + commands + Caveman staging)
 curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
+
+# Minimal: only engineer-shovel skill and slash commands
+./install.sh --minimal
+
+# Full: ECC/GSD + superpowers + Caveman + RTK + engineer-shovel
+./install.sh --full
 ```
 
-This auto-installs **ECC**, **GSD**, **superpowers**, **Caveman**, **RTK** and the `engineer-shovel` skill.
+Then use either:
 
-**In session:**
-
-```
+```text
 skill(name="engineer-shovel")
 ```
 
-Then pick your scenario — each `/tool-*` command has the full workflow.
+or call a command directly:
 
----
-
-## 🌟 Features
-
-| Category | Description |
-|----------|------------|
-| 🎯 **9 Commands** | New Feature, Bug Fix, Planning, Refactoring, Code Review, Brainstorming, Quick Tasks, Complex Projects, Deep Research |
-| 🔀 **Dual Environment** | Explicit `[OC]` / `[CC]` command branching |
-| 🧭 **Decision Trees** | Primary router + complexity router |
-| 🛠️ **Self-Contained** | Each command file has env-aware steps, ready to execute |
-| ⚡ **Token Mgmt** | Caveman lite/full/ultra + context preservation |
-| 🌐 **Lang Reference** | Test / Build / Review for 10 languages |
-| 📋 **Quick Lookup** | 9-scenario command summary |
-
----
-
-## 📋 Commands & Workflows
-
-| Command | Scenario | Pipeline |
-|---------|----------|----------|
-| `/tool-feat` | 🆕 New Feature | `/plan` → `/prp-implement` → `/verify` → commit |
-| `/tool-fix` | 🐛 Bug Fix | `/gsd-debug` → fix → test → commit |
-| `/tool-plan` | 📐 Planning | `/plan` / `/blueprint` → review → execute |
-| `/tool-refactor` | 🔧 Refactoring | `/refactor` → verify → `/review-work` → commit |
-| `/tool-review` | 📋 Code Review | `/code-review` / `/review-pr` / `/review-work` |
-| `/tool-brainstorm` | 💡 Brainstorming | `/gsd-explore` / `/superpowers:brainstorming` |
-| `/tool-quick` | ⚡ Quick Tasks | `/gsd-fast` / cavecrew builder |
-| `/tool-blueprint` | 🏗️ Complex Projects | `/blueprint` / GSD phases → `/gsd-ship` |
-| `/tool-research` | 🔬 Deep Research | `/deep-research` → synthesize → apply |
-
-> Each `commands/tool-*.md` is self-contained — env-aware steps with OpenCode `[OC]` and Claude Code `[CC]` variants.
-
----
-
-## 🔧 Toolchain
-
-| Tool | Purpose | Install |
-|------|---------|---------|
-| **ECC** | Plugin & skill framework | `/plugin install ecc@ecc` |
-| **GSD** | Project management | Part of ECC |
-| **superpowers** | Brainstorming & planning | `/plugin install superpowers@claude-plugins-official` |
-| **Caveman** | Token compression | `/plugin install caveman@caveman` |
-| **RTK** | CLI token optimization | `cargo install rtk` |
-
----
-
-## 📂 Structure
-
+```text
+/tool-quick --fast "fix typo in README"
+/tool-review --fast
+/tool-research --deep "compare options for X"
+/tool-statistic --fast
 ```
+
+## Cost Modes
+
+| Mode | Use when | Typical path |
+|---|---|---|
+| `--fast` | low-risk, known target | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
+| `--standard` | normal development | `/caveman full`, targeted search, implementation, tests/build |
+| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, GSD, deep research, Oracle/review-work |
+
+RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context.
+
+## Commands
+
+| Command | Use for |
+|---|---|
+| `/tool-quick` | Obvious small edits |
+| `/tool-fix` | Bugs, failing tests, regressions |
+| `/tool-feat` | New functionality |
+| `/tool-plan` | Requirements and implementation planning |
+| `/tool-refactor` | Behavior-preserving cleanup |
+| `/tool-review` | Local diff, PR, or deep review |
+| `/tool-brainstorm` | Clarify ideas before building |
+| `/tool-blueprint` | Multi-step or multi-session projects |
+| `/tool-research` | Evidence gathering and synthesis |
+| `/tool-statistic` | Session token usage and savings report |
+
+## Structure
+
+```text
 engineer-shovel/
-├── commands/          # 9 standalone slash commands
-├── SKILL.md           # Main skill (700+ lines)
-├── install.sh         # One-command bootstrap installer
-├── README.md          # English docs (this file)
-├── README_zh.md       # Chinese docs
-└── LICENSE            # MIT
+├── commands/          # 9 executable slash commands
+├── docs/              # long-form references kept out of runtime context
+├── SKILL.md           # lightweight router
+├── install.sh         # minimal/recommended/full installer
+├── README.md
+├── README_zh.md
+└── LICENSE
 ```
 
----
+## Documentation
 
-## 📝 License
+- Full workflows: [`docs/workflows.md`](docs/workflows.md)
+- Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
+- Installation modes: [`docs/install.md`](docs/install.md)
+- Language reference: [`docs/language-reference.md`](docs/language-reference.md)
 
-MIT — see [LICENSE](LICENSE)
+## License
 
-<p align="center">
-  <sub>Built for OpenCode + superpowers + ecc + gsd + Caveman + rtk</sub>
-</p>
+MIT — see [LICENSE](LICENSE).

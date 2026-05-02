@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.0 (2026-05-02)
+
+### Changed
+- Slimmed `SKILL.md` into a lightweight router and moved long-form references into `docs/`.
+- Added token-aware `--fast`, `--standard`, and `--deep` cost modes to slash commands.
+- Changed installer default to recommended mode with explicit `--minimal`, `--recommended`, and `--full` options.
+- Reduced default use of high-cost workflows such as `/review-work`, `/gsd-debug`, and deep research.
+
+### Added
+- `docs/workflows.md`, `docs/token-cost.md`, `docs/install.md`, and `docs/language-reference.md`.
+- CI guardrails for command frontmatter, token-efficiency footers, skill size, docs presence, and shell syntax.
+- `/tool-statistic` command for measured Caveman/RTK session token statistics when available.
+
+---
+
 ## 1.1.0 (2026-05-01)
 
 ### Changed
