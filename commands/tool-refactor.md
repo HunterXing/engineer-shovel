@@ -16,15 +16,13 @@ when-to-use: Use for behavior-preserving cleanup where baseline and post-change 
 
 Behavior must remain identical. Do not mix feature work into a refactor.
 
-Compression: use `/caveman full`; switch to `/caveman ultra` for broad diffs or long verification output. Use RTK for git diff, tests, and build logs when available.
+Compression: follow `docs/token-cost.md`; use full by default, ultra for broad diffs, and RTK for diff/test/build logs.
 
 ## Cost Modes
 
-| Mode | Use when | Review path |
-|---|---|---|
-| `--fast` | 1-2 file cleanup | targeted tests + `/tool-review --fast` |
-| `--standard` or default | normal refactor | baseline tests → refactor → tests/build → local review |
-| `--deep` | broad, risky, security-sensitive, or performance-critical | `/refactor` + `/review-work` + E2E if applicable |
+- `--fast`: 1-2 file cleanup → targeted tests + `/tool-review --fast`.
+- `--standard` or default: normal refactor → baseline tests → refactor → tests/build → local review.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → `/refactor` + `/review-work` + E2E if applicable.
 
 ## Flow
 

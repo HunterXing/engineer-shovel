@@ -16,15 +16,13 @@ when-to-use: Use when behavior is broken, tests fail, logs show regressions, or 
 
 Start with the cheapest path that can prove the bug is fixed. Escalate only when reproduction or root cause is unclear.
 
-Compression: use `/caveman full` by default; use `/caveman lite` for `--fast`; use RTK-wrapped shell output for logs, tests, and stack traces when available.
+Compression: follow `docs/token-cost.md`; default to `/caveman full`, lite for `--fast`, and RTK for logs/tests/traces.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--fast` | known file/function, obvious cause | direct fix + targeted test |
-| `--standard` or default | reproducible bug, local scope | reproduce → inspect related code → fix → regression test |
-| `--deep` | flaky, cross-module, security, or unknown root cause | `/gsd-debug` and optional Oracle after failed attempts |
+- `--fast`: known file/function, obvious cause → direct fix + targeted test.
+- `--standard` or default: reproducible bug, local scope → reproduce → inspect related code → fix → regression test.
+- `--deep`: flaky, cross-module, security, or unknown root cause → `/gsd-debug` and optional Oracle after failed attempts.
 
 ## Flow
 

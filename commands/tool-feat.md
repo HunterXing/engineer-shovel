@@ -16,15 +16,13 @@ when-to-use: Use for adding new functionality after choosing the smallest verifi
 
 Build the smallest feature slice that can be verified. Use deep workflows only for unclear or multi-component work.
 
-Compression: use `/caveman full` by default; use `/caveman lite` for `--fast`; use RTK-wrapped shell output for git/test/build output when available.
+Compression: follow `docs/token-cost.md`; default to `/caveman full`, lite for `--fast`, and RTK for git/test/build output.
 
 ## Cost Modes
 
-| Mode | Use when | Path |
-|---|---|---|
-| `--fast` | known area, small feature | targeted search → implement → tests |
-| `--standard` or default | normal feature, 3-8 files | explore patterns → plan → implement → verify |
-| `--deep` | ambiguous, external deps, multi-system | librarian/explore → `/tool-plan` or `/tool-blueprint` |
+- `--fast`: known area, small feature → targeted search → implement → tests.
+- `--standard` or default: normal feature, 3-8 files → explore patterns → plan → implement → verify.
+- `--deep`: ambiguous, external deps, multi-system → librarian/explore → `/tool-plan` or `/tool-blueprint`.
 
 ## Flow
 
