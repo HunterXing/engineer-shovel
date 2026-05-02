@@ -34,7 +34,7 @@
 **工兵铲** — 如同一把真正的工兵铲，集铲、镐、锯、量于一身。封装为 **9 个独立斜杠指令**，覆盖全部开发场景：
 
 ```
-OpenCode   + superpowers + ecc + gsd + + Caveman + rtk
+OpenCode   + superpowers + ecc + gsd + Caveman + rtk
 Claude Code + superpowers + ecc + gsd      + Caveman + rtk
 ```
 
@@ -151,6 +151,6 @@ engineer-shovel/
 MIT — 详见 [LICENSE](LICENSE)
 
 <p align="center">
-  <sub>基于 OpenCode + superpowers + ecc + gsd + + Caveman + rtk 构建</sub><br>
+  <sub>基于 OpenCode + superpowers + ecc + gsd + Caveman + rtk 构建</sub><br>
   <sub>同时兼容 Claude Code + superpowers + ecc + gsd + Caveman + rtk</sub>
 </p>

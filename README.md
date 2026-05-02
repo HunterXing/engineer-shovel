@@ -34,7 +34,7 @@
 **Engineer Shovel** — like a real entrenching tool, it serves as a shovel, pickaxe, saw, and ruler all in one. Encapsulates the best practices of the full development toolchain into **9 standalone slash commands**, covering the entire development lifecycle.
 
 ```
-OpenCode   + superpowers + ecc + gsd + + Caveman + rtk
+OpenCode   + superpowers + ecc + gsd + Caveman + rtk
 Claude Code + superpowers + ecc + gsd      + Caveman + rtk
 ```
 
