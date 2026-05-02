@@ -1,6 +1,6 @@
 # Engineer Shovel Workflows
 
-This document is the long-form reference for the 9 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
+This document is the long-form reference for the 10 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
 
 ## `/tool-quick`
 
