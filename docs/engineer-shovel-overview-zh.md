@@ -287,7 +287,7 @@ bash scripts/branch-workflow.sh <subcommand> [args...]
 
 | 技能或工具 | 用途 |
 |---|---|
-| refactoring / gitnexus-refactoring | 安全重构 |
+| refactoring / code-review-graph | 安全重构 |
 | `/tool-review` | 重构后审查 |
 | `/tool-fix` | baseline 失败时先修 Bug |
 | RTK | 压缩 diff、测试、构建日志 |

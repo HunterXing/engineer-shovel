@@ -4,7 +4,7 @@ display_name: engineer-shovel
 description: |
   工兵铲 (Engineer Shovel) — token-aware AI agent development workflow router.
   Provides 12 slash commands for feature work, bug fixing, branch workflow, planning, refactoring,
-  review, brainstorming, quick tasks, complex projects, research, graph updates, and sync.
+  review, brainstorming, quick tasks, complex projects, research, code graph management, and sync.
 license: MIT
 metadata:
   version: "1.3.0"
@@ -16,7 +16,7 @@ metadata:
     - GSD (Get Stuff Done)
     - Caveman plugin
     - rtk
-    - code-review-graph 
+    - code-review-graph
 ---
 
 # 🪖 工兵铲 — Engineer Shovel
@@ -37,7 +37,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 | `/tool-brainstorm` | Explore unclear ideas before building | Low → Medium |
 | `/tool-blueprint` | Multi-step, multi-session projects | High |
 | `/tool-research` | Current-state technical research | Low → High by mode |
-| `/tool-graph` | code-review-graph status, full build, incremental update, rebuild, watch | Low |
+| `/tool-graph` | code-review-graph status, build, update, rebuild, watch | Low |
 | `/tool-update` | Sync and update installation | Low |
 
 ## Router
