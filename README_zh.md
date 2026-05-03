@@ -1,6 +1,27 @@
-# 🪖 工兵铲 · Engineer Shovel
+<h1 align="center">🪖 工兵铲 · Engineer Shovel</h1>
 
-**面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。**
+<p align="center">
+  <b>面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。</b><br>
+  <sub>快速任务 · Bug 修复 · 新功能 · 分支 · 规划 · 重构 · 审查 · 头脑风暴 · 蓝图 · 研究 · 代码图谱 · 同步</sub>
+</p>
+
+<p align="center">
+  <a href="README.md">English</a> |
+  <a href="README_zh.md">简体中文</a> |
+  <a href="README.ja-JP.md">日本語</a> |
+  <a href="README.ko-KR.md">한국어</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
+  <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
+  <img alt="Commands" src="https://img.shields.io/badge/commands-12-5865F2?style=flat-square">
+  <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square">
+  <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
+</p>
+
+---
 
 它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、代码图谱和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
 

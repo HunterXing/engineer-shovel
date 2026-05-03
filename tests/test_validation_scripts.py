@@ -151,3 +151,20 @@ def test_feature_workflow_requires_branch_gate():
 
     assert "/tool-branch create" in text
     assert "before editing" in text.lower()
+
+
+def test_readme_header_has_language_links_and_badges_without_command_wall():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    header = text.split("---", 1)[0]
+
+    for label in ("English", "简体中文", "日本語", "한국어"):
+        assert label in header
+    for badge in ("GitHub stars", "GitHub forks", "License", "Commands", "OpenCode"):
+        assert badge in header
+    assert "/tool-quick" not in header
+    assert "/tool-update" not in header
+
+
+def test_localized_readme_files_exist_for_header_links():
+    for name in ("README_zh.md", "README.ja-JP.md", "README.ko-KR.md"):
+        assert (ROOT / name).exists()
