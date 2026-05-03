@@ -1,39 +1,24 @@
 ---
-description: Brainstorming workflow — refine ideas and route to action
-argument-hint: [--fast|--standard|--deep] [idea or topic]
+description: [DEPRECATED] Use /tool-feat or /tool-plan instead. Brainstorming is now built into these commands as Phase 0.
+argument-hint: "[redirect — use /tool-plan or /tool-feat instead]"
 cost-profile: variable
 risk-level: low
-recommended-mode: --standard
-allowed-tools: [Read, Grep, Glob, Task]
-escalates-to: [/tool-plan, /tool-research, /tool-blueprint]
+recommended-mode: --fast
+allowed-tools: []
+escalates-to: [/tool-plan, /tool-feat]
 depends-on: []
-when-to-use: Use when an idea is not implementation-ready and needs assumptions, options, or routing clarified first.
+when-to-use: DEPRECATED since v1.4.0. Use `/tool-feat` or `/tool-plan` — both auto-detect when clarification is needed and enter a brainstorm phase. If you specifically need an exploration-only session, use `/tool-plan --fast` with a vague goal.
 ---
 
-# /tool-brainstorm — Brainstorming & Exploration
+# /tool-brainstorm — DEPRECATED
 
-**Input**: $ARGUMENTS
+**This command is deprecated as of v1.4.0.** Brainstorming is now a built-in Phase 0 in `/tool-feat` and `/tool-plan`.
 
-Use this when the idea is not yet implementation-ready.
+If your feature or plan direction is unclear, just use the target command directly:
+- `/tool-feat "add auth to the app"` — will auto-trigger brainstorm if direction is unclear
+- `/tool-plan "redesign the database layer"` — will auto-trigger brainstorm before planning
 
-Compression: caveman lite for readability, caveman full when options/tradeoffs get long.
-
-## Cost Modes
-
-- `--fast`: capture and rough route → short options → route to backlog.
-- `--standard` or default: clarify direction → follow Decision Tree 1 in `docs/decision-trees.md`:
-  - **Product direction unclear** ("what to build") → L6: `gsd-explore`
-  - **Technical approach unclear** ("how to build") → L5: `superpowers:brainstorming`
-- `--deep`: multiple viable paths or go/no-go decision → L6: `council` after options are clear.
-
-## Flow
-
-1. State the idea, goal, and uncertainty.
-2. Surface assumptions and hidden constraints.
-3. Generate options with tradeoffs.
-   For domain-specific exploration, load relevant L4 ECC skills based on project context (language, framework, security).
-4. Route to `/tool-quick`, `/tool-feat`, `/tool-plan`, `/tool-research`, or backlog.
-
-## Avoid
-
-Do not start implementation from brainstorming unless the next action is clear and verifiable.
+The router auto-detects ambiguity and enters the appropriate clarification path:
+- Product direction unclear → `gsd-explore`
+- Technical approach unclear → `superpowers:brainstorming`
+- Multiple architecture options → `ecc:council`

@@ -3,11 +3,11 @@ name: 工兵铲
 display_name: engineer-shovel
 description: |
   工兵铲 (Engineer Shovel) — token-aware AI agent development workflow router.
-  Provides 12 slash commands for feature work, bug fixing, branch workflow, planning, refactoring,
-  review, brainstorming, quick tasks, complex projects, research, code graph management, and sync.
+  Provides 8 slash commands for feature work, bug fixing, planning, refactoring,
+  review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -29,28 +29,29 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 |---|---|---|
 | `/tool-quick` | Typos, config edits, 1-2 file surgical changes | Low |
 | `/tool-fix` | Bug reports, failing tests, regressions | Low → High by scope |
-| `/tool-feat` | New functionality | Medium |
-| `/tool-branch` | Branch workflow: create, review, merge, abort | Low |
-| `/tool-plan` | Requirements and implementation planning | Medium |
+| `/tool-feat` | New functionality (auto-brainstorms when unclear) | Medium |
+| `/tool-plan` | Requirements and implementation planning (auto-escalates to blueprint/gsd) | Medium |
 | `/tool-refactor` | Behavior-preserving cleanup | Medium |
 | `/tool-review` | Local diff, PR, or post-implementation review | Low → High by mode |
-| `/tool-brainstorm` | Explore unclear ideas before building | Low → Medium |
-| `/tool-blueprint` | Multi-step, multi-session projects | High |
-| `/tool-research` | Current-state technical research | Low → High by mode |
-| `/tool-graph` | code-review-graph status, build, update, rebuild, watch | Low |
+| `/tool-research` | Codebase-aware technical research | Low → High by mode |
+| `/tool-graph` | code-review-graph diagnostics only (auto-refreshed via git hooks) | Low |
 | `/tool-update` | Sync and update installation | Low |
+| `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` | — |
+| `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` | — |
+| `/tool-branch` | Branch create, status, review, merge, abort (auto-called by feat/fix) | Low |
 
 ## Router
 
 - If the change is obvious and touches at most 2 files, use `/tool-quick`.
 - If something is broken, use `/tool-fix`; only escalate to GSD debugging when the cause crosses files or is not reproducible locally.
-- If you need to build a feature, use `/tool-feat`; use `/tool-plan` first when requirements are unclear.
-- If starting any non-trivial task, use `/tool-branch create` first to isolate changes in a feature branch.
+- If you need to build a feature, use `/tool-feat` — it auto-brainstorms when requirements are unclear.
+- If starting any non-trivial task, `/tool-feat` and `/tool-fix` auto-create a feature branch.
 - If behavior must remain identical, use `/tool-refactor` and verify before/after.
-- If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work. Use `/tool-branch review` to see diff before merging.
-- If the work spans phases, milestones, or multiple PRs, use `/tool-blueprint`.
-- If you need external/current information, use `/tool-research`; start with `--quick` and escalate only when evidence is insufficient.
-- If you need to refresh code-review-graph context, use `/tool-graph update` for incremental refresh or `/tool-graph build` for full graph creation.
+- If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work.
+- If planning is needed, use `/tool-plan` — `--fast` for inline plans, `--standard` for `writing-plans`, `--deep` auto-escalates to `ecc:blueprint` or `gsd project`.
+- If you need external/current information, use `/tool-research` (codebase-aware via graph); start with `--quick` and escalate only when evidence is insufficient.
+- If you need to diagnose code-review-graph health, use `/tool-graph status` — graph is auto-refreshed by git hooks.
+- If you need manual branch operations, use `/tool-branch create|status|review|merge|abort`.
 
 ## Cost Modes
 
@@ -58,7 +59,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 |---|---|---|
 | `--fast` | Low-risk, known location, small diff | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
 | `--standard` | Normal development work | `/caveman full`, targeted exploration, tests, build, local review |
-| `--deep` | Ambiguous, high-risk, cross-system, security-sensitive | `/caveman full` or `/caveman ultra`, GSD, deep research, Oracle/review-work |
+| `--deep` | Ambiguous, high-risk, cross-system, security-sensitive | `/caveman full` or `/caveman ultra`, GSD, deep research, council, review-work |
 
 Default to the cheapest mode that still verifies the outcome. Escalate only when evidence shows the lighter mode is insufficient.
 
@@ -77,6 +78,7 @@ Default to the cheapest mode that still verifies the outcome. Escalate only when
 3. Run the smallest meaningful verification first, then expand if risk demands it.
 4. Keep high-cost agents for high-risk decisions, not routine work.
 5. Use Caveman or compact handoffs when context usage grows.
+6. Code-review-graph is auto-refreshed by git hooks — never manually refresh during workflow.
 
 ## Token Guidance
 
@@ -89,6 +91,7 @@ Default to the cheapest mode that still verifies the outcome. Escalate only when
 ## References
 
 - Full workflows: `docs/workflows.md`
+- Toolchain architecture: `docs/12-commands-toolchain.md`
 - Token cost model: `docs/token-cost.md`
 - Installation modes: `docs/install.md`
 - Language command reference: `docs/language-reference.md`

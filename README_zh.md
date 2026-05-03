@@ -23,11 +23,11 @@
 
 ---
 
-它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、代码图谱和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
+它提供 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、研究、代码图谱诊断和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
 
 ## 能力边界
 
-Engineer Shovel 原生安装的是轻量路由器和 12 个 `/tool-*` 命令。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
+Engineer Shovel 原生安装的是轻量路由器和 `/tool-*` 命令（8 个活跃 + 2 个已废弃）。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
 
 Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Caveman、RTK 或 code-review-graph 等外部能力，需要对应工具已经安装并处于健康状态。
 
@@ -98,7 +98,9 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 
 ## 指令
 
-`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-branch`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-brainstorm`、`/tool-blueprint`、`/tool-research`、`/tool-graph`、`/tool-update`。
+`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-branch`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-research`、`/tool-graph`、`/tool-update`。
+
+> **v1.4.0**: `/tool-brainstorm` 已内化为 `/tool-feat` 和 `/tool-plan` 的 Phase 0；`/tool-blueprint` 已合并到 `/tool-plan --deep`。这两个命令文件保留重定向说明。
 
 ## 文档
 

@@ -111,8 +111,8 @@ RTK はインストールされている場合、git、テスト、ビルド、�
 | `/tool-plan` | 要件と実装の計画 |
 | `/tool-refactor` | 動作を保つクリーンアップ |
 | `/tool-review` | ローカル差分、PR、または深いレビュー |
-| `/tool-brainstorm` | 構築前にアイデアを明確化 |
-| `/tool-blueprint` | マルチステップまたはマルチセッションプロジェクト |
+| `/tool-brainstorm` | **[非推奨]** — アイデア明確化は `/tool-feat` や `/tool-plan` に内蔵 |
+| `/tool-blueprint` | **[非推奨]** — マルチステップ計画は `/tool-plan --deep` に統合 |
 | `/tool-research` | 証拠の収集と統合 |
 | `/tool-graph` | code-review-graph ステータス、完全ビルド，增分更新、再構築、監視 |
 | `/tool-update` | インストールと同期 |

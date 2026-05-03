@@ -1,12 +1,10 @@
 # Engineer Shovel 工作流指南
 
-Engineer Shovel 是 OpenCode 和 Claude Code 的轻量级开发工作流路由器。当前项目以 `SKILL.md` 和 12 个 `/tool-*` 命令为公共入口；长文档放在 `docs/`，避免每次会话加载完整手册。
+Engineer Shovel 是 OpenCode 和 Claude Code 的轻量级开发工作流路由器。当前项目以 `SKILL.md` 和 `/tool-*` 命令为公共入口；长文档放在 `docs/`，避免每次会话加载完整手册。
 
 ## 工具链边界
 
-原生安装内容：轻量级 `engineer-shovel` 技能和 12 个 `/tool-*` 命令。
-
-可选增强能力来自外部组件：ECC、GSD、superpowers、code-review-graph、Caveman、RTK。最小安装不会自动具备这些外部命令；如果工作流提到它们，先确认对应工具已安装且健康。
+原生安装内容：轻量级 `engineer-shovel` 技能和 8 个活跃 `/tool-*` 命令（2 个已废弃）。
 
 ## 快速入口
 
@@ -24,22 +22,22 @@ skill(name="engineer-shovel")
 /tool-graph update
 ```
 
-## 12 个命令
+## 命令表
 
 | Command | Use for |
 |---|---|
 | `/tool-quick` | 明确、低风险、1-2 文件小改 |
 | `/tool-fix` | Bug、失败测试、回归 |
-| `/tool-feat` | 新功能 |
-| `/tool-branch` | 分支创建、状态、审查、合并、放弃 |
-| `/tool-plan` | 需求和实现计划 |
+| `/tool-feat` | 新功能（需求模糊时自动脑暴） |
+| `/tool-branch` | 分支创建、状态、审查、合并、放弃（feat/fix 自动调用） |
+| `/tool-plan` | 需求与实现规划（--deep 自动升级为 blueprint/gsd） |
 | `/tool-refactor` | 行为保持不变的重构 |
 | `/tool-review` | 本地 diff、PR、实现后审查 |
-| `/tool-brainstorm` | 想法不清晰时先澄清 |
-| `/tool-blueprint` | 多步骤、多会话、复杂项目 |
-| `/tool-research` | 当前状态研究和证据综合 |
-| `/tool-graph` | code-review-graph 状态、构建、更新、重建、监听 |
+| `/tool-research` | 代码库感知的技术研究 |
+| `/tool-graph` | code-review-graph 诊断（git hook 自动刷新） |
 | `/tool-update` | 同步和更新安装 |
+| `/tool-brainstorm` | **[已废弃]** — 已内化为 feat/plan 的 Phase 0 |
+| `/tool-blueprint` | **[已废弃]** — 已合并到 plan --deep |
 
 ## 成本模式
 
@@ -83,7 +81,7 @@ skill(name="engineer-shovel")
 
 - `README.md`：项目概览、安装、能力边界。
 - `SKILL.md`：轻量运行时路由器。
-- `docs/workflows.md`：12 个 `/tool-*` 命令长文档。
+- `docs/workflows.md`：`/tool-*` 命令长文档。
 - `docs/token-cost.md`：Caveman/RTK 成本模型。
 - `docs/language-reference.md`：语言和框架命令参考。
 

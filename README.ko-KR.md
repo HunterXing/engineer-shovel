@@ -111,8 +111,8 @@ RTK는 설치될 때 보완적으로 작동합니다: git, 테스트, 빌드, �
 | `/tool-plan` | 요구사항 및 구현 계획 |
 | `/tool-refactor` | 동작 보존 정리 |
 | `/tool-review` | 로컬 diff, PR 또는 깊은 리뷰 |
-| `/tool-brainstorm` | 구축 전 아이디어 명확화 |
-| `/tool-blueprint` | 멀티스텝 또는 멀티세션 프로젝트 |
+| `/tool-brainstorm` | **[지원 중단]** — 아이디어 명확화는 `/tool-feat` 또는 `/tool-plan`에 내장 |
+| `/tool-blueprint` | **[지원 중단]** — 멀티스텝 계획은 `/tool-plan --deep`에 통합 |
 | `/tool-research` | 증거 수집 및 합성 |
 | `/tool-graph` | code-review-graph 상태, 전체 빌드, 증분 업데이트, 재빌드, 감시 |
 | `/tool-update` | 동기화 및 설치 업데이트 |

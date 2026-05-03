@@ -1,54 +1,47 @@
 # Engineer Shovel Workflows
 
-This document is the long-form reference for the 12 `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
+This document is the long-form reference for the `/tool-*` commands. Keep runtime prompts short; use this file for documentation and maintenance.
 
 ## `/tool-quick`
 
 Use for obvious, low-risk work: typo fixes, config changes, simple renames, or 1-2 file edits.
 
-Default path: execute inline, run targeted verification. Call `rtk gain` before test/build output.
+Default path: code-review-graph context (auto-refreshed) → execute inline → run targeted verification with `rtk gain` → report.
 
 ## `/tool-fix`
 
 Use for broken behavior, failing tests, or regressions.
 
 Cost routing:
-- `--fast`: known file/function, clear cause, direct fix.
+- `--fast`: known file/function, clear cause → code-review-graph trace → direct fix.
 - `--standard`: reproduce → code-review-graph trace → fix → impact analysis → regression tests.
-- `--deep`: cross-file, flaky, security-sensitive → gsd-debug + systematic-debugging + security-review.
+- `--deep`: flaky, cross-file, security-sensitive → ecc:deep-research → systematic-debugging → gsd-debug → security-review.
+
+Unified verification gate: test → graph impact → caveman review.
 
 Security gate: if touching auth/input/secrets/network/sql → add `/security-review` regardless of mode.
 
 ## `/tool-feat`
 
-Use for new functionality.
+Use for new functionality. Auto-brainstorms when requirements are unclear.
 
 Cost routing:
 - `--fast`: small feature in known location → code-review-graph explore → implement.
-- `--standard`: code-review-graph explore → implement (skip brainstorm if feature is clearly described).
-- `--deep`: multi-component or ambiguous → brainstorm → plan → blueprint if needed.
+- `--standard`: code-review-graph explore → skip brainstorm if specific files named → implement → verify.
+- `--deep`: multi-component or ambiguous → brainstorm (gsd-explore / superpowers:brainstorming / ecc:council) → implement → ecc:review-work.
+
+Unified verification gate: test → graph impact → caveman review.
 
 Security gate: if touching auth/input/secrets → add `/security-review`.
 
-## `/tool-branch`
-
-Use for managing feature branch lifecycle with squash merge and diff review.
-
-Subcommands:
-- `create [type] <description>`: Create branch from current with auto-detected type (feat/fix/refactor/docs).
-- `status`: Show branch info and diff stats vs source.
-- `review`: Show full diff + code-review-graph assisted analysis.
-- `merge`: Squash merge to source branch, prompt for commit message, delete branch.
-- `abort`: Discard branch and return to source.
-
 ## `/tool-plan`
 
-Use before implementation when requirements, dependencies, or verification criteria are unclear.
+Unified planning entry point. Auto-escalates to blueprint or GSD project.
 
-Planning paths (pick one, not both):
-- Product direction unclear → `gsd-explore`
-- Technical approach unclear → `superpowers:brainstorming`
-- Then: ≤3 PR → `writing-plans` | >3 PR → `/tool-blueprint`
+Cost routing:
+- `--fast`: small task, clear scope → inline plan → route to quick/feat.
+- `--standard`: brainstorm if needed → superpowers:writing-plans.
+- `--deep`: auto-classify → ecc:blueprint (≤3 PR) or gsd project (milestone) or council (architecture).
 
 ## `/tool-refactor`
 
@@ -56,10 +49,12 @@ Use when external behavior must remain unchanged.
 
 Required pattern:
 1. Establish baseline tests/build. Call `rtk gain` before test runs.
-2. If code-review-graph installed, check impact before refactoring.
+2. Code-review-graph impact analysis (auto-refreshed).
 3. Make one logical refactor at a time.
 4. Re-run verification after each step.
-5. Review using the cheapest mode that fits risk.
+5. `--deep`: mandatory gsd-execute-phase + ecc:review-work.
+
+Unified verification gate: all tests pass → graph impact clean → caveman review.
 
 Security gate: if touching auth/security paths → add `/security-review`.
 
@@ -67,44 +62,49 @@ Security gate: if touching auth/security paths → add `/security-review`.
 
 Modes:
 - `--fast`: Caveman-compressed review for routine local diffs.
-- default: code-review-graph assisted review for PRs.
+- default: code-review-graph assisted review + ecc:coding-standards + ecc:github-ops for PRs.
 - `--deep`: post-implementation review with `/review-work` (5-agent parallel).
 
-## `/tool-brainstorm`
-
-Use when the idea is not implementation-ready. Capture the decision and route to quick, feature, plan, research, or backlog.
-
-Paths:
-- Product direction → `gsd-explore`
-- Technical approach → `superpowers:brainstorming`
-
-## `/tool-blueprint`
-
-Use for multi-step projects, multi-session work, or changes that need dependency ordering.
-
-Paths:
-- Code-centric multi-PR → `ecc:blueprint`
-- Milestone-scale engineering → `gsd project`
+Post-review: superpowers:receiving-code-review for feedback application.
 
 ## `/tool-research`
 
+Codebase-aware research with code-review-graph context.
+
 Modes:
-- `--quick`: local docs and known references.
-- `--web`: add current web/docs search.
-- `--deep`: multi-source research with deep-research.
+- `--quick`: local docs + code-review-graph architecture context.
+- `--web`: add current web/docs search + code-review-graph context.
+- `--deep`: multi-source research with ecc:deep-research + code-review-graph exploration.
 
 ## `/tool-graph`
 
-Manage the `code-review-graph` index.
+**Diagnostic only.** The code-review-graph is auto-refreshed via git hooks (post-commit, post-checkout). Use this command only for manual inspection or troubleshooting.
 
 Modes:
 - `status`: show install and graph health.
 - `build`: full initial graph build.
-- `update`: incremental graph refresh after code changes.
+- `update`: manual refresh (only if hooks not active).
 - `rebuild`: full refresh for stale or damaged graphs.
 - `watch`: explain or start continuous graph updates.
 
-Integration: other commands use graph implicitly for exploring, debugging, impact analysis, and review.
+## `/tool-brainstorm` — DEPRECATED
+
+Brainstorming is now built into `/tool-feat` and `/tool-plan` as Phase 0. Use those commands directly — they auto-detect when clarification is needed.
+
+## `/tool-blueprint` — DEPRECATED
+
+Multi-step project planning is now part of `/tool-plan --deep`. It auto-classifies complexity and escalates to `ecc:blueprint` or `gsd project`.
+
+## `/tool-branch`
+
+Branch lifecycle management (called automatically by feat/fix).
+
+Subcommands:
+- `create [type] <description>`: Create branch from current with auto-detected type.
+- `status`: Show branch info and diff stats vs source.
+- `review`: Show full diff + code-review-graph assisted analysis.
+- `merge`: Squash merge to source branch, prompt for commit message, delete branch.
+- `abort`: Discard branch and return to source.
 
 ## `/tool-update`
 

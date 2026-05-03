@@ -25,13 +25,13 @@ Compression: caveman lite by default. Call `rtk gain` before tests/validation to
 
 ## Flow
 
-0. If code-review-graph installed, get minimal context: `get_minimal_context_tool` for the target file(s) (L3).
+0. Get code-review-graph minimal context: `get_minimal_context_tool` for the target file(s) (L2, auto-refreshed by git hooks).
    If project language is known, load matching L4 ECC pattern reference from `docs/language-reference.md`.
 1. Confirm the target file or symbol from context.
 2. Make the smallest safe change.
 3. Run the nearest useful verification: formatter/lint/test/build as applicable.
    Call `rtk gain` before noisy commands (test runs, builds, diff/log inspection).
-4. Report what changed and what passed.
+4. **Verification Gate**: Run the project-native test/build command. On pass, report what changed and what was verified.
 
 ## Security Gate
 

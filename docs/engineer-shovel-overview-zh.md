@@ -6,7 +6,7 @@
 
 Engineer Shovel，中文名“工兵铲”，是一个面向 OpenCode / Claude Code 的 token-aware AI 软件工程工作流路由器。
 
-它不是单一开发框架，而是一个轻量入口层，用 12 个 `/tool-*` 指令把不同开发场景路由到合适的工作流、技能、命令和验证路径。
+它不是单一开发框架，而是一个轻量入口层，用一系列 `/tool-*` 指令把不同开发场景路由到合适的工作流、技能、命令和验证路径。
 
 核心目标：
 
@@ -29,7 +29,7 @@ Engineer Shovel 由几层组成：
 | 层级 | 作用 |
 |---|---|
 | `SKILL.md` | 轻量路由层，告诉 AI 应该选哪个 `/tool-*` 命令 |
-| `commands/tool-*.md` | 12 个具体场景命令，定义适用场景、风险、成本模式、流程和升级路径 |
+| `commands/tool-*.md` | 具体场景命令，定义适用场景、风险、成本模式、流程和升级路径 (8 活跃 + 2 废弃 + 2 辅助) |
 | `docs/workflows.md` | 长文档版工作流说明 |
 | `docs/token-cost.md` | token 成本模型，定义什么时候用 fast / standard / deep |
 | `docs/install.md` | 安装方式和组件说明 |
@@ -83,11 +83,13 @@ RTK 压缩工具输出进入上下文前的噪声。
 | `/tool-fix --standard` | `/caveman full` |
 | `/tool-feat --standard` | `/caveman full` |
 | `/tool-refactor --standard` | `/caveman full` |
-| `/tool-blueprint` | `/caveman full` |
+| `/tool-plan --deep` | `/caveman full` |
 | `/tool-research --deep` | 上下文压力大时用 `/caveman ultra` |
 | git/test/build/log 输出 | RTK |
 
-## 12 个场景命令
+## 12 个命令（8 个活跃 + 2 个已废弃 + 2 个辅助）
+
+> **v1.4.0**: brainstorm 已内化到 feat/plan、blueprint 已合并到 plan --deep、graph 已后台自动刷新。
 
 ### `/tool-quick`：快速任务
 
@@ -174,16 +176,15 @@ RTK 压缩工具输出进入上下文前的噪声。
 |---|---|
 | `--fast` | 已知区域的小功能，搜索、实现、测试 |
 | `--standard` | 普通功能，3-8 个文件，探索模式、计划、实现、验证 |
-| `--deep` | 多组件、外部依赖、需求模糊，升级到 `/tool-plan` 或 `/tool-blueprint` |
+| `--deep` | 多组件、外部依赖、需求模糊，自动进入 Phase 0 脑暴 → 升级到 `/tool-plan` |
 
 会用到的技能 / 工具：
 
 | 技能或工具 | 用途 |
 |---|---|
-| brainstorming | 新功能或行为变化前澄清意图 |
+| brainstorming | 新功能或行为变化前澄清意图 (Phase 0 自动触发) |
 | project-native skills | 按语言或框架选择专用能力 |
 | `/tool-plan` | 需求或验证标准不清时先规划 |
-| `/tool-blueprint` | 多组件或多 PR 功能 |
 | `/tool-review` | 实现后审查 |
 | Caveman full | 压缩功能开发中的计划和验证输出 |
 | RTK | 压缩 git/test/build 输出 |
@@ -259,7 +260,7 @@ bash scripts/branch-workflow.sh <subcommand> [args...]
 |---|---|
 | writing-plans | 多步骤任务前制定计划 |
 | `/tool-research --quick` | 技术方案未知时先研究 |
-| `/tool-blueprint` | 多 PR 或 milestone 级任务 |
+| `/tool-plan --deep` | 多 PR 或 milestone 级任务 (自动升级到 blueprint/gsd) |
 | GSD planning | 阶段化复杂项目 |
 | Caveman lite/full | 根据计划长度压缩输出 |
 
@@ -324,48 +325,20 @@ bash scripts/branch-workflow.sh <subcommand> [args...]
 | code-review-graph | 提供图谱上下文和影响面分析 |
 | RTK | 压缩 diff / log 输出 |
 
-### `/tool-brainstorm`：头脑风暴
+### `/tool-brainstorm`：头脑风暴 — 已废弃
 
-适用场景：想法还不能直接实现，需要澄清目标、假设、约束和选项。
+> **v1.4.0 起已弃用。** 头脑风暴现在内置为 `/tool-feat` 和 `/tool-plan` 的 Phase 0。当你执行命令时，如果需求不够明确（没有具体的文件、类名、预期行为），系统会自动触发脑暴阶段。
 
-工作原理：
+自动路由：
+- 产品方向不清晰 → `gsd-explore`
+- 技术方案不明确 → `superpowers:brainstorming`
+- 多方案架构决策 → `ecc:council`
 
-1. 表述想法、目标和不确定性。
-2. 暴露隐藏假设和约束。
-3. 生成可选方案和 tradeoff。
-4. 路由到 `/tool-quick`、`/tool-feat`、`/tool-plan`、`/tool-research` 或 backlog。
+直接用目标命令即可，不需要单独调用 `/tool-brainstorm`。
 
-成本模式：
+### `/tool-blueprint`：复杂多步骤项目 — 已废弃
 
-| 模式 | 行为 |
-|---|---|
-| `--fast` | 快速捕获和粗略路由，使用 `/gsd-note` |
-| `--standard` | 澄清产品或技术方向，使用 `/gsd-explore` 或 brainstorming |
-| `--deep` | 多条可行路径或 go/no-go 决策，使用 `/council` |
-
-会用到的技能 / 工具：
-
-| 技能或工具 | 用途 |
-|---|---|
-| brainstorming | 创造性工作和行为变化前澄清需求 |
-| gsd-explore | 苏格拉底式探索想法 |
-| gsd-note | 捕获想法 |
-| council | 多路径决策 |
-| Caveman lite/full | 保持探索输出可读但不浪费上下文 |
-
-重要约束：除非下一步清晰且可验证，否则不要从 brainstorming 直接开始实现。
-
-### `/tool-blueprint`：复杂多步骤项目
-
-适用场景：单个小计划或单个 PR 无法安全承载的多步骤、多 session、多依赖项目。
-
-工作原理：
-
-1. 创建 blueprint，拆成独立可验证步骤。
-2. 标记依赖关系和可并行工作。
-3. 每个步骤使用匹配的 `/tool-*` 工作流执行。
-4. 依赖步骤连接后运行集成验证。
-5. 验证通过后再进入深度审查或发布流程。
+> **v1.4.0 起已弃用。** 多步骤项目规划现在由 `/tool-plan --deep` 统一处理，自动根据复杂度分类：≤3 PR → `ecc:blueprint`，>3 PR → `gsd project`，架构变更 → `ecc:council`。
 
 成本模式：
 
@@ -527,7 +500,7 @@ Engineer Shovel 在 full 模式下集成这些上游工具：
 
 | 模式 | 安装内容 |
 |---|---|
-| `--minimal` | 只安装 Engineer Shovel skill 和 12 个命令 |
+| `--minimal` | 只安装 Engineer Shovel skill 和 8 个活跃命令 |
 | `--recommended` | 安装 Engineer Shovel + Caveman |
 | `--full` | 安装完整工具链：ECC、GSD、superpowers、Caveman、RTK、code-review-graph、Engineer Shovel |
 
@@ -549,18 +522,18 @@ Engineer Shovel 在 full 模式下集成这些上游工具：
 | 修一个 flaky / 跨模块 Bug | `/tool-fix --deep` |
 | 加一个小功能 | `/tool-feat --fast` |
 | 加普通功能 | `/tool-feat --standard` |
-| 做多组件功能 | `/tool-blueprint` |
-| 开始新开发分支 | `/tool-branch create` |
+| 做多组件功能 | `/tool-plan --deep` (自动判断蓝图/GSD) |
+| 开始新开发分支 | `/tool-feat` 或 `/tool-fix` (自动创建分支) |
 | 合并前看 diff | `/tool-branch review` |
-| 需求不清 | `/tool-plan` |
+| 需求不清 | `/tool-plan` (自动触发 Phase 0 脑暴) |
 | 技术方案不确定 | `/tool-research --quick` |
 | 需要当前官方资料 | `/tool-research --web` |
 | 需要战略比较 | `/tool-research --deep` |
 | 行为不变的整理 | `/tool-refactor` |
 | 审查本地 diff | `/tool-review` |
 | 审查高风险实现 | `/tool-review --deep` |
-| 想法还不清楚 | `/tool-brainstorm` |
-| 刷新代码图谱 | `/tool-graph update` |
+| 想法还不清楚 | `/tool-feat` 或 `/tool-plan` (自动脑暴) |
+| 检查代码图谱 | `/tool-graph status` (后台自动刷新) |
 | 检查安装健康 | `/tool-update --check` |
 
 ## 核心工作哲学
@@ -586,9 +559,9 @@ Engineer Shovel 的工程哲学：
 Engineer Shovel 的理想路由可能是：
 
 1. 这是新功能，先判断需求是否清晰。
-2. 如果需求不清，走 `/tool-plan` 或 `/tool-brainstorm`。
+2. 如果需求不清，`/tool-feat` 会自动进入 Phase 0 脑暴。
 3. 如果功能范围清楚，走 `/tool-feat --standard`。
-4. 开始前用 `/tool-branch create feat add-login-retry-limit`。
+4. `/tool-feat` 自动调用 `/tool-branch create feat add-login-retry-limit`。
 5. 搜索现有认证、rate limit、错误处理模式。
 6. 做最小功能片。
 7. 添加或运行相关测试。

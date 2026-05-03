@@ -22,16 +22,16 @@ Compression: caveman full by default, lite for `--fast`, ultra for broad diffs. 
 
 - `--fast`: 1-2 file cleanup → baseline tests → refactor → verify → `/tool-review --fast`.
 - `--standard` or default: normal refactor → baseline tests → refactor (small steps) → tests/build → local review.
-- `--deep`: broad, risky, security-sensitive, or performance-critical → plan phases → `/review-work` + E2E if applicable.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → L6: `gsd-execute-phase` (mandatory phase management) → L4: `ecc:review-work` + E2E if applicable.
 
 ## Flow
 
 1. Run baseline tests before any edits. Call `rtk gain` before test runs.
-2. If code-review-graph installed (L3), use impact analysis to understand affected callers before refactoring. Also identify existing codebase patterns for reference.
+2. Code-review-graph (L2, auto-refreshed): use impact analysis to understand affected callers before refactoring. Also identify existing codebase patterns for reference.
 3. Refactor one logical unit at a time.
 4. Re-run the same verification after each step.
 5. Compare behavior, public APIs, and performance-sensitive paths.
-6. Escalate review only when the risk justifies the agent cost.
+6. **Verification Gate**: confirm all tests pass → graph impact check clean → caveman review → report.
 
 ## Security Gate
 

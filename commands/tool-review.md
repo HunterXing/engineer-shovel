@@ -21,16 +21,18 @@ Compression: Caveman review style for `--fast`, full by default, ultra for deep 
 ## Cost Modes
 
 - `--fast`: quick sanity check or small local diff → `/caveman:caveman-review`.
-- `--standard` or default: local diff or normal PR → L3: code-review-graph assisted analysis (if installed) → L4: `ecc:coding-standards` (by language) → `/code-review` or `/review-pr $ARGUMENTS`.
+- `--standard` or default: local diff or normal PR → code-review-graph assisted analysis (L2, auto-refreshed) → L4: `ecc:coding-standards` (by language) → `/code-review` or `/review-pr $ARGUMENTS`.
 - `--deep`: major implementation, security, broad refactor → L4: `ecc:security-review` (if security-sensitive) → `/review-work`.
 
 ## Flow
 
 1. Select local, PR, or post-implementation mode from the input.
-2. If code-review-graph installed, run `/tool-graph update` then use graph for diff analysis.
-3. Review for correctness, regressions, security, and maintainability.
-4. Fix critical/high findings surgically.
-5. Re-run the same or stronger review mode until clean.
+2. Code-review-graph (L2, auto-refreshed): use graph for diff analysis, blast-radius detection.
+3. For PR review with `--standard` or `--deep`: use L4: `ecc:github-ops` to manage PR lifecycle (review comments, merge status, CI checks).
+4. Review for correctness, regressions, security, and maintainability.
+5. Fix critical/high findings surgically.
+6. Re-run the same or stronger review mode until clean.
+7. Post-review: use L5: `superpowers:receiving-code-review` to apply feedback when review results return.
 
 ## Security-Sensitive Code
 

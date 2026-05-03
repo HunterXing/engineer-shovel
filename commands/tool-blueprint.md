@@ -1,40 +1,22 @@
 ---
-description: Complex multi-step project workflow — blueprint, execute, integrate, verify, ship
-argument-hint: [--standard|--deep] [project-name] [goal description]
+description: [DEPRECATED] Use /tool-plan --deep instead. Multi-step project planning is now auto-escalated from /tool-plan.
+argument-hint: "[redirect — use /tool-plan --deep instead]"
 cost-profile: high
 risk-level: high
 recommended-mode: --standard
-allowed-tools: [Read, Grep, Glob, Bash, Task]
-escalates-to: [/blueprint, GSD]
-depends-on: [/tool-plan, /tool-research]
-when-to-use: Use for multi-step or multi-session projects that cannot safely fit in a single small plan or PR.
+allowed-tools: []
+escalates-to: [/tool-plan]
+depends-on: []
+when-to-use: DEPRECATED since v1.4.0. Use `/tool-plan --deep` — it auto-classifies complexity and escalates to `ecc:blueprint` (≤3 PR code) or `gsd project` (milestone-scale engineering). If you specifically need a code-level dependency graph plan, use `/tool-plan --deep "your goal"`.
 ---
 
-# /tool-blueprint — Complex Multi-Step Projects
+# /tool-blueprint — DEPRECATED
 
-**Input**: $ARGUMENTS
+**This command is deprecated as of v1.4.0.** Multi-step project planning is now part of `/tool-plan --deep`.
 
-Use this only when the work cannot fit safely in a single small plan or PR.
+`/tool-plan --deep` auto-classifies your project and routes to the right engine:
+- **≤3 PR code work** → `ecc:blueprint` (dependency graph + `superpowers:writing-plans`)
+- **>3 PR or milestone-scale** → `gsd project` (discuss → plan → execute phases)
+- **Architecture change** → `ecc:council` for structured go/no-go before blueprint
 
-Compression: caveman full by default, caveman ultra for GSD/multi-agent summaries. Use rtk for scans/logs.
-
-## Cost Modes
-
-- `--standard` or default: multi-step but clear project → follow Decision Tree 3 in `docs/decision-trees.md`:
-  - Code-centric multi-PR → L4: `ecc:blueprint` + L5: `superpowers:writing-plans`
-- `--deep`: milestone-scale engineering → follow Decision Tree 3 in `docs/decision-trees.md`:
-  - Milestone → L6: `gsd project` (discuss/plan/execute phases)
-  - Architecture change → L6: `council`
-
-## Flow
-
-1. Create a blueprint with independently verifiable steps.
-2. Mark dependencies and parallelizable work.
-3. Execute each step with the matching `/tool-*` workflow.
-4. If the blueprint touches auth, user data, or security boundaries, add L4: `ecc:security-review` as a project-level gate.
-5. Run integration verification after dependent steps connect.
-6. Use deep review/ship flow only after verification passes.
-
-## Guardrail
-
-If the task is under 3 files and requirements are clear, use `/tool-quick` or `/tool-feat` instead.
+Use `/tool-plan --deep "your goal description"` — it provides everything `/tool-blueprint` did, plus automatic complexity classification.

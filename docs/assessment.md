@@ -46,15 +46,14 @@ Public commands:
 - `/tool-quick`
 - `/tool-fix`
 - `/tool-feat`
-- `/tool-branch`
 - `/tool-plan`
 - `/tool-refactor`
 - `/tool-review`
-- `/tool-brainstorm`
-- `/tool-blueprint`
 - `/tool-research`
 - `/tool-graph`
 - `/tool-update`
+- `/tool-branch`
+- (deprecated: `/tool-brainstorm`, `/tool-blueprint`)
 
 Installer modes:
 - `--minimal`
@@ -177,9 +176,10 @@ python3 scripts/validate-command-schema.py
 
 | Area | Before | After |
 |---|---|---|
-| Command token estimate total | 3816 estimated tokens (`.sisyphus/evidence/task-1-token-baseline.json`) | 3724 estimated tokens (`.sisyphus/evidence/task-10-full-verification.txt`) |
+| Command token estimate total | 3816 estimated tokens | 3724 estimated tokens (`.sisyphus/evidence/task-10-full-verification.txt`) |
 | Average command token estimate | 381.6 | 372.4 |
 | Python regression tests | None | `pytest` with 5 passing tests covering 3 validation scripts |
+| Active commands | 12 | 8 (2 deprecated, 2 utility / v1.4.0) |
 | Installer guidance | README promoted `curl \| bash` one-liner first | README/README_zh now recommend download-first install, keep one-liner as trusted shortcut |
 | External installer guardrail | No explicit timeout or clone error details | ECC external installer wrapped with timeout and clearer failure reporting; clone errors surfaced |
 | Documentation consistency | `docs/workflows.md` still claimed 9 commands | Router/docs/README now aligned on 10 commands |

@@ -106,15 +106,15 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 |---|---|
 | `/tool-quick` | Obvious small edits |
 | `/tool-fix` | Bugs, failing tests, regressions |
-| `/tool-feat` | New functionality |
+| `/tool-feat` | New functionality (auto-brainstorms) |
 | `/tool-branch` | Branch workflow: create, review, merge, abort |
-| `/tool-plan` | Requirements and implementation planning |
+| `/tool-plan` | Requirements and planning (auto-escalates to blueprint/gsd) |
 | `/tool-refactor` | Behavior-preserving cleanup |
 | `/tool-review` | Local diff, PR, or deep review |
-| `/tool-brainstorm` | Clarify ideas before building |
-| `/tool-blueprint` | Multi-step or multi-session projects |
-| `/tool-research` | Evidence gathering and synthesis |
-| `/tool-graph` | code-review-graph status, full build, incremental update, rebuild, watch |
+| `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` |
+| `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` |
+| `/tool-research` | Evidence gathering and synthesis (codebase-aware) |
+| `/tool-graph` | code-review-graph diagnostics (auto-refreshed) |
 | `/tool-update` | Sync and update installation |
 
 ## Structure

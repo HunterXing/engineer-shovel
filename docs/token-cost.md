@@ -16,7 +16,7 @@ Engineer Shovel optimizes for cost-aware escalation: start cheap, verify, then e
 |---|---|---|
 | Low | Known file, small diff | `/caveman lite`, `/tool-quick`, `/tool-review --fast` |
 | Medium | Normal feature/fix/refactor | `/caveman full`, `/tool-feat`, `/tool-fix`, `/tool-plan` |
-| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-blueprint`, `/tool-research --deep`, `/review-work` |
+| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-plan --deep`, `/tool-research --deep`, `/review-work` |
 
 ## Caveman Defaults
 
@@ -29,7 +29,7 @@ Caveman should be treated as the default compression layer, not an emergency-onl
 | `/tool-feat --standard` | `/caveman full` | Reduces repeated planning and verification chatter |
 | `/tool-refactor --standard` | `/caveman full` | Keeps before/after verification summaries compact |
 | `/tool-review --fast` | Caveman review mode | Review findings compress well into one-line issues |
-| `/tool-blueprint` | `/caveman full` | Plans and dependency graphs are verbose |
+| `/tool-plan --deep` | `/caveman full` | Plans and dependency graphs are verbose |
 | `/tool-research --deep` | `/caveman ultra` when context pressure is high | Multi-source research can overwhelm context |
 
 Use `/caveman ultra` when multiple agents are running, outputs are mostly summaries, or context usage is already high. Stay on `lite` when the answer must remain comfortable for humans to read.

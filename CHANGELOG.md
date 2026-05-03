@@ -1,6 +1,25 @@
 # Changelog
 
-## 1.2.0 (2026-05-02)
+## 1.4.0 (2026-05-03)
+
+### Changed
+- **P0**: code-review-graph now auto-refreshed via git hooks — removed all "if installed" conditionals from 5 commands (`quick`, `fix`, `feat`, `refactor`, `review`). Graph queries are always-on in pre-action phase.
+- **P0**: ecc capabilities fully deployed: `ecc:deep-research` added to `fix --deep`, `ecc:council` added to `feat --deep` and `plan --deep`, `ecc:github-ops` added to `review`, `ecc:review-work` added to `feat --deep`.
+- **P1**: `/tool-brainstorm` deprecated — brainstorming internalized as Phase 0 in `/tool-feat` and `/tool-plan` with auto-trigger.
+- **P1**: `/tool-blueprint` deprecated — merged into `/tool-plan --deep` with automatic complexity classification (≤3 PR → `ecc:blueprint`, >3 PR → `gsd project`).
+- **P1**: Unified `Verification Gate` added to all code-modifying commands (`quick`, `fix`, `feat`, `refactor`): test → graph impact → caveman review → report.
+- `/tool-graph` demoted to diagnostic-only; graph refresh handled by git hooks.
+- `superpowers:receiving-code-review` integrated into `/tool-review` post-feedback flow.
+
+### Architecture
+- Active commands: 8 (`quick`, `fix`, `feat`, `plan`, `refactor`, `review`, `research`, `update`)
+- Deprecated (redirect): 2 (`brainstorm`, `blueprint`)
+- Utility (kept): 2 (`branch`, `graph`)
+- Updated 5-layer architecture: Layer 1 compression, Layer 2 auto-managed graph, Layer 3 superpowers methodology, Layer 4 ecc expertise, Layer 5 gsd project management.
+
+---
+
+## 1.3.0 (2026-05-02)
 
 ### Changed
 - Slimmed `SKILL.md` into a lightweight router and moved long-form references into `docs/`.
