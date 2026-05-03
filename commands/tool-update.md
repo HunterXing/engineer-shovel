@@ -40,7 +40,7 @@ Synchronize Engineer Shovel files and verify supporting component health.
 
 Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, plus selected runtimes (`opencode`, `claude`).
 
-Checks Full-mode components: `code-review-graph`, GSD, `superpowers`, Caveman, RTK, ECC.
+Checks Full-mode components: L1: RTK, L2: Caveman, L3: code-review-graph, L4: ECC, L5: Superpowers, L6: GSD.
 
 MCP policy:
 - `code-review-graph install` may configure MCP/rules because upstream explicitly supports this.
@@ -53,6 +53,10 @@ Safety:
 - Does not delete user config.
 - Backs up JSON config before editing.
 
+## Missing Component Guidance
+
+When a Full-mode component is missing or broken, suggest the install command (e.g. `pipx install code-review-graph`, `npx get-shit-done-cc@latest`) instead of silently skipping.
+
 ## Compression
 
-Use Caveman review style for check mode output. RTK not needed for sync operations.
+Use L2: `/caveman-review` style for check mode output. RTK not needed for sync operations.

@@ -16,20 +16,24 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 
 Use planning when execution order, risks, or verification criteria are not obvious.
 
-Compression: follow `docs/token-cost.md`; use lite for short plans, full for file-backed plans, and RTK for shell evidence.
+Compression: caveman lite for short plans, caveman full for file-backed plans. Use rtk for shell evidence.
 
 ## Cost Modes
 
 - `--fast`: small task, clear scope → short inline plan.
-- `--standard` or default: medium work → `/plan` or `/prp-plan` with verification criteria.
-- `--deep`: multi-session, ambiguous, many dependencies → `/blueprint` or GSD planning.
+- `--standard` or default: medium work → follow Decision Tree 1 in `docs/decision-trees.md`:
+  - **Product direction unclear** → L6: `gsd-explore`
+  - **Technical approach unclear** → L5: `superpowers:brainstorming`
+  → Then: ≤3 PR → `superpowers:writing-plans` | >3 PR → `/tool-blueprint`
+- `--deep`: multi-session, ambiguous, many dependencies → gsd-plan-phase (phase-level) or `/blueprint` (code-level).
 
 ## Flow
 
 1. Restate the goal and non-goals.
-2. Identify files/modules likely affected.
+2. Identify files/modules likely affected. If code-review-graph installed (L3), run `code-review-graph detect-changes` for impact assessment first.
 3. Define verification commands and exit criteria.
-4. For file-backed plans, request Momus review before execution.
+3b. If the work touches auth, user data, or security-sensitive paths, add L4: `ecc:security-review` as a planning checkpoint.
+4. For file-backed plans, request review before execution.
 5. Execute only after the plan is clear enough to verify.
 
 ## Escalation

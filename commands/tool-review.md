@@ -16,21 +16,22 @@ when-to-use: Use for local diffs, pull requests, or post-implementation review w
 
 Choose the cheapest review mode that can catch the relevant failure class.
 
-Compression: follow `docs/token-cost.md`; use Caveman review style for `--fast`, full by default, ultra for deep summaries, and RTK for diffs/logs.
+Compression: Caveman review style for `--fast`, full by default, ultra for deep summaries. Call `rtk gain` before diff/log commands.
 
 ## Cost Modes
 
 - `--fast`: quick sanity check or small local diff → `/caveman:caveman-review`.
-- `--standard` or default: local diff or normal PR → `/code-review` or `/review-pr $ARGUMENTS`.
-- `--deep`: major implementation, security, broad refactor → `/review-work`.
+- `--standard` or default: local diff or normal PR → L3: code-review-graph assisted analysis (if installed) → L4: `ecc:coding-standards` (by language) → `/code-review` or `/review-pr $ARGUMENTS`.
+- `--deep`: major implementation, security, broad refactor → L4: `ecc:security-review` (if security-sensitive) → `/review-work`.
 
 ## Flow
 
 1. Select local, PR, or post-implementation mode from the input.
-2. Review for correctness, regressions, security, and maintainability.
-3. Fix critical/high findings surgically.
-4. Re-run the same or stronger review mode until clean.
+2. If code-review-graph installed, run `/tool-graph update` then use graph for diff analysis.
+3. Review for correctness, regressions, security, and maintainability.
+4. Fix critical/high findings surgically.
+5. Re-run the same or stronger review mode until clean.
 
 ## Security-Sensitive Code
 
-Add `/security-review` and `/security-scan` before approval.
+Apply Decision Tree 4 from `docs/decision-trees.md`: evaluate scope → route to L4: `ecc:security-review` or `ecc:security-scan`.

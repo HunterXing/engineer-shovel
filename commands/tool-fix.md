@@ -6,7 +6,7 @@ risk-level: variable
 recommended-mode: --standard
 allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
 escalates-to: [/gsd-debug, /security-review, /tool-review]
-depends-on: []
+depends-on: [/tool-graph]
 when-to-use: Use when behavior is broken, tests fail, logs show regressions, or root cause must be proven before fixing.
 ---
 
@@ -16,24 +16,31 @@ when-to-use: Use when behavior is broken, tests fail, logs show regressions, or 
 
 Start with the cheapest path that can prove the bug is fixed. Escalate only when reproduction or root cause is unclear.
 
-Compression: follow `docs/token-cost.md`; default to `/caveman full`, lite for `--fast`, and RTK for logs/tests/traces.
+Compression: caveman full by default, lite for `--fast`, ultra for `--deep`. Call `rtk gain` before test/log commands.
 
 ## Cost Modes
 
-- `--fast`: known file/function, obvious cause → direct fix + targeted test.
-- `--standard` or default: reproducible bug, local scope → reproduce → inspect related code → fix → regression test.
-- `--deep`: flaky, cross-module, security, or unknown root cause → `/gsd-debug` and optional Oracle after failed attempts.
+- `--fast`: known file/function, obvious cause → CRG trace (L3) if graph installed → direct fix + targeted test.
+- `--standard` or default: reproducible bug, local scope → graph-assisted tracing → fix → regression test.
+- `--deep`: flaky, cross-module, security, or unknown root cause → L5: `superpowers:systematic-debugging` (4-phase) → L6: `gsd-debug` and optional L4 security review.
 
 ## Flow
 
+0. If code-review-graph installed, ensure graph freshness: `/tool-graph update`.
 1. Reproduce or identify the failing assertion/log.
-2. Find the smallest root cause, not just the symptom.
-3. Apply a surgical fix.
-4. Run the failing test first, then related tests/build.
-5. Add regression coverage when the project has a suitable test pattern.
+2. Use `code-review-graph` tracing (if graph available) to trace the error call chain and narrow root cause.
+3. Find the smallest root cause, not just the symptom.
+4. Apply a surgical fix.
+5. Run the failing test first, then related tests/build. Call `rtk gain` before each test run.
+6. Use `code-review-graph` impact analysis to verify no callers broken by the fix.
+7. Add regression coverage when the project has a suitable test pattern.
+
+## Security Gate
+
+If the change touches auth, user input parsing, file system, network, secrets, cookies, or SQL, add L4: `ecc:security-review` regardless of cost mode.
 
 ## Escalation Rules
 
 - Single-line typo: use `/tool-quick` instead.
 - Cross-file state or architecture issue: use `--deep`.
-- Security vulnerability: add `/security-review` and `/security-scan` before finalizing.
+- If systematic debugging fails 3+ times → question architecture, not hypothesis.

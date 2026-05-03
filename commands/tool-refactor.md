@@ -16,21 +16,26 @@ when-to-use: Use for behavior-preserving cleanup where baseline and post-change 
 
 Behavior must remain identical. Do not mix feature work into a refactor.
 
-Compression: follow `docs/token-cost.md`; use full by default, ultra for broad diffs, and RTK for diff/test/build logs.
+Compression: caveman full by default, lite for `--fast`, ultra for broad diffs. Call `rtk gain` before test/build commands.
 
 ## Cost Modes
 
-- `--fast`: 1-2 file cleanup → targeted tests + `/tool-review --fast`.
-- `--standard` or default: normal refactor → baseline tests → refactor → tests/build → local review.
-- `--deep`: broad, risky, security-sensitive, or performance-critical → `/refactor` + `/review-work` + E2E if applicable.
+- `--fast`: 1-2 file cleanup → baseline tests → refactor → verify → `/tool-review --fast`.
+- `--standard` or default: normal refactor → baseline tests → refactor (small steps) → tests/build → local review.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → plan phases → `/review-work` + E2E if applicable.
 
 ## Flow
 
-1. Run baseline verification before edits.
-2. Refactor one logical unit at a time.
-3. Re-run the same verification after edits.
-4. Compare behavior, public APIs, and performance-sensitive paths.
-5. Escalate review only when the risk justifies the agent cost.
+1. Run baseline tests before any edits. Call `rtk gain` before test runs.
+2. If code-review-graph installed (L3), use impact analysis to understand affected callers before refactoring. Also identify existing codebase patterns for reference.
+3. Refactor one logical unit at a time.
+4. Re-run the same verification after each step.
+5. Compare behavior, public APIs, and performance-sensitive paths.
+6. Escalate review only when the risk justifies the agent cost.
+
+## Security Gate
+
+If the change touches auth, security-sensitive paths, or data handling, add L4: `ecc:security-review` regardless of cost mode.
 
 ## Stop Conditions
 

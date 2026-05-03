@@ -22,7 +22,7 @@ Compression: follow `docs/token-cost.md`; use full for normal research, ultra fo
 
 - `--quick` or default: local docs, known library, simple comparison → targeted docs/search.
 - `--web`: current facts or official docs needed → web/docs search + concise synthesis.
-- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → multi-source research + examples + tradeoff report.
+- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → L4: load matching ECC research skills → multi-source research + examples + tradeoff report.
 
 ## Flow
 
@@ -30,7 +30,7 @@ Compression: follow `docs/token-cost.md`; use full for normal research, ultra fo
 2. Search the smallest source set likely to answer it.
 3. Cite or name sources when facts are current/external.
 4. Highlight conflicts and confidence.
-5. Route findings to `/tool-plan`, `/tool-feat`, `/tool-quick`, or documentation.
+5. Route findings to `/tool-plan` (complex), `/tool-feat` (medium), `/tool-quick` (simple), or documentation. Append routing rationale.
 
 ## Avoid
 
