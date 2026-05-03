@@ -1,85 +1,96 @@
-# 最佳开发方案 (Optimal Workflow)
+# Engineer Shovel 工作流指南
 
-基于 **OpenCode + superpowers + ecc + gsd + omo + Caveman + rtk** 工具链的最优开发流程。
+Engineer Shovel 是 OpenCode 和 Claude Code 的轻量级开发工作流路由器。当前项目以 `SKILL.md` 和 12 个 `/tool-*` 命令为公共入口；长文档放在 `docs/`，避免每次会话加载完整手册。
 
-> Claude Code 环境: **superpowers + ecc + gsd + Caveman + rtk**
+## 工具链边界
 
----
+原生安装内容：轻量级 `engineer-shovel` 技能和 12 个 `/tool-*` 命令。
 
-## 🚀 快速入口
+可选增强能力来自外部组件：ECC、GSD、superpowers、code-review-graph、Caveman、RTK。最小安装不会自动具备这些外部命令；如果工作流提到它们，先确认对应工具已安装且健康。
 
-```bash
-# 加载完整工作流指南 (推荐)
-skill(name="optimal-workflow")
+## 快速入口
 
-# 然后按场景选择对应流程
+```text
+skill(name="engineer-shovel")
 ```
 
-> 完整的工作流说明书在 `/root/.agents/skills/optimal-workflow/SKILL.md`，包含：
-> - 8 大场景的详细步骤
-> - OpenCode vs Claude Code 双环境分支
-> - 决策树、Token 管理、命令速查表
+也可以直接调用命令：
 
----
+```text
+/tool-quick --fast "fix typo in README"
+/tool-feat --standard "add smallest verifiable feature slice"
+/tool-review --fast
+/tool-research --deep "compare options for X"
+/tool-graph update
+```
 
-## 快速参考表
+## 12 个命令
 
-| 场景 | 命令 | 文档章节 |
-|------|------|----------|
-| 🆕 新功能 | `/plan` → `/prp-implement` | 1. New Feature |
-| 🐛 Bug 修复 | `/gsd-debug` → fix → test | 2. Bug Fixing |
-| 💡 头脑风暴 | `/gsd-explore` or `/superpowers:brainstorming` | 3. Brainstorming |
-| 🔧 重构 | `/refactor` → verify → `/review-work` | 4. Refactoring |
-| 📋 代码审查 | `/code-review` or `/review-pr <url>` | 5. Code Review |
-| ⚡ 快速任务 | `/gsd-fast` or cavecrew builder | 6. Quick Tasks |
-| 🏗️ 复杂项目 | `/blueprint` or GSD phases | 7. Complex Projects |
-| 🔬 深度研究 | `/deep-research` | 8. Deep Research |
+| Command | Use for |
+|---|---|
+| `/tool-quick` | 明确、低风险、1-2 文件小改 |
+| `/tool-fix` | Bug、失败测试、回归 |
+| `/tool-feat` | 新功能 |
+| `/tool-branch` | 分支创建、状态、审查、合并、放弃 |
+| `/tool-plan` | 需求和实现计划 |
+| `/tool-refactor` | 行为保持不变的重构 |
+| `/tool-review` | 本地 diff、PR、实现后审查 |
+| `/tool-brainstorm` | 想法不清晰时先澄清 |
+| `/tool-blueprint` | 多步骤、多会话、复杂项目 |
+| `/tool-research` | 当前状态研究和证据综合 |
+| `/tool-graph` | code-review-graph 状态、构建、更新、重建、监听 |
+| `/tool-update` | 同步和更新安装 |
 
----
+## 成本模式
+
+| Mode | Use when | Typical path |
+|---|---|---|
+| `--fast` | 低风险、目标明确、小 diff | `/caveman lite`、直接编辑、定向验证、快速审查 |
+| `--standard` | 常规开发 | `/caveman full`、搜索模式、实现、测试/构建 |
+| `--deep` | 模糊、高风险、跨系统 | `/caveman full` 或 `ultra`、GSD、深度研究、深度审查 |
+
+默认选择能验证结果的最低成本路径。只有证据显示轻量路径不足时才升级。
 
 ## 核心原则
 
-1. **Search before build** — `/search-first` 或先搜索现有方案
-2. **Test-first** — `/tdd-workflow` 测试驱动开发
-3. **Surgical changes** — ≤3 files/task, 复杂任务拆解
-4. **Verify every step** — 构建→测试→审查, 从不跳过验证
-5. **Token awareness** — `/caveman-stats` 监控, `/caveman` 省 token
-6. **Parallel when independent** — 独立任务并行执行
-7. **Right model for the job** — `visual-engineering` 做 UI, `ultrabrain` 做复杂逻辑, `deep` 做自主任务
+1. 先搜索现有模式，再新增结构。
+2. 优先做最小可验证切片。
+3. 默认小改、保持项目风格，不引入无必要兼容层。
+4. 每步运行最小有意义验证；高风险时扩展到测试、构建、审查。
+5. 只在用户明确要求时提交 commit。
+6. 独立任务可并行；共享状态或顺序依赖任务串行。
 
----
+## 语言/框架命令
 
-## 🔧 按语言/框架专用命令
+项目原生命令优先。完整表见 `docs/language-reference.md`。
 
-| 语言/框架 | 测试 | 构建 | 审查 |
-|-----------|------|------|------|
-| Go | `/go-test` | `/go-build` | `/go-review` |
-| Rust | `/rust-test` | `/rust-build` | `/rust-review` |
-| C++ | `/cpp-test` | `/cpp-build` | `/cpp-review` |
-| Flutter | `/flutter-test` | `/flutter-build` | `/flutter-review` |
-| Kotlin | `/kotlin-test` | `/kotlin-build` | `/kotlin-review` |
-| Python | `pytest` | - | `/python-review` |
-| Laravel | `/laravel-tdd` | - | `/laravel-verification` |
-| Django | `/django-tdd` | - | `/django-verification` |
-| Spring Boot | `/springboot-tdd` | - | `/springboot-verification` |
-| TypeScript/JS | `bun test` | `bun run build` | `/code-review` |
+| Language/Framework | Test | Build | Review |
+|---|---|---|---|
+| Go | `/go-test` or `go test ./...` | `/go-build` or `go build ./...` | `/go-review` |
+| Rust | `/rust-test` or `cargo test` | `/rust-build` or `cargo build` | `/rust-review` |
+| Python | `pytest` | project-specific | `/python-review` |
+| TypeScript/JS | `bun test` / `npm test` | `bun run build` / `npm run build` | `/code-review` |
 
----
+## Token 和输出压缩
 
-## 💡 Token 管理
+详细策略见 `docs/token-cost.md`。
 
-```bash
-/caveman lite    # 轻度压缩 (25-50% context)
-/caveman full    # 完全压缩 (50-75% context)
-/caveman ultra   # 最大压缩 (>75% context)
-/caveman-stats   # 查看实时用量
-/strategic-compact  # 上下文压缩
-/gsd-thread      # 跨 session 连续性
-```
+- Caveman 是默认沟通压缩层：`--fast` 用 `/caveman lite`，`--standard` 用 `/caveman full`，长上下文或多 agent 时可用 `/caveman ultra`。
+- RTK 是工具输出压缩层：用于 git、测试、构建、日志等噪声输出；不要把 RTK 描述成 prompt 压缩器。
+- Caveman 和 RTK 可叠加：前者压缩模型沟通，后者压缩 Bash/tool 输出。
 
----
+## 参考文档
 
-## 其他
-- 尽可能给用户中文回答
-- 完整工作流参考: `skill(name="optimal-workflow")`
-*最后更新: 2026-05-01*
+- `README.md`：项目概览、安装、能力边界。
+- `SKILL.md`：轻量运行时路由器。
+- `docs/workflows.md`：12 个 `/tool-*` 命令长文档。
+- `docs/token-cost.md`：Caveman/RTK 成本模型。
+- `docs/language-reference.md`：语言和框架命令参考。
+
+## 其他约定
+
+- 尽可能用中文回答用户。
+- 不要把已移除或非当前文档中的组件写回这里。
+- 本文件应和 `CLAUDE.md` 保持一致。
+
+最后更新：2026-05-03

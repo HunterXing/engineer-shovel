@@ -19,8 +19,8 @@
 ## 1.1.0 (2026-05-01)
 
 ### Changed
-- Renamed project from `optimal-workflow` to `engineer-shovel` (工兵铲)
-- GitHub repo: `HunterXing/optimal-workflow` → `HunterXing/engineer-shovel`
+- Renamed project to `engineer-shovel` (工兵铲)
+- GitHub repo: `HunterXing/engineer-shovel`
 - Skill name: `skill(name="engineer-shovel")`
 
 ### Added
@@ -30,14 +30,14 @@
 - One-command bootstrap installer (`install.sh`)
 
 ### Removed
-- `omo` from toolchain declarations (duplicate of OpenCode)
+- Legacy duplicate toolchain alias from toolchain declarations
 
 ---
 
 ## 1.0.0 (2026-05-01)
 
 ### Added
-- Initial release as `optimal-workflow`
+- Initial release of the workflow router
 - SKILL.md covering 8 development scenarios
 - Dual environment support: OpenCode and Claude Code
 - Decision trees and token management guide
