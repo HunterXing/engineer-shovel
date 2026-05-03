@@ -1,8 +1,8 @@
 <h1 align="center">🪖 Engineer Shovel</h1>
 
 <p align="center">
-  <b>Token-aware AI agent development workflow router</b><br>
-  <sub>Quick Tasks · Bug Fix · Feature · Branch · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Graph · Sync</sub>
+  <b>Token-aware AI エージェント開発ワークフロールーター</b><br>
+  <sub>クイックタスク · バグ修正 · 新機能 · ブランチ · プラン · リファクタリング · レビュー · ブレインストーミング · ブループリント · リサーチ · グラフ · 同期</sub>
 </p>
 
 <p align="center">
@@ -23,65 +23,65 @@
 
 ---
 
-## What is this?
+## これは何ですか？
 
-Engineer Shovel is a lightweight skill + slash-command pack for OpenCode and Claude Code. It routes development work to the cheapest workflow that can still verify the outcome, then escalates to deeper agent workflows only when risk requires it.
+Engineer Shovel は、OpenCode と Claude Code 向けの軽量スキル + スラッシュコマンドパックです。開発作業を最も低コストで結果を検証できるワークフローにルーティングし、リスクが必要と判断した場合のみより深いエージェントワークフローにエスカレーションします。
 
-The runtime `SKILL.md` is intentionally small; long-form documentation lives in `docs/` so routine sessions do not pay for the full manual.
+ランタイムの `SKILL.md` は意図的に小さく保たれています。長文ドキュメントは `docs/` に置かれているため、日常的なセッションでは完全なマニュアルを読み込むコストを払う必要がありません。
 
-## Capability Boundary
+## 能力の境界
 
-Native Engineer Shovel installs the lightweight router and 12 `/tool-*` commands. The deeper capabilities advertised in full workflows come from optional external tools installed or configured by recommended/full modes: ECC, GSD, superpowers, code-review-graph, Caveman, and RTK.
+Engineer Shovel のネイティブインストールは、軽量ルーターと12の `/tool-*` コマンドです。フルワークフローで宣伝されているより深い機能は、recommended/full モードでインストールまたは構成されたオプションの外部ツールから提供されます：ECC、GSD、superpowers、code-review-graph、Caveman、RTK。
 
-Minimal installs are intentionally small. If a workflow mentions external commands such as GSD, ECC, Caveman, RTK, or code-review-graph behavior, those capabilities require the corresponding optional tool to be installed and healthy.
+Minimal インストールは意図的に小さく保たれています。ワークフローで GSD、ECC、Caveman、RTK、code-review-graph などの外部コマンドが言及されている場合、これらの機能には対応するオプションツールがインストールされ正常動作している必要があります。
 
-## Quick Start
+## クイックスタート
 
 ```bash
-# Download, inspect, then run (default: full mode with all components)
+# ダウンロード，检查，実行（デフォルト：全コンポーネントのフルモード）
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh
 bash install.sh
 
-# Non-interactive: full install for OpenCode (default)
+# 非対話型：OpenCode 用フルインストール（デフォルト）
 bash install.sh --target opencode
 
-# Non-interactive: full install for both OpenCode and Claude Code
+# 非対話型：OpenCode と Claude Code の両方にインストール
 bash install.sh --target all
 
-# Shortcut if you already trust the source:
+# ソースをすでに信頼している場合のショートカット：
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
-# Other modes
-./install.sh --target opencode --recommended  # Skill + commands + Caveman
-./install.sh --target opencode --minimal      # Skill + commands only
-./install.sh --target opencode --full --with-graph-build  # Also build initial code-review-graph index
+# その他のモード
+./install.sh --target opencode --recommended  # Skill + コマンド + Caveman
+./install.sh --target opencode --minimal      # Skill + コマンドのみ
+./install.sh --target opencode --full --with-graph-build  # 初期 code-review-graph インデックスも構築
 ```
 
-The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.
+インストーラーは、オプションの依存関係をステージングする前に、固定された外部リポジトリの SHA を確認します。ダウンロードファーストインストールは、スクリプトを検査でき、サーバーサイドのパイプ検出の違いを回避できるため、直接 Bash にパイプするよりも安全です。
 
-## Compatibility Notes
+## 互換性について
 
-This optimization cycle keeps the public interface stable:
+この最適化サイクルは、公開インターフェースを安定に保ちます：
 
-- `skill(name="engineer-shovel")` is unchanged.
-- All 12 `/tool-*` commands remain installed with the same names.
-- `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
-- `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
+- `skill(name="engineer-shovel")` は変更されません。
+- 12 の `/tool-*` コマンドはすべて同じ名前で維持されます。
+- `--minimal`、`--recommended`、`--full`、`--dry-run` は変更されません。
+- `--target opencode|claude|all|auto` により、新しいマシンは OpenCode、Claude Code、またはその両方を明示的に選択できます。
 
-New guardrails added:
+追加された新しいガードレール：
 
-- Download-first installation is now the recommended documented path.
-- The installer keeps SHA pin verification and now surfaces clearer failure behavior around external installer execution.
-- Validation scripts now have lightweight pytest regression coverage.
+- ダウンロードファーストインストールが推奨されるドキュメントパスになりました。
+- インストーラーは SHA ピン検証を維持し、外部インストーラー実行に関するより明確な失敗動作を表示するようになりました。
+- バリデーションスクリプトに軽量な pytest 回帰テストが追加されました。
 
-Then use either:
+その後、いずれかを使用します：
 
 ```text
 skill(name="engineer-shovel")
 ```
 
-or call a command directly:
+または、コマンドを直接呼び出します：
 
 ```text
 /tool-quick --fast "fix typo in README"
@@ -90,68 +90,68 @@ or call a command directly:
 /tool-graph update
 ```
 
-## Cost Modes
+## コストモード
 
-| Mode | Use when | Typical path |
+| モード | 使用タイミング | 典型的なパス |
 |---|---|---|
-| `--fast` | low-risk, known target | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
-| `--standard` | normal development | `/caveman full`, targeted search, implementation, tests/build |
-| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, GSD, deep research, Oracle/review-work |
+| `--fast` | 低リスク、既知のターゲット | `/caveman lite`、直接編集、`/gsd-fast`、Caveman レビュー |
+| `--standard` | 通常の開発 | `/caveman full`、ターゲット検索、実装、テスト/ビルド |
+| `--deep` | 曖昧、高リスク、マルチシステム | `/caveman full` または `ultra`、GSD、深いリサーチ、Oracle/review-work |
 
-RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context.
+RTK はインストールされている場合、git、テスト、ビルド、ログなどのノイズの多い Bash/tool 出力をモデルコンテキストに入る前に圧縮する дополнение です。
 
-## Commands
+## コマンド
 
-| Command | Use for |
+| コマンド | 用途 |
 |---|---|
-| `/tool-quick` | Obvious small edits |
-| `/tool-fix` | Bugs, failing tests, regressions |
-| `/tool-feat` | New functionality |
-| `/tool-branch` | Branch workflow: create, review, merge, abort |
-| `/tool-plan` | Requirements and implementation planning |
-| `/tool-refactor` | Behavior-preserving cleanup |
-| `/tool-review` | Local diff, PR, or deep review |
-| `/tool-brainstorm` | Clarify ideas before building |
-| `/tool-blueprint` | Multi-step or multi-session projects |
-| `/tool-research` | Evidence gathering and synthesis |
-| `/tool-graph` | code-review-graph status, full build, incremental update, rebuild, watch |
-| `/tool-update` | Sync and update installation |
+| `/tool-quick` | 明らかな小さな編集 |
+| `/tool-fix` | バグ、失敗したテスト、回帰 |
+| `/tool-feat` | 新機能 |
+| `/tool-branch` | ブランチワークフロー：作成、レビュー、マージ、中止 |
+| `/tool-plan` | 要件と実装の計画 |
+| `/tool-refactor` | 動作を保つクリーンアップ |
+| `/tool-review` | ローカル差分、PR、または深いレビュー |
+| `/tool-brainstorm` | 構築前にアイデアを明確化 |
+| `/tool-blueprint` | マルチステップまたはマルチセッションプロジェクト |
+| `/tool-research` | 証拠の収集と統合 |
+| `/tool-graph` | code-review-graph ステータス、完全ビルド，增分更新、再構築、監視 |
+| `/tool-update` | インストールと同期 |
 
-## Structure
+## 構造
 
 ```
 engineer-shovel/
-├── commands/          # 12 executable slash commands
-├── docs/              # long-form references kept out of runtime context
-├── scripts/           # sync and validation utilities
-├── SKILL.md           # lightweight router
-├── install.sh         # minimal/recommended/full installer
+├── commands/          # 12 の実行可能スラッシュコマンド
+├── docs/              # ランタイムコンテキストから分離された長文リファレンス
+├── scripts/           # 同期とバリデーションのユーティリティ
+├── SKILL.md           # 軽量ルーター
+├── install.sh         # minimal/recommended/full インストーラー
 ├── README.md
 ├── README_zh.md
 └── LICENSE
 ```
 
-## Documentation
+## ドキュメント
 
-- Full workflows: [`docs/workflows.md`](docs/workflows.md)
-- Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
-- Installation modes: [`docs/install.md`](docs/install.md)
-- Language reference: [`docs/language-reference.md`](docs/language-reference.md)
-- Repository assessment: [`docs/assessment.md`](docs/assessment.md)
+- フルワークフロー：[`docs/workflows.md`](docs/workflows.md)
+- Token コストモデル：[`docs/token-cost.md`](docs/token-cost.md)
+- インストールモード：[`docs/install.md`](docs/install.md)
+- 言語リファレンス：[`docs/language-reference.md`](docs/language-reference.md)
+- リポジトリアセスメント：[`docs/assessment.md`](docs/assessment.md)
 
-## License
+## ライセンス
 
-MIT — see [LICENSE](LICENSE).
+MIT — [LICENSE](LICENSE) 参照。
 
-## Upstream Tool Versions
+## 上流ツールバージョン
 
-Engineer Shovel integrates and configures these upstream tools in `--full` mode.
+Engineer Shovel は `--full` モードでこれらの上流ツールを統合および構成します。
 
-| Tool | Repository | Current referenced version | Role |
+| ツール | リポジトリ | 現在の参照バージョン | 役割 |
 |---|---|---:|---|
-| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven planning, phase execution, verification, and context engineering |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | Mandatory skill workflows: brainstorming, TDD, planning, review, branch finishing |
-| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
-| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | Output-token compression, terse review/commit helpers, MCP shrink |
-| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell and tool output compression proxy plus command rewrite hooks |
+| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI エージェントハーネス性能システム：スキル、ルール、フック、MCP、セキュリティ、research-first ワークフロー |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec駆動の計画、フェーズ実行、検証、コンテキストエンジニアリング |
+| superpowers | https://github.com/obra/superpowers | v5.0.7 | 必須スキルワークフロー：ブレインストーミング、TDD、計画、レビュー、ブランチ終結 |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | ローカルコード知識グラフ、MCP レビューコンテキスト、ブラスト半径分析 |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 出力トークン圧縮、簡潔なレビュー/コミット、MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | シェルとツール出力圧縮プロキシおよびコマンド書き換えフック |
