@@ -105,11 +105,7 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 ## 文档
 
 - 完整工作流：[`docs/workflows.md`](docs/workflows.md)
-- 工具说明：[`docs/engineer-shovel-overview-zh.md`](docs/engineer-shovel-overview-zh.md)
-- Token 成本模型：[`docs/token-cost.md`](docs/token-cost.md)
-- 安装模式：[`docs/install.md`](docs/install.md)
-- 语言命令参考：[`docs/language-reference.md`](docs/language-reference.md)
-- 仓库评估报告：[`docs/assessment.md`](docs/assessment.md)
+- 工具链架构：[`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## License
 

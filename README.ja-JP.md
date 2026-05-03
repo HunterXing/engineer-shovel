@@ -137,7 +137,7 @@ engineer-shovel/
 - Token コストモデル：[`docs/token-cost.md`](docs/token-cost.md)
 - インストールモード：[`docs/install.md`](docs/install.md)
 - 言語リファレンス：[`docs/language-reference.md`](docs/language-reference.md)
-- リポジトリアセスメント：[`docs/assessment.md`](docs/assessment.md)
+- ツールチェーンアーキテクチャ：[`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## ライセンス
 

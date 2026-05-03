@@ -137,7 +137,7 @@ engineer-shovel/
 - Token 비용 모델: [`docs/token-cost.md`](docs/token-cost.md)
 - 설치 모드: [`docs/install.md`](docs/install.md)
 - 언어 참조: [`docs/language-reference.md`](docs/language-reference.md)
-- 리포지토리 평가: [`docs/assessment.md`](docs/assessment.md)
+- 툴체인 아키텍처: [`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## 라이선스
 

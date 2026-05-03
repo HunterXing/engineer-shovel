@@ -137,7 +137,7 @@ engineer-shovel/
 - Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
 - Installation modes: [`docs/install.md`](docs/install.md)
 - Language reference: [`docs/language-reference.md`](docs/language-reference.md)
-- Repository assessment: [`docs/assessment.md`](docs/assessment.md)
+- Toolchain architecture: [`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## License
 
