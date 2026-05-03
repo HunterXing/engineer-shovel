@@ -25,6 +25,12 @@
 
 它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、代码图谱和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
 
+## 能力边界
+
+Engineer Shovel 原生安装的是轻量路由器和 12 个 `/tool-*` 命令。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
+
+Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Caveman、RTK 或 code-review-graph 等外部能力，需要对应工具已经安装并处于健康状态。
+
 ## 快速开始
 
 ```bash
@@ -45,6 +51,7 @@ bash install.sh --target all
 # 其他模式
 ./install.sh --target opencode --recommended  # Skill + 命令 + Caveman
 ./install.sh --target opencode --minimal      # 只安装 Skill + 命令
+./install.sh --target opencode --full --with-graph-build  # 同时构建初始 code-review-graph 索引
 ```
 
 安装器会在 staging 可选依赖前校验外部仓库的 pinned SHA。相比直接 pipe 到 Bash，先下载再执行更安全，因为你可以检查脚本内容，也能避免服务端根据 pipe 场景返回不同内容。

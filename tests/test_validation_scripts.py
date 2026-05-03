@@ -129,6 +129,14 @@ def test_readmes_list_upstream_tool_versions():
             assert version in text, f"{readme_name} missing {version}"
 
 
+def test_readme_clarifies_native_and_external_capabilities():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "Native Engineer Shovel" in text
+    assert "optional external tools" in text
+    assert "--with-graph-build" in text
+
+
 def test_installer_dry_run_mentions_all_full_mode_integrations():
     install_text = (ROOT / "install.sh").read_text(encoding="utf-8")
 
@@ -144,6 +152,21 @@ def test_installer_dry_run_mentions_all_full_mode_integrations():
         "code-review-graph build",
     ):
         assert marker in install_text
+
+
+def test_installer_uses_all_for_gsd_dual_target():
+    install_text = (ROOT / "install.sh").read_text(encoding="utf-8")
+
+    assert 'gsd_target="--all"' in install_text
+    assert 'gsd_target="--both"' not in install_text
+
+
+def test_graph_build_is_explicit_installer_option():
+    install_text = (ROOT / "install.sh").read_text(encoding="utf-8")
+
+    assert "WITH_GRAPH_BUILD" in install_text
+    assert "--with-graph-build" in install_text
+    assert "Skipping code-review-graph build; pass --with-graph-build" in install_text
 
 
 def test_feature_workflow_requires_branch_gate():
@@ -198,6 +221,18 @@ def test_health_detects_project_language_markers(tmp_path, monkeypatch):
     monkeypatch.setattr(module, "ROOT", tmp_path)
 
     assert module.detect_project_rule_packs() == ["typescript", "python"]
+
+
+def test_health_detects_opencode_gsd_agent_skill_marker(tmp_path, monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "HOME", tmp_path)
+    marker = tmp_path / ".agents" / "skills" / "gsd-core" / "SKILL.md"
+    marker.parent.mkdir(parents=True)
+    marker.write_text("# GSD\n", encoding="utf-8")
+
+    result = module.check_gsd("opencode")
+
+    assert result.status == module.STATUS_OK
 
 
 def test_health_code_review_graph_missing_when_binary_absent(monkeypatch):

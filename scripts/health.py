@@ -165,9 +165,15 @@ def check_rtk(runner: CommandRunner) -> CheckResult:
 
 def check_gsd(target: str) -> CheckResult:
     command_dir = HOME / ".config/opencode/commands" if target == "opencode" else HOME / ".claude/commands"
-    skill_dir = HOME / ".config/opencode/skills" if target == "opencode" else HOME / ".claude/skills"
+    if target == "opencode":
+        skill_dirs = [HOME / ".agents/skills", HOME / ".config/opencode/skills"]
+    else:
+        skill_dirs = [HOME / ".claude/skills"]
     has_gsd = any(command_dir.glob("gsd-*.md")) if command_dir.exists() else False
-    has_gsd = has_gsd or (skill_dir.exists() and any(skill_dir.glob("gsd-*/SKILL.md")))
+    has_gsd = has_gsd or any(
+        skill_dir.exists() and any(skill_dir.glob("gsd-*/SKILL.md"))
+        for skill_dir in skill_dirs
+    )
     if has_gsd:
         return CheckResult("gsd", STATUS_OK, "GSD files found", target=target)
     flag = "--opencode" if target == "opencode" else "--claude"

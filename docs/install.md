@@ -119,7 +119,12 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 
 # Both targets global
 ./install.sh --target all --scope global --full
+
+# Full mode plus initial repository graph build
+./install.sh --target opencode --scope global --full --with-graph-build
 ```
+
+Full mode installs and configures code-review-graph but does not build the initial repository graph by default. Pass `--with-graph-build` when you want installation to run `code-review-graph build` for the current git worktree.
 
 ### What full mode installs
 
@@ -139,7 +144,7 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 
 **GSD** (Get Shit Done) is installed independently via `npx get-shit-done-cc@latest --<target> --<scope>`. It is not bundled with ECC.
 
-**code-review-graph** is installed using the upstream PyPI package: `pipx install code-review-graph` when `pipx` exists, otherwise `python3 -m pip install --user code-review-graph`. Full mode then runs `code-review-graph install` to configure MCP/rules and `code-review-graph build` for the current git repository.
+**code-review-graph** is installed using the upstream PyPI package: `pipx install code-review-graph` when `pipx` exists, otherwise `python3 -m pip install --user code-review-graph`. Full mode then runs `code-review-graph install` to configure MCP/rules. It only runs `code-review-graph build` for the current git repository when `--with-graph-build` is supplied.
 
 **superpowers** is installed per target. For OpenCode, it adds a plugin entry to `~/.config/opencode/opencode.json`. For Claude Code, it uses `claude plugin install superpowers@claude-plugins-official`.
 

@@ -29,6 +29,12 @@ Engineer Shovel is a lightweight skill + slash-command pack for OpenCode and Cla
 
 The runtime `SKILL.md` is intentionally small; long-form documentation lives in `docs/` so routine sessions do not pay for the full manual.
 
+## Capability Boundary
+
+Native Engineer Shovel installs the lightweight router and 12 `/tool-*` commands. The deeper capabilities advertised in full workflows come from optional external tools installed or configured by recommended/full modes: ECC, GSD, superpowers, code-review-graph, Caveman, and RTK.
+
+Minimal installs are intentionally small. If a workflow mentions external commands such as GSD, ECC, Caveman, RTK, or code-review-graph behavior, those capabilities require the corresponding optional tool to be installed and healthy.
+
 ## Quick Start
 
 ```bash
@@ -49,6 +55,7 @@ bash install.sh --target all
 # Other modes
 ./install.sh --target opencode --recommended  # Skill + commands + Caveman
 ./install.sh --target opencode --minimal      # Skill + commands only
+./install.sh --target opencode --full --with-graph-build  # Also build initial code-review-graph index
 ```
 
 The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.

@@ -26,6 +26,7 @@ SKILL_DIR="$HOME/.agents/skills"
 COMMAND_DIR="$HOME/.config/opencode/commands"
 PLUGIN_CACHE_DIR="$HOME/.claude/plugins/cache"
 DRY_RUN=0
+WITH_GRAPH_BUILD=0
 FAILURES=0
 TMP_ROOT=""
 TARGETS=()
@@ -46,6 +47,8 @@ Modes:
                  engineer-shovel skill, and commands.
                   Interactive default.
   --dry-run      Print planned actions without writing files or cloning repos.
+  --with-graph-build
+                 In full mode, run initial code-review-graph build after install.
 
 Targets:
   --target auto      Auto-detect OpenCode or Claude Code. Default for non-interactive use.
@@ -98,6 +101,7 @@ parse_args() {
       --global) SCOPE="global"; SCOPE_SET=1 ;;
       --local) SCOPE="local"; SCOPE_SET=1 ;;
       --dry-run) DRY_RUN=1 ;;
+      --with-graph-build) WITH_GRAPH_BUILD=1 ;;
       -h|--help) usage; exit 0 ;;
       *) err "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -516,7 +520,7 @@ _gsd_provisioned() {
 install_gsd() {
   # Resolve GSD target flag from the already-resolved TARGETS array
   if [[ ${#TARGETS[@]} -eq 2 ]]; then
-    gsd_target="--both"
+    gsd_target="--all"
   elif [[ ${#TARGETS[@]} -eq 1 ]]; then
     case "${TARGETS[0]}" in
       opencode) gsd_target="--opencode" ;;
@@ -726,7 +730,11 @@ install_code_review_graph() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
     info "DRY-RUN: pipx install code-review-graph || python3 -m pip install --user code-review-graph"
     info "DRY-RUN: code-review-graph install"
-    info "DRY-RUN: code-review-graph build"
+    if [[ "$WITH_GRAPH_BUILD" -eq 1 ]]; then
+      info "DRY-RUN: code-review-graph build"
+    else
+      info "DRY-RUN: Skipping code-review-graph build; pass --with-graph-build to run it"
+    fi
     return 0
   fi
 
@@ -743,7 +751,12 @@ install_code_review_graph() {
 
   if command -v code-review-graph >/dev/null 2>&1; then
     code-review-graph install 2>&1 || record_failure "code-review-graph install failed; run manually: code-review-graph install"
+    if [[ "$WITH_GRAPH_BUILD" -ne 1 ]]; then
+      info "Skipping code-review-graph build; pass --with-graph-build to run it."
+      return 0
+    fi
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      info "Building code-review-graph for current repository..."
       code-review-graph build 2>&1 || record_failure "code-review-graph build failed; run manually: code-review-graph build"
     else
       info "Skipping code-review-graph build outside a git worktree"
