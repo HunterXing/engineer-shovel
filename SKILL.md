@@ -7,16 +7,16 @@ description: |
   review, brainstorming, quick tasks, complex projects, research, graph updates, and sync.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   category: workflow
   token_profile: lightweight-router
   sources:
-    - OhMyOpenCode documentation
     - superpowers plugin
     - ECC (Everything Claude Code)
     - GSD (Get Stuff Done)
     - Caveman plugin
     - rtk
+    - code-review-graph 
 ---
 
 # 🪖 工兵铲 — Engineer Shovel
