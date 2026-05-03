@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🪖 Engineer Shovel — AI 开发工作流路由器</title>
-  <meta name="description" content="面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。12 个命令覆盖完整开发周期。">
+  <title>🪖 Engineer Shovel — AI Dev Workflow Router</title>
+  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 12 commands covering the full dev lifecycle.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
@@ -16,10 +16,14 @@
     <div class="nav-inner">
       <span class="nav-logo">🪖 Engineer Shovel</span>
       <div class="nav-links">
-        <a href="#commands">命令</a>
-        <a href="#cost-modes">成本模式</a>
-        <a href="#quickstart">快速开始</a>
-        <a href="#upstream">上游工具</a>
+        <a href="#commands" data-i18n="nav.commands">Commands</a>
+        <a href="#cost-modes" data-i18n="nav.modes">Cost Modes</a>
+        <a href="#quickstart" data-i18n="nav.start">Quick Start</a>
+        <a href="#upstream" data-i18n="nav.upstream">Upstream</a>
+        <div class="lang-toggle" id="lang-toggle">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="zh">中文</button>
+        </div>
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank" class="nav-github">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
           GitHub
@@ -28,85 +32,86 @@
     </div>
   </nav>
 
+  <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge">v1.3.0 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.3.0 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
     </h1>
-    <p class="hero-subtitle">面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器</p>
-    <p class="hero-desc">12 个命令覆盖快速任务、Bug 修复、新功能、分支、规划、重构、审查、头脑风暴、蓝图、研究、图谱和同步。用最低成本完成工作，只在需要时升级。</p>
+    <p class="hero-subtitle" data-i18n="hero.subtitle">Token-aware AI development workflow router for OpenCode / Claude Code</p>
+    <p class="hero-desc" data-i18n="hero.desc">12 commands covering quick tasks, bug fixes, features, branch, planning, refactoring, review, brainstorming, blueprints, research, graph, and sync. Use the cheapest path that verifies the result.</p>
     <div class="hero-actions">
-      <a href="#quickstart" class="btn btn-primary">快速开始</a>
-      <a href="#commands" class="btn btn-secondary">查看命令</a>
+      <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
+      <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span class="stat-num">12</span><span class="stat-label">命令</span></div>
-      <div class="stat"><span class="stat-num">6</span><span class="stat-label">上游工具</span></div>
-      <div class="stat"><span class="stat-num">3</span><span class="stat-label">安装模式</span></div>
-      <div class="stat"><span class="stat-num">4</span><span class="stat-label">语言文档</span></div>
+      <div class="stat"><span class="stat-num">12</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
     </div>
     <div class="scroll-hint" id="scroll-hint">
-      <span>向下滚动探索</span>
+      <span data-i18n="hero.scroll">Scroll to explore</span>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
     </div>
   </section>
 
+  <!-- ===================== COMMANDS ===================== -->
   <section class="section" id="commands">
     <div class="section-header">
-      <h2 class="section-title">12 个命令</h2>
-      <p class="section-sub">每个命令对应一个明确的开发场景。选对工具，用最少的 token 完成任务。</p>
+      <h2 class="section-title" data-i18n="commands.title">12 Commands</h2>
+      <p class="section-sub" data-i18n="commands.sub">Each command maps to a specific development scenario. Pick the right tool, spend the fewest tokens.</p>
     </div>
-    <div class="commands-grid" id="commands-grid">
-      <!-- injected by JS -->
-    </div>
+    <div class="commands-grid" id="commands-grid"></div>
   </section>
 
+  <!-- ===================== COST MODES ===================== -->
   <section class="section section-dark" id="cost-modes">
     <div class="section-header">
-      <h2 class="section-title">成本模式</h2>
-      <p class="section-sub">根据任务复杂度选择对应模式，默认选择能验证结果的最低成本路径。</p>
+      <h2 class="section-title" data-i18n="modes.title">Cost Modes</h2>
+      <p class="section-sub" data-i18n="modes.sub">Choose the mode matching task complexity. Default: cheapest mode that still verifies.</p>
     </div>
     <div class="modes-grid">
       <div class="mode-card" data-mode="fast">
         <div class="mode-card-header">
           <span class="mode-label mode-fast">--fast</span>
-          <span class="mode-title">低风险 · 明确目标</span>
+          <span class="mode-title" data-i18n="modes.fast.title">Low risk · Clear scope</span>
         </div>
         <ul class="mode-list">
-          <li>Typo 修复</li>
-          <li>1-2 文件编辑</li>
-          <li>已知位置的配置修改</li>
+          <li data-i18n="modes.fast.1">Typo fixes</li>
+          <li data-i18n="modes.fast.2">1-2 file edits</li>
+          <li data-i18n="modes.fast.3">Known-location config changes</li>
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman lite</span>
-          <span class="tool-tag">直接编辑</span>
+          <span class="tool-tag">direct edit</span>
         </div>
       </div>
       <div class="mode-card" data-mode="standard">
         <div class="mode-card-header">
           <span class="mode-label mode-standard">--standard</span>
-          <span class="mode-title">常规开发任务</span>
+          <span class="mode-title" data-i18n="modes.standard.title">Normal development</span>
         </div>
         <ul class="mode-list">
-          <li>新功能实现</li>
-          <li>中等规模重构</li>
-          <li>本地 diff 审查</li>
+          <li data-i18n="modes.standard.1">New feature implementation</li>
+          <li data-i18n="modes.standard.2">Medium refactoring</li>
+          <li data-i18n="modes.standard.3">Local diff review</li>
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman full</span>
-          <span class="tool-tag">定向验证</span>
+          <span class="tool-tag">targeted verify</span>
         </div>
       </div>
       <div class="mode-card" data-mode="deep">
         <div class="mode-card-header">
           <span class="mode-label mode-deep">--deep</span>
-          <span class="mode-title">高风险 · 跨系统 · 模糊</span>
+          <span class="mode-title" data-i18n="modes.deep.title">High risk · Cross-system · Ambiguous</span>
         </div>
         <ul class="mode-list">
-          <li>架构决策</li>
-          <li>跨模块调试</li>
-          <li>深度研究</li>
+          <li data-i18n="modes.deep.1">Architecture decisions</li>
+          <li data-i18n="modes.deep.2">Cross-module debugging</li>
+          <li data-i18n="modes.deep.3">Deep research</li>
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman ultra</span>
@@ -116,17 +121,18 @@
     </div>
   </section>
 
+  <!-- ===================== QUICK START ===================== -->
   <section class="section" id="quickstart">
     <div class="section-header">
-      <h2 class="section-title">快速开始</h2>
-      <p class="section-sub">下载 → 检查 → 运行，三步完成安装。</p>
+      <h2 class="section-title" data-i18n="start.title">Quick Start</h2>
+      <p class="section-sub" data-i18n="start.sub">Download → Inspect → Run. Three steps to ready.</p>
     </div>
     <div class="steps-container">
       <div class="step-item" data-step="1">
         <div class="step-num">01</div>
         <div class="step-content">
-          <h3 class="step-title">下载安装脚本</h3>
-          <p class="step-desc">先下载、检查内容，再执行。默认全量安装所有组件。</p>
+          <h3 class="step-title" data-i18n="start.step1.title">Download Installer</h3>
+          <p class="step-desc" data-i18n="start.step1.desc">Download first, inspect the content, then run. Default: full install all components.</p>
           <div class="code-block">
             <div class="code-lang">bash</div>
             <pre><code>curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
@@ -134,7 +140,7 @@ less install.sh</code></pre>
             <button class="copy-btn" data-copy="curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              复制
+              Copy
             </button>
           </div>
         </div>
@@ -142,27 +148,27 @@ less install.sh">
       <div class="step-item" data-step="2">
         <div class="step-num">02</div>
         <div class="step-content">
-          <h3 class="step-title">选择安装模式</h3>
-          <p class="step-desc">支持 OpenCode / Claude Code，minimal / recommended / full 多种模式。</p>
+          <h3 class="step-title" data-i18n="start.step2.title">Choose Install Mode</h3>
+          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code, minimal / recommended / full modes.</p>
           <div class="code-block">
             <div class="code-lang">bash</div>
-            <pre><code># OpenCode 全量安装（默认）
+            <pre><code># OpenCode full install (default)
 bash install.sh --target opencode
 
-# Skill + 命令 + Caveman
+# Skill + commands + Caveman
 bash install.sh --target opencode --recommended
 
-# 只安装 Skill + 命令
+# Skill + commands only
 bash install.sh --target opencode --minimal
 
-# 同时安装到 OpenCode 和 Claude Code
+# Install for both OpenCode and Claude Code
 bash install.sh --target all</code></pre>
             <button class="copy-btn" data-copy="bash install.sh --target opencode
 bash install.sh --target opencode --recommended
 bash install.sh --target opencode --minimal
 bash install.sh --target all">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              复制
+              Copy
             </button>
           </div>
         </div>
@@ -170,28 +176,26 @@ bash install.sh --target all">
       <div class="step-item" data-step="3">
         <div class="step-num">03</div>
         <div class="step-content">
-          <h3 class="step-title">开始使用</h3>
-          <p class="step-desc">在会话中加载技能或直接调用命令。</p>
+          <h3 class="step-title" data-i18n="start.step3.title">Start Using</h3>
+          <p class="step-desc" data-i18n="start.step3.desc">Load the skill in session or call commands directly.</p>
           <div class="code-block">
             <div class="code-lang">text</div>
-            <pre><code># 加载技能
+            <pre><code># Load skill
 skill(name="engineer-shovel")
 
-# 或直接调用命令
-/tool-quick --fast "修一个 README typo"
+# Or call commands directly
+/tool-quick --fast "fix a README typo"
 /tool-review --fast
-/tool-research --deep "比较 X 的方案"
+/tool-research --deep "compare X options"
 /tool-graph update</code></pre>
-            <button class="copy-btn" data-copy="# 加载技能
-skill(name="engineer-shovel")
+            <button class="copy-btn" data-copy="skill(name=&quot;engineer-shovel&quot;)
 
-# 或直接调用命令
-/tool-quick --fast "修一个 README typo"
+/tool-quick --fast &quot;fix a README typo&quot;
 /tool-review --fast
-/tool-research --deep "比较 X 的方案"
+/tool-research --deep &quot;compare X options&quot;
 /tool-graph update">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              复制
+              Copy
             </button>
           </div>
         </div>
@@ -199,82 +203,85 @@ skill(name="engineer-shovel")
     </div>
   </section>
 
+  <!-- ===================== UPSTREAM ===================== -->
   <section class="section section-dark" id="upstream">
     <div class="section-header">
-      <h2 class="section-title">上游工具</h2>
-      <p class="section-sub">Engineer Shovel 在 --full 模式下会安装并配置这些上游工具。</p>
+      <h2 class="section-title" data-i18n="upstream.title">Upstream Tools</h2>
+      <p class="section-sub" data-i18n="upstream.sub">Engineer Shovel installs these upstream tools in --full mode.</p>
     </div>
     <div class="upstream-table">
       <div class="ut-header">
-        <span>工具</span>
-        <span>版本</span>
-        <span>作用</span>
+        <span data-i18n="upstream.col.tool">Tool</span>
+        <span data-i18n="upstream.col.ver">Version</span>
+        <span data-i18n="upstream.col.role">Role</span>
       </div>
       <div class="ut-row" data-tool="ECC">
         <span class="ut-name">ECC</span>
         <span class="ut-ver">v1.10.0</span>
-        <span class="ut-desc">AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流</span>
+        <span class="ut-desc" data-i18n="upstream.ecc">AI agent harness performance: skills, rules, hooks, MCP, security, research-first workflow</span>
       </div>
       <div class="ut-row" data-tool="GSD">
         <span class="ut-name">GSD</span>
         <span class="ut-ver">v1.39.0</span>
-        <span class="ut-desc">Spec-driven 规划、阶段执行、验证和上下文工程</span>
+        <span class="ut-desc" data-i18n="upstream.gsd">Spec-driven planning, phase execution, verification, context engineering</span>
       </div>
       <div class="ut-row" data-tool="superpowers">
         <span class="ut-name">superpowers</span>
         <span class="ut-ver">v5.0.7</span>
-        <span class="ut-desc">强制技能工作流：brainstorming、TDD、planning、review、branch finishing</span>
+        <span class="ut-desc" data-i18n="upstream.sp">Enforced skill workflows: brainstorming, TDD, planning, review, branch finishing</span>
       </div>
       <div class="ut-row" data-tool="code-review-graph">
         <span class="ut-name">code-review-graph</span>
         <span class="ut-ver">v2.3.2</span>
-        <span class="ut-desc">本地代码知识图谱、MCP review context、影响面分析</span>
+        <span class="ut-desc" data-i18n="upstream.crg">Local code knowledge graph, MCP review context, impact analysis</span>
       </div>
       <div class="ut-row" data-tool="Caveman">
         <span class="ut-name">Caveman</span>
         <span class="ut-ver">v1.7.0</span>
-        <span class="ut-desc">输出 token 压缩、精简 review/commit、MCP shrink</span>
+        <span class="ut-desc" data-i18n="upstream.caveman">Output token compression, concise review/commit, MCP shrink</span>
       </div>
       <div class="ut-row" data-tool="RTK">
         <span class="ut-name">RTK</span>
         <span class="ut-ver">v0.38.0</span>
-        <span class="ut-desc">Shell/tool 输出压缩代理和命令 rewrite hooks</span>
+        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression proxy and command rewrite hooks</span>
       </div>
     </div>
   </section>
 
+  <!-- ===================== CAPABILITY BOUNDARY ===================== -->
   <section class="section" id="capability-boundary">
     <div class="section-header">
-      <h2 class="section-title">能力边界</h2>
+      <h2 class="section-title" data-i18n="boundary.title">Capability Boundary</h2>
     </div>
     <div class="boundary-layout">
       <div class="boundary-core">
-        <h3 class="boundary-title">原生安装（最小模式）</h3>
-        <p class="boundary-desc">Engineer Shovel 原生安装的是轻量路由器和 12 个 /tool-* 命令。</p>
+        <h3 class="boundary-title" data-i18n="boundary.core.title">Native Install (Minimal)</h3>
+        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 12 /tool-* commands.</p>
         <div class="boundary-list">
-          <div class="b-item"><span class="b-dot b-native"></span>轻量级 SKILL.md 路由层</div>
-          <div class="b-item"><span class="b-dot b-native"></span>12 个 /tool-* 命令</div>
-          <div class="b-item"><span class="b-dot b-native"></span>install.sh 安装脚本</div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.1">Lightweight SKILL.md router</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">12 /tool-* commands</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.3">install.sh installer</span></div>
         </div>
       </div>
       <div class="boundary-arrow">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </div>
       <div class="boundary-ext">
-        <h3 class="boundary-title">可选外部工具（recommended / full 模式）</h3>
-        <p class="boundary-desc">完整工作流里更深的能力来自 recommended / full 模式安装或配置的可选外部工具。</p>
+        <h3 class="boundary-title" data-i18n="boundary.ext.title">Optional External Tools (recommended / full)</h3>
+        <p class="boundary-desc" data-i18n="boundary.ext.desc">Deeper capabilities come from optional external tools configured by recommended / full mode.</p>
         <div class="boundary-list">
-          <div class="b-item"><span class="b-dot b-ext"></span>ECC — AI agent harness 性能系统</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>GSD — Spec-driven 规划和执行</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>superpowers — 强制技能工作流</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>code-review-graph — 本地代码知识图谱</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>Caveman — 输出 token 压缩</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>RTK — Shell 输出压缩</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>ECC — AI agent harness performance</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>GSD — Spec-driven planning &amp; execution</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>superpowers — Enforced skill workflows</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>code-review-graph — Local code knowledge graph</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>Caveman — Output token compression</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>RTK — Shell output compression</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-left">
@@ -283,12 +290,30 @@ skill(name="engineer-shovel")
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>
-        <a href="docs/workflows.md" target="_blank">文档</a>
-        <a href="docs/install.md" target="_blank">安装</a>
-        <a href="docs/token-cost.md" target="_blank">成本模型</a>
+        <a href="docs/workflows.md" target="_blank" data-i18n="footer.docs">Docs</a>
+        <a href="docs/install.md" target="_blank" data-i18n="footer.install">Install</a>
+        <a href="docs/token-cost.md" target="_blank" data-i18n="footer.cost">Cost Model</a>
       </div>
     </div>
   </footer>
+
+  <!-- ===================== WORKFLOW MODAL ===================== -->
+  <div class="wf-modal" id="wf-modal">
+    <div class="wf-modal-backdrop" id="wf-modal-backdrop"></div>
+    <div class="wf-modal-panel">
+      <div class="wf-modal-header">
+        <div class="wf-modal-title-row">
+          <span class="wf-modal-cmd" id="wf-modal-cmd"></span>
+          <span class="wf-modal-tag" id="wf-modal-tag"></span>
+        </div>
+        <button class="wf-modal-close" id="wf-modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="wf-modal-sub" id="wf-modal-sub"></p>
+      <div class="wf-modal-body" id="wf-modal-body"></div>
+    </div>
+  </div>
 
   <script src="scripts/main.js"></script>
 </body>

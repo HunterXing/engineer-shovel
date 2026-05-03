@@ -894,6 +894,40 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ---- Language Toggle ---- */
+.lang-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.lang-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-sans);
+  letter-spacing: 0.03em;
+}
+
+.lang-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.lang-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .nav-links a:not(.nav-github) { display: none; }
@@ -905,4 +939,173 @@ body {
   .step-item { flex-direction: column; gap: 12px; }
   .step-item::before { display: none; }
   .step-num { width: 40px; height: 40px; font-size: 0.75rem; }
+}
+
+/* ---- Workflow Modal ---- */
+.wf-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wf-modal.open {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.wf-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8,12,20,0.8);
+  backdrop-filter: blur(8px);
+}
+
+.wf-modal-panel {
+  position: relative;
+  width: min(680px, 92vw);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-bright) transparent;
+}
+
+.wf-modal.open .wf-modal-panel {
+  transform: translateY(0) scale(1);
+}
+
+.wf-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 24px 0;
+}
+
+.wf-modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wf-modal-cmd {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wf-modal-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wf-modal-close {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: -4px;
+}
+
+.wf-modal-close:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.wf-modal-sub {
+  padding: 10px 24px 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.wf-modal-body {
+  padding: 24px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wf-step {
+  display: flex;
+  gap: 20px;
+}
+
+.wf-step-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.wf-step-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wf-step-line {
+  width: 2px;
+  flex: 1;
+  min-height: 24px;
+  margin-top: 4px;
+  background: linear-gradient(to bottom, var(--border-bright), var(--border));
+}
+
+.wf-step-content {
+  flex: 1;
+  padding-bottom: 24px;
+}
+
+.wf-step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.wf-step-phase {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.wf-step-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wf-step-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .wf-modal-panel { max-height: 90vh; }
 }
