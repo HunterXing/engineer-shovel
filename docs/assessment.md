@@ -53,7 +53,8 @@ Public commands:
 - `/tool-brainstorm`
 - `/tool-blueprint`
 - `/tool-research`
-- `/tool-statistic`
+- `/tool-graph`
+- `/tool-update`
 
 Installer modes:
 - `--minimal`
@@ -149,7 +150,7 @@ Token efficiency is a core design goal:
 
 Evidence:
 - `SKILL.md:52-84` — cost modes and token guidance.
-- `docs/token-cost.md:1-79` — token model and session statistics policy.
+- `docs/token-cost.md:1-80` — token model, Caveman/RTK statistics policy, and graph status boundary.
 - `scripts/token-benchmark.py:28-45` — static proxy output.
 - `.sisyphus/evidence/task-1-token-baseline.json` — baseline token estimate.
 

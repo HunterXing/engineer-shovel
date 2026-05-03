@@ -69,12 +69,13 @@ Use `scripts/token-benchmark.py` for static size estimates before and after comm
 
 ## Session Statistics
 
-Use `/tool-statistic` to report current-session token usage and savings.
+Use the upstream statistics tools directly rather than wrapping them in a separate Engineer Shovel command.
 
 - Caveman statistics should come from `/caveman-stats` when available.
 - RTK project statistics should come from `rtk gain --project --format json` when available.
 - If project statistics are empty, RTK global statistics can come from `rtk gain` and must be labeled global.
 - RTK session adoption can come from `rtk session`.
+- code-review-graph status and graph freshness belong in `/tool-graph status`.
 - RTK hook rewrite audit can come from `rtk hook-audit`, but only when `RTK_HOOK_AUDIT=1` has been enabled and an audit log exists.
 - Avoid `rtk gain --history` as a default statistics source because RTK 0.37.2 can panic on non-ASCII paths in history rendering.
 - If one source lacks measured data, report it separately as unknown instead of rolling it into a total.

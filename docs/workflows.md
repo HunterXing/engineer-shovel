@@ -89,12 +89,18 @@ Modes:
 - `--web`: add current web/docs search.
 - `--deep`: multi-source research, code examples, synthesis, and conflict analysis.
 
-## `/tool-statistic`
+## `/tool-graph`
 
-Use when you want to know how many tokens the current session saved.
+Use when you need to manually manage the `code-review-graph` index.
 
-Reporting rules:
-- Prefer `/caveman-stats` for real Caveman session numbers.
-- Use RTK's own statistics only if the installed RTK integration exposes them.
-- Keep Caveman and RTK numbers separate unless both are measured.
-- Never invent exact savings from estimates.
+Modes:
+- `status`: show install and graph health.
+- `build`: full initial graph build.
+- `update`: incremental graph refresh after code changes.
+- `rebuild`: full refresh for stale or damaged graphs; ask before deleting graph storage.
+- `watch`: explain or start continuous graph updates only with user approval.
+
+Integration:
+- Run `/tool-graph update` before deep `/tool-review` and before `/tool-branch review` or merge.
+- Use `/caveman-stats` directly for Caveman session statistics.
+- Use `rtk gain` directly for RTK output-compression statistics.

@@ -10,6 +10,7 @@ REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
 
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 RTK_REPO="https://github.com/rtk-ai/rtk"
+CODE_REVIEW_GRAPH_REPO="https://github.com/tirth8205/code-review-graph"
 
 ECC_SHA="841beea45cb25ba51f29fa45b7e272938d19b80a"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
@@ -41,7 +42,8 @@ Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|a
 Modes:
   --minimal      Install only engineer-shovel skill and slash commands.
   --recommended Install skill, commands, and Caveman plugin.
-  --full         Install ECC, GSD, superpowers, Caveman, RTK, engineer-shovel skill, and commands.
+  --full         Install ECC, GSD, superpowers, code-review-graph, Caveman, RTK,
+                 engineer-shovel skill, and commands.
                   Interactive default.
   --dry-run      Print planned actions without writing files or cloning repos.
 
@@ -131,7 +133,7 @@ prompt_mode() {
   local choice
   cat <<'PROMPT'
 Select install mode:
-   1) Full: ECC, GSD, superpowers, Caveman, RTK, engineer-shovel skill, and commands (default)
+   1) Full: ECC, GSD, superpowers, code-review-graph, Caveman, RTK, engineer-shovel skill, and commands (default)
   2) Recommended: skill + commands + Caveman
   3) Minimal: skill + commands only
 PROMPT
@@ -339,7 +341,7 @@ install_skill() {
 
 install_commands() {
   local src_dir="$(dirname "$0")/commands"
-  local names=(branch feat fix plan refactor review brainstorm quick blueprint research statistic update)
+  local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
   local count=0
 
   run_or_print mkdir -p "$COMMAND_DIR"
@@ -401,9 +403,14 @@ install_caveman_for_target() {
     *) record_failure "Unknown target for Caveman: ${target}"; return 1 ;;
   esac
 
+  local mode_flag=""
+  if [[ "$MODE" == "recommended" ]]; then
+    mode_flag="--minimal"
+  fi
+
   if [[ "$DRY_RUN" -eq 1 ]]; then
     info "DRY-RUN: Caveman official installer for ${target}"
-    info "  curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} --minimal"
+    info "  curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} ${mode_flag}"
     if [[ "$SCOPE" == "local" ]]; then
       warn "DRY-RUN: Caveman does not support project-scoped installation."
       warn "  Will install globally. Agent discovers skills from home directory."
@@ -423,13 +430,13 @@ install_caveman_for_target() {
 
   info "Installing Caveman for ${target} via official installer..."
   local caveman_output
-  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- ${agent_flag} --minimal 2>&1)"; then
+  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- ${agent_flag} ${mode_flag} 2>&1)"; then
     printf '%s\n' "$caveman_output"
     ok "Caveman installed for ${target}"
   else
     local rc=$?
     printf '%s\n' "$caveman_output" >&2
-    record_failure "Caveman install failed for ${target} (exit ${rc}). Install manually: curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag}"
+    record_failure "Caveman install failed for ${target} (exit ${rc}). Install manually: curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} ${mode_flag}"
   fi
 }
 
@@ -661,13 +668,88 @@ install_rtk() {
 
   if command -v rtk >/dev/null 2>&1; then
     ok "RTK already installed"
+    init_rtk
     return 0
   fi
 
-  if command -v cargo >/dev/null 2>&1; then
-    warn "RTK not installed. To avoid surprise compile time, install manually when needed: cargo install rtk --git ${RTK_REPO} --rev ${RTK_SHA}"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"
+    info "DRY-RUN: rtk init for ${TARGETS[*]}"
+    return 0
+  fi
+
+  info "Installing RTK via official installer..."
+  local rtk_output
+  if rtk_output="$(curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh 2>&1)"; then
+    printf '%s\n' "$rtk_output"
+    init_rtk
+  elif command -v cargo >/dev/null 2>&1; then
+    warn "RTK official installer failed; trying pinned cargo install."
+    if cargo install --git "$RTK_REPO" --rev "$RTK_SHA" rtk 2>&1; then
+      init_rtk
+    else
+      record_failure "RTK install failed. Manual: curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"
+    fi
   else
-    warn "RTK not installed and cargo not found. Install RTK manually if needed."
+    record_failure "RTK install failed and cargo not found. Manual: install from ${RTK_REPO} releases."
+  fi
+}
+
+init_rtk() {
+  local target
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    for target in "${TARGETS[@]}"; do
+      case "$target" in
+        opencode) info "DRY-RUN: rtk init -g --opencode" ;;
+        claude-code) info "DRY-RUN: rtk init -g" ;;
+      esac
+    done
+    return 0
+  fi
+  if ! command -v rtk >/dev/null 2>&1; then
+    record_failure "RTK binary unavailable after install"
+    return 1
+  fi
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      opencode)
+        rtk init -g --opencode 2>&1 || record_failure "RTK OpenCode init failed; run manually: rtk init -g --opencode"
+        ;;
+      claude-code)
+        rtk init -g 2>&1 || record_failure "RTK Claude init failed; run manually: rtk init -g"
+        ;;
+    esac
+  done
+}
+
+install_code_review_graph() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: pipx install code-review-graph || python3 -m pip install --user code-review-graph"
+    info "DRY-RUN: code-review-graph install"
+    info "DRY-RUN: code-review-graph build"
+    return 0
+  fi
+
+  if ! command -v code-review-graph >/dev/null 2>&1; then
+    info "Installing code-review-graph from PyPI..."
+    if command -v pipx >/dev/null 2>&1; then
+      pipx install code-review-graph 2>&1 || record_failure "code-review-graph pipx install failed"
+    elif command -v python3 >/dev/null 2>&1; then
+      python3 -m pip install --user code-review-graph 2>&1 || record_failure "code-review-graph pip install failed"
+    else
+      record_failure "Python 3 not found. Install code-review-graph manually: pipx install code-review-graph"
+    fi
+  fi
+
+  if command -v code-review-graph >/dev/null 2>&1; then
+    code-review-graph install 2>&1 || record_failure "code-review-graph install failed; run manually: code-review-graph install"
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      code-review-graph build 2>&1 || record_failure "code-review-graph build failed; run manually: code-review-graph build"
+    else
+      info "Skipping code-review-graph build outside a git worktree"
+    fi
+  else
+    record_failure "code-review-graph unavailable after install. See ${CODE_REVIEW_GRAPH_REPO}"
   fi
 }
 
@@ -711,7 +793,7 @@ verify_install() {
   local missing=0
   [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing=1
 
-  local names=(branch feat fix plan refactor review brainstorm quick blueprint research statistic update)
+  local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
   for name in "${names[@]}"; do
     [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing=1
   done
@@ -751,6 +833,7 @@ main() {
       install_ecc
       install_gsd
       install_superpowers
+      install_code_review_graph
       _install_caveman_for_targets
       install_rtk
       ;;

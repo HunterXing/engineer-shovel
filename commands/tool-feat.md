@@ -26,6 +26,7 @@ Compression: follow `docs/token-cost.md`; default to `/caveman full`, lite for `
 
 ## Flow
 
+0. Before editing, verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
 1. Search existing code for matching patterns before adding new structure.
 2. Decide the smallest useful increment and verification target.
 3. Implement using project conventions.

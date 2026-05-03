@@ -15,7 +15,7 @@ TRACKED_FILES = {
     "skill": ["SKILL.md"],
     "commands": [f"tool-{name}.md" for name in [
         "branch", "feat", "fix", "plan", "refactor", "review",
-        "brainstorm", "quick", "blueprint", "research", "statistic", "update"
+        "brainstorm", "quick", "blueprint", "research", "graph", "update"
     ]],
 }
 

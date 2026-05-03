@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-branch</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-statistic</code> <code>/tool-update</code>
+  <code>/tool-quick</code> <code>/tool-fix</code> <code>/tool-feat</code> <code>/tool-branch</code> <code>/tool-plan</code> <code>/tool-refactor</code> <code>/tool-review</code> <code>/tool-brainstorm</code> <code>/tool-blueprint</code> <code>/tool-research</code> <code>/tool-graph</code> <code>/tool-update</code>
 </p>
 
 ---
@@ -68,7 +68,7 @@ or call a command directly:
 /tool-quick --fast "fix typo in README"
 /tool-review --fast
 /tool-research --deep "compare options for X"
-/tool-statistic --fast
+/tool-graph update
 ```
 
 ## Cost Modes
@@ -95,7 +95,7 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 | `/tool-brainstorm` | Clarify ideas before building |
 | `/tool-blueprint` | Multi-step or multi-session projects |
 | `/tool-research` | Evidence gathering and synthesis |
-| `/tool-statistic` | Session token usage and savings report |
+| `/tool-graph` | code-review-graph status, full build, incremental update, rebuild, watch |
 | `/tool-update` | Sync and update installation |
 
 ## Structure
@@ -123,3 +123,16 @@ engineer-shovel/
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Upstream Tool Versions
+
+Engineer Shovel integrates and configures these upstream tools in `--full` mode.
+
+| Tool | Repository | Current referenced version | Role |
+|---|---|---:|---|
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0-rc.1 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven planning, phase execution, verification, and context engineering |
+| superpowers | https://github.com/obra/superpowers | v5.0.7 | Mandatory skill workflows: brainstorming, TDD, planning, review, branch finishing |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | Output-token compression, terse review/commit helpers, MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell and tool output compression proxy plus command rewrite hooks |

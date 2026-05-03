@@ -4,7 +4,7 @@ display_name: engineer-shovel
 description: |
   工兵铲 (Engineer Shovel) — token-aware AI agent development workflow router.
   Provides 12 slash commands for feature work, bug fixing, branch workflow, planning, refactoring,
-  review, brainstorming, quick tasks, complex projects, research, and token statistics.
+  review, brainstorming, quick tasks, complex projects, research, graph updates, and sync.
 license: MIT
 metadata:
   version: "1.2.0"
@@ -37,7 +37,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 | `/tool-brainstorm` | Explore unclear ideas before building | Low → Medium |
 | `/tool-blueprint` | Multi-step, multi-session projects | High |
 | `/tool-research` | Current-state technical research | Low → High by mode |
-| `/tool-statistic` | Session token usage and savings report | Low |
+| `/tool-graph` | code-review-graph status, full build, incremental update, rebuild, watch | Low |
 | `/tool-update` | Sync and update installation | Low |
 
 ## Router
@@ -50,7 +50,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 - If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work. Use `/tool-branch review` to see diff before merging.
 - If the work spans phases, milestones, or multiple PRs, use `/tool-blueprint`.
 - If you need external/current information, use `/tool-research`; start with `--quick` and escalate only when evidence is insufficient.
-- If you need session token usage or savings, use `/tool-statistic`; it reports measured Caveman/RTK data when available and avoids fake precision.
+- If you need to refresh code-review-graph context, use `/tool-graph update` for incremental refresh or `/tool-graph build` for full graph creation.
 
 ## Cost Modes
 

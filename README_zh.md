@@ -2,7 +2,7 @@
 
 **面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。**
 
-它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、token 统计和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
+它提供 12 个 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、头脑风暴、复杂项目、研究、代码图谱和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
 
 ## 快速开始
 
@@ -55,7 +55,7 @@ skill(name="engineer-shovel")
 /tool-quick --fast "修一个 README typo"
 /tool-review --fast
 /tool-research --deep "比较 X 的方案"
-/tool-statistic --fast
+/tool-graph update
 ```
 
 ## 成本模式
@@ -70,7 +70,7 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 
 ## 指令
 
-`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-branch`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-brainstorm`、`/tool-blueprint`、`/tool-research`、`/tool-statistic`、`/tool-update`。
+`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-branch`、`/tool-plan`、`/tool-refactor`、`/tool-review`、`/tool-brainstorm`、`/tool-blueprint`、`/tool-research`、`/tool-graph`、`/tool-update`。
 
 ## 文档
 
@@ -83,3 +83,16 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 ## License
 
 MIT — 详见 [LICENSE](LICENSE)。
+
+## 上游工具版本
+
+Engineer Shovel 在 `--full` 模式下会安装并配置这些上游工具。
+
+| 工具 | 仓库 | 当前参考版本 | 作用 |
+|---|---|---:|---|
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0-rc.1 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven 规划、阶段执行、验证和上下文工程 |
+| superpowers | https://github.com/obra/superpowers | v5.0.7 | 强制技能工作流：brainstorming、TDD、planning、review、branch finishing |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | 本地代码知识图谱、MCP review context、影响面分析 |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 输出 token 压缩、精简 review/commit、MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell/tool 输出压缩代理和命令 rewrite hooks |

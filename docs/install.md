@@ -128,9 +128,10 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 | Engineer Shovel | ✓ | ✓ | Always installed |
 | ECC | ✓ (global only) | ✓ (global only) | Skipped for local scope (no project path upstream) |
 | GSD | ✓ | ✓ | Installed via `npx get-shit-done-cc@latest` independently |
+| code-review-graph | ✓ | ✓ | Installed from PyPI via `pipx` or `pip`, then configured with `code-review-graph install` |
 | Caveman | ✓ | ✓ | OpenCode: `npx skills add`; Claude: `claude plugin` commands |
-| superpowers | Skipped | Built-in (no-op) | Claude's marketplace is pre-registered; OpenCode has no equivalent |
-| RTK | ✓ | ✓ | System binary, always global regardless of scope selection |
+| superpowers | ✓ | ✓ | OpenCode plugin entry or Claude marketplace plugin |
+| RTK | ✓ | ✓ | System binary, always global regardless of scope selection; initialized with target-specific hooks |
 
 ### Component details
 
@@ -138,11 +139,13 @@ Installs the full toolchain: **ECC**, **GSD**, **superpowers**, **Caveman**, **R
 
 **GSD** (Get Shit Done) is installed independently via `npx get-shit-done-cc@latest --<target> --<scope>`. It is not bundled with ECC.
 
+**code-review-graph** is installed using the upstream PyPI package: `pipx install code-review-graph` when `pipx` exists, otherwise `python3 -m pip install --user code-review-graph`. Full mode then runs `code-review-graph install` to configure MCP/rules and `code-review-graph build` for the current git repository.
+
 **superpowers** is installed per target. For OpenCode, it adds a plugin entry to `~/.config/opencode/opencode.json`. For Claude Code, it uses `claude plugin install superpowers@claude-plugins-official`.
 
 **Caveman** uses the official installer from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman). It auto-detects installed agents and runs their native install method. For Claude Code, it uses `claude plugin marketplace add && claude plugin install`. For OpenCode, it uses `npx skills add`.
 
-**RTK** (Rust Token Killer) is installed as a system binary via `cargo install --git <repo>`, then initialized with `rtk init -g` for hooks. The binary always installs to `~/.local/bin/` or `~/.cargo/bin/`, not to the selected scope path.
+**RTK** (Rust Token Killer) is installed as a system binary via the upstream install script, with pinned cargo fallback when available. It is then initialized with `rtk init -g` for Claude Code or `rtk init -g --opencode` for OpenCode. The binary always installs globally, not to the selected scope path.
 
 ## Dry Run
 

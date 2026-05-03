@@ -102,3 +102,52 @@ def test_token_benchmark_reports_static_and_unknown_sources(capsys):
     assert report["measurement_sources"]["rtk_project"]["status"] == "unknown"
     assert report["caveman_session"]["measured_tokens_saved"] is None
     assert report["rtk_project"]["measured_tokens_saved"] is None
+
+
+def test_command_set_stays_at_twelve_with_graph_replacing_statistic():
+    commands = sorted(path.stem for path in (ROOT / "commands").glob("tool-*.md"))
+
+    assert len(commands) == 12
+    assert "tool-graph" in commands
+    assert "tool-statistic" not in commands
+
+
+def test_readmes_list_upstream_tool_versions():
+    expected = {
+        "ECC": "v2.0.0-rc.1",
+        "GSD": "v1.39.0",
+        "superpowers": "v5.0.7",
+        "code-review-graph": "v2.3.2",
+        "Caveman": "v1.7.0",
+        "RTK": "v0.38.0",
+    }
+
+    for readme_name in ("README.md", "README_zh.md"):
+        text = (ROOT / readme_name).read_text(encoding="utf-8")
+        for tool, version in expected.items():
+            assert tool in text, f"{readme_name} missing {tool}"
+            assert version in text, f"{readme_name} missing {version}"
+
+
+def test_installer_dry_run_mentions_all_full_mode_integrations():
+    install_text = (ROOT / "install.sh").read_text(encoding="utf-8")
+
+    for marker in (
+        "install_ecc",
+        "install_gsd",
+        "install_superpowers",
+        "install_caveman_for_target",
+        "install_rtk",
+        "install_code_review_graph",
+        "rtk init",
+        "code-review-graph install",
+        "code-review-graph build",
+    ):
+        assert marker in install_text
+
+
+def test_feature_workflow_requires_branch_gate():
+    text = (ROOT / "commands" / "tool-feat.md").read_text(encoding="utf-8")
+
+    assert "/tool-branch create" in text
+    assert "before editing" in text.lower()
