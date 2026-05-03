@@ -168,3 +168,81 @@ def test_readme_header_has_language_links_and_badges_without_command_wall():
 def test_localized_readme_files_exist_for_header_links():
     for name in ("README_zh.md", "README.ja-JP.md", "README.ko-KR.md"):
         assert (ROOT / name).exists()
+
+
+def test_health_expands_both_targets():
+    module = load_script("health.py")
+
+    assert module.expand_targets("both") == ["opencode", "claude"]
+    assert module.expand_targets("opencode") == ["opencode"]
+    assert module.expand_targets("claude") == ["claude"]
+
+
+def test_health_reports_missing_base_executable(monkeypatch):
+    module = load_script("health.py")
+
+    monkeypatch.setattr(module, "which", lambda name: None)
+    checks = module.check_base_dependencies(["opencode"], runner=module.CommandRunner(dry_run=True))
+    by_name = {check.name: check for check in checks}
+
+    assert by_name["git"].status == "missing"
+    assert by_name["python3"].status == "missing"
+    assert by_name["opencode"].status == "missing"
+    assert "claude" not in by_name
+
+
+def test_health_detects_project_language_markers(tmp_path, monkeypatch):
+    module = load_script("health.py")
+    (tmp_path / "package.json").write_text("{}\n", encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+
+    assert module.detect_project_rule_packs() == ["typescript", "python"]
+
+
+def test_health_code_review_graph_missing_when_binary_absent(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: None)
+
+    result = module.check_code_review_graph(module.CommandRunner(dry_run=True))
+
+    assert result.name == "code-review-graph"
+    assert result.status == "missing"
+    assert "pipx install code-review-graph" in result.repair
+
+
+def test_health_repair_code_review_graph_uses_official_commands(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/bin/" + name if name in {"pipx", "code-review-graph"} else None)
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_code_review_graph(runner, ["opencode", "claude"])
+
+    assert ["pipx", "install", "code-review-graph"] in runner.commands
+    assert ["code-review-graph", "install"] in runner.commands
+    assert ["code-review-graph", "build"] in runner.commands
+
+
+def test_health_repair_gsd_uses_all_for_both_targets():
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_gsd(runner, ["opencode", "claude"])
+
+    assert ["npx", "-y", "get-shit-done-cc@latest", "--all", "--global"] in runner.commands
+
+
+def test_tool_update_mentions_component_health_checks():
+    text = (ROOT / "commands" / "tool-update.md").read_text(encoding="utf-8")
+
+    assert "component health" in text.lower()
+    assert "code-review-graph" in text
+    assert "superpowers" in text
+    assert "MCP" in text
+
+
+def test_sync_script_invokes_health_script():
+    text = (ROOT / "scripts" / "sync.py").read_text(encoding="utf-8")
+
+    assert "health.py" in text
+    assert "--skip-health" in text

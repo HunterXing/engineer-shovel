@@ -14,12 +14,12 @@ when-to-use: Use to update installed engineer-shovel files to latest version, ch
 
 **Input**: $ARGUMENTS
 
-Synchronize the installed engineer-shovel skill and commands with the latest repository version.
+Synchronize Engineer Shovel files and verify supporting component health.
 
 ## Modes
 
-- `--check` or default: Compare installed files with latest repo and report missing/outdated.
-- `--full`: Update all installed components (skill, commands, hooks) to latest version.
+- `--check` or default: Compare installed Engineer Shovel files and check base dependencies plus Full-mode components. Read-only.
+- `--full`: Update Engineer Shovel files, then install/configure missing low-risk components using official installers.
 
 ## Target Scope
 
@@ -32,8 +32,26 @@ Synchronize the installed engineer-shovel skill and commands with the latest rep
 1. Detect installed locations based on target(s).
 2. Compare local installed files with latest repo versions.
 3. Report missing, outdated, or extra files.
-4. If `--full`: overwrite installed files with latest versions.
-5. Verify installation integrity after update.
+4. Check component health for base tools and Full-mode integrations.
+5. If `--full`: overwrite installed files and repair missing/unconfigured components.
+6. Verify installation integrity after update.
+
+## Component Health
+
+Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, plus selected runtimes (`opencode`, `claude`).
+
+Checks Full-mode components: `code-review-graph`, GSD, `superpowers`, Caveman, RTK, ECC.
+
+MCP policy:
+- `code-review-graph install` may configure MCP/rules because upstream explicitly supports this.
+- Superpowers has no separate MCP auto-configuration step; it is configured as a plugin/skills provider.
+- ECC bundled MCPs are not auto-enabled by default because they may require credentials or duplicate user servers.
+
+Safety:
+- Does not start background watch/daemon processes.
+- Does not enable telemetry explicitly.
+- Does not delete user config.
+- Backs up JSON config before editing.
 
 ## Compression
 

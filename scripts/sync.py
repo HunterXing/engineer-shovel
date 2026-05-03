@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import subprocess
 import sys
 from pathlib import Path
 
@@ -201,6 +202,15 @@ def print_check_report(check_result: dict, verbose: bool = False) -> None:
     print(f"\n  Status: {status} ({summary['up_to_date']}/{summary['total']} files current)")
 
 
+def run_health(command: str, target: str, dry_run: bool = False) -> int:
+    health_command = "check" if command == "check" else "repair"
+    args = [sys.executable, str(ROOT / "scripts" / "health.py"), health_command, "--target", target]
+    if dry_run:
+        args.append("--dry-run")
+    proc = subprocess.run(args, text=True, check=False)
+    return proc.returncode
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Synchronize engineer-shovel installation"
@@ -232,6 +242,11 @@ def main() -> int:
         action="store_true",
         help="Show detailed output"
     )
+    parser.add_argument(
+        "--skip-health",
+        action="store_true",
+        help="Only sync Engineer Shovel files; skip external component health checks"
+    )
     
     args = parser.parse_args()
     
@@ -244,6 +259,10 @@ def main() -> int:
             print_check_report(result, verbose=args.verbose)
             if result["summary"]["issues"] > 0:
                 all_ok = False
+        
+        health_rc = 0 if args.skip_health else run_health("check", args.target, dry_run=True)
+        if health_rc != 0:
+            all_ok = False
         
         print()
         if all_ok:
@@ -270,6 +289,11 @@ def main() -> int:
             print(f"\nDRY-RUN: Would update {total_updated} file(s)")
         else:
             print(f"\n✔ Updated {total_updated} file(s)")
+        
+        if not args.skip_health:
+            health_rc = run_health("sync", args.target, dry_run=args.dry_run)
+            if health_rc != 0:
+                return health_rc
         
         return 0
     
