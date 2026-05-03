@@ -344,7 +344,8 @@ install_skill() {
 }
 
 install_commands() {
-  local src_dir="$(dirname "$0")/commands"
+  local src_dir
+  src_dir="$(dirname "$0")/commands"
   local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
   local count=0
 
@@ -434,7 +435,7 @@ install_caveman_for_target() {
 
   info "Installing Caveman for ${target} via official installer..."
   local caveman_output
-  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- ${agent_flag} ${mode_flag} 2>&1)"; then
+  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- "${agent_flag}" "${mode_flag}" 2>&1)"; then
     printf '%s\n' "$caveman_output"
     ok "Caveman installed for ${target}"
   else
@@ -555,8 +556,6 @@ install_gsd() {
     record_failure "GSD installer exited with code ${gsd_rc}; run manually: npx -y get-shit-done-cc@latest ${gsd_target} ${gsd_scope}"
   fi
 }
-
-SUPERPOWERS_REPO="https://github.com/obra/superpowers.git"
 
 _superpowers_opencode_installed() {
   local config_file="$HOME/.config/opencode/opencode.json"
@@ -803,15 +802,15 @@ verify_install() {
     return 0
   fi
 
-  local missing=0
-  [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing=1
+  local missing_count=0
+  [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing_count=1
 
   local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
   for name in "${names[@]}"; do
-    [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing=1
+    [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing_count=1
   done
 
-  if [[ "$missing" -eq 0 && "$FAILURES" -eq 0 ]]; then
+  if [[ "$missing_count" -eq 0 && "$FAILURES" -eq 0 ]]; then
     ok "Verification passed"
   else
     err "Verification failed: missing installed files or ${FAILURES} non-fatal setup failure(s)"
