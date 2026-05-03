@@ -1,6 +1,9 @@
-# Engineer Shovel 12 命令完整工具链分析
+# Engineer Shovel 12 命令能力参考
 
-Engineer Shovel 的 12 个 `/tool-*` 命令是轻量路由器，每个命令在不同成本模式 (`--fast` / `--standard` / `--deep`) 下调用完全不同的底层工具组合。本文档逐一分析每个命令的完整调用链。
+> **⚠️ 重要**: 本文档描述底层工具在理想状态下可能的协作模式，是**能力参考指南**，非命令的实际执行规范。
+> **各命令的权威定义以 `commands/tool-*.md` 为准。** 实际命令是轻量路由器——定义范围、升级路径和验证标准，不硬编码具体工具调用链。
+
+Engineer Shovel 的 12 个 `/tool-*` 命令是轻量路由器。本文档按命令逐一介绍底层工具在不同场景下的可能协作模式。
 
 ---
 
@@ -34,6 +37,8 @@ Engineer Shovel 的 12 个 `/tool-*` 命令是轻量路由器，每个命令在�
 ## 1. /tool-quick — 简单编辑
 
 > Typos, config edits, 1-2 file surgical changes | 默认成本: Low
+
+> **定义文件**: `commands/tool-quick.md`
 
 ### 路由判断
 
@@ -77,6 +82,8 @@ caveman full
 
 > Bug reports, failing tests, regressions | 默认成本: Low → High by scope
 
+> **定义文件**: `commands/tool-fix.md`
+
 ### 路由判断
 
 ```
@@ -102,45 +109,36 @@ caveman lite
 
 ```
 caveman full
-  → /gsd-debug "$BUG_DESCRIPTION"
-      ├─ 收集症状 (5 问: expected/actual/error/timeline/repro)
-      ├─ 创建 .planning/debug/{slug}.md
-      ├─ spawn gsd-debug-session-manager
-      │   └─ spawn gsd-debugger (新 subagent, 独立 200k context)
-      │       ├─ 读错误信息 → 复现 → 检查近期变更
-      │       ├─ 多组件诊断: 层层日志定位
-      │       ├─ 数据流追踪: 从 bad value 往回追
-      │       └─ 输出: ROOT CAUSE FOUND
-      └─ specialist_dispatch: 匹配专家 skill
-  → 直接修复 或 spawn gsd-code-fixer
-  → /superpowers:tdd-workflow
-      └─ 回归测试: 先写复现 bug 的失败测试 → RED → GREEN → REFACTOR
-  → 语言测试
-  → /ai-regression-testing (自动生成回归检查)
-  → git commit
+  → reproduce or identify failing assertion/log
+  → inspect related code (可升级: /gsd-debug "$BUG_DESCRIPTION")
+      ├─ 收集症状: expected/actual/error/timeline/repro
+      ├─ 调查: 读错误 → 复现 → 检查近期变更
+      ├─ 定位: 从小范围扩展到大范围
+      └─ 输出: 根因分析
+  → apply surgical fix (只修最小的 root cause)
+  → /superpowers:tdd-workflow (可选: 回归测试)
+  → 语言测试/building
+  → regression coverage (if project has test pattern)
 ```
 
-**调用工具:** caveman + gsd (debug) + superpowers (systematic-debugging 内嵌, tdd) + ecc (语言测试, regression)
+**可能调用的工具:** caveman + gsd (debug) + superpowers (systematic-debugging, tdd) + ecc (语言测试/构建, ai-regression-testing)
 **不经过:** code-review-graph, review-work, security-review
 
 ### --deep (跨文件/架构问题)
 
 ```
 caveman full/ultra
-  → /gsd-debug --diagnose                        ← 先只诊断
+  → /gsd-debug (复杂场景)                         ← 先只诊断
       └─ 输出: 结构化 Root Cause Report
   → 用户确认诊断
-  → /gsd-code-fixer                              ← gsd 自动修复
-      └─ 读源文件 → 应用修复 → 原子提交
+  → 应用修复 (细分小步)
   → /superpowers:tdd-workflow
   → 语言测试
   → /security-review (if security-related)        ← ecc 安全审查
-      └─ → /security-scan → fix → re-review
-  → /review-work (5 并行审查 agent)               ← ecc 重量级审查
-  → git commit
+  → /review-work (if high-risk)                   ← ecc 重量级审查
 ```
 
-**调用工具:** caveman + gsd (debug, code-fixer) + superpowers (systematic-debugging, tdd) + ecc (语言命令, security-review, security-scan, review-work)
+**可能调用的工具:** caveman + gsd (debug) + superpowers (tdd) + ecc (语言命令, security-review, review-work)
 **不经过:** code-review-graph
 
 ### 关键差异: --diagnose 模式
@@ -169,6 +167,8 @@ caveman full/ultra
 
 > New functionality | 默认成本: Medium
 
+> **定义文件**: `commands/tool-feat.md`
+
 ### 路由判断
 
 ```
@@ -195,33 +195,22 @@ caveman lite
 
 ```
 caveman full
-  → /search-first "existing solutions for $FEATURE"
-      ├─ npm/PyPI 搜索
-      ├─ MCP server 检查
-      ├─ GitHub code search
-      └─ 输出: Adopt / Extend / Build 决策
-  → /superpowers:brainstorming
-      ├─ 探索项目上下文
+  → /search-first "existing solutions for $FEATURE" ← 可选: npm/PyPI/GitHub/Context7
+  → /superpowers:brainstorming                     ← 可选: 需求不明确时
       ├─ 逐一提问澄清需求
       ├─ 提出 2-3 个方案 + tradeoffs
-      ├─ 呈现设计 → 用户批准
-      ├─ 写 spec → 自检 → 用户审查
-      └─ 终态: 调用 writing-plans ↓
-  → /superpowers:writing-plans
+      └─ 输出: 明确的设计方向
+  → /superpowers:writing-plans                     ← 可选: 需要结构化计划时
       ├─ 文件结构映射
-      ├─ TDD 任务分解 (每个 step 2-5 分钟)
-      ├─ 无占位符, 完整代码
-      └─ 输出: docs/superpowers/plans/xxx.md
-  → /superpowers:tdd-workflow
-      ├─ RED: 写失败测试 → 运行确认失败 → commit
-      ├─ GREEN: 最小实现 → 运行确认通过 → commit
-      └─ REFACTOR: 清理 → 测试仍绿 → commit
+      ├─ TDD 任务分解
+      └─ 输出: 计划文档
+  → explore patterns → implement using conventions
+  → /superpowers:tdd-workflow (可选)
   → 语言测试/构建
-  → 本地审查 (caveman review)
-  → git commit
+  → /tool-review --fast or default
 ```
 
-**调用工具:** caveman + superpowers (brainstorm, plans, tdd) + ecc (search-first, 语言命令)
+**可能调用的工具:** caveman + superpowers (brainstorm, plans, tdd) + ecc (search-first, 语言命令)
 **不经过:** gsd, code-review-graph, review-work
 
 ### --deep (复杂功能)
@@ -231,20 +220,16 @@ caveman full/ultra
   → /search-first
   → /superpowers:brainstorming
   → /superpowers:writing-plans
-  → /gsd-execute-phase                          ← gsd 介入
-      ├─ 波次并行执行 (wave-based)
-      ├─ 每个 plan → 独立 subagent
-      ├─ 原子提交 per task
-      └─ 状态追踪
+  → /tool-plan 或 /tool-blueprint              ← 升级到完整规划或 blueprint
+  → 按 plan/blueprint 逐步实现
   → /superpowers:tdd-workflow
   → 语言测试/构建
   → /review-work (5 并行审查 agent)             ← ecc 重量级审查
-  → git commit
   → /tool-branch review → merge
 ```
 
-**调用工具:** caveman + superpowers (brainstorm, plans, tdd) + gsd (execute-phase) + ecc (search-first, 语言命令, review-work)
-**不经过:** code-review-graph
+**调用工具:** caveman + superpowers (brainstorm, plans, tdd) + ecc (search-first, 语言命令, review-work)
+**可能升级到:** gsd (执行阶段), code-review-graph (审查辅助)
 
 ### Token 消耗分布
 
@@ -263,81 +248,88 @@ caveman full/ultra
 
 > Branch workflow: create, review, merge, abort | 默认成本: Low
 
+> **定义文件**: `commands/tool-branch.md`
+> **实现**: 委托 `scripts/branch-workflow.sh` 执行
+
 ### 子命令
 
 ```
-/tool-branch create feat/xxx   → 创建分支
+/tool-branch create feat/xxx   → 创建分支 (自动检测类型)
 /tool-branch status            → 查看状态
 /tool-branch review            → 审查 diff
-/tool-branch merge             → 合并
+/tool-branch merge             → squash 合并
 /tool-branch abort             → 放弃分支
 ```
+
+### 分支类型自动检测
+
+根据 description 关键词自动判定类型:
+
+| 关键词 | 分支类型 | 示例 |
+|--------|---------|------|
+| fix, bug, error, broken, crash, issue, problem | `fix` | `fix/null-pointer-error` |
+| add, new, feature, implement, support, create | `feat` | `feat/add-login` |
+| refactor, clean, optimize, improve, restructure | `refactor` | `refactor/clean-auth` |
+| doc, readme, comment, typo, docs | `docs` | `docs/update-readme` |
+| 默认 | `feat` | |
 
 ### create (创建分支)
 
 ```
 caveman lite
-  → git checkout -b feat/xxx
-  → 显示分支状态
+  → bash scripts/branch-workflow.sh create "description"
+  → 根据关键词自动检测 type → 生成 {type}/{slug} 分支名
+  → 显示状态
 ```
-
-**调用工具:** caveman + ecc (github-ops)
-**Token:** 极低
 
 ### status (查看状态)
 
 ```
 caveman lite
-  → git status + git log --oneline
-  → 显示: 未提交变更、领先/落后远程、分支 diff 统计
+  → bash scripts/branch-workflow.sh status
+  → 未提交变更、领先/落后远程、diff 统计
 ```
-
-**调用工具:** caveman only
-**Token:** 极低
 
 ### review (审查分支 diff)
 
 ```
 caveman full
-  → git diff main...HEAD
-  → /caveman:caveman-review                      ← 压缩审查
-      └─ 每个 finding 一行: path:line: problem. fix.
-  → (可选) code-review-graph: pr-review          ← 深度审查
-      └─ 知识图谱分析变更影响
+  → bash scripts/branch-workflow.sh review
+  → diff vs source 分支展示
+  → 可选: code-review-graph: pr-review (知识图谱辅助)
   → 显示: 是否可以合并
 ```
-
-**调用工具:** caveman (caveman-review) + code-review-graph (可选)
-**Token:** 低-中
 
 ### merge (合并分支)
 
 ```
 caveman lite
-  → 确认: 有未提交变更? 测试通过?
-  → git merge 或 gh pr create
-  → 显示合并结果
+  → bash scripts/branch-workflow.sh merge
+  → squash merge → 提示 commit message → 删除分支
 ```
-
-**调用工具:** caveman + ecc (github-ops)
-**Token:** 极低
 
 ### abort (放弃分支)
 
 ```
 caveman lite
-  → 确认: 真的放弃? 有未推送提交?
-  → git checkout main && git branch -D feat/xxx
+  → bash scripts/branch-workflow.sh abort
+  → 确认 → 切回 source 分支 → 删除 feature 分支
+  → 有 uncommitted changes 时: auto-stash → 切换 → 恢复 stash
 ```
 
-**调用工具:** caveman only
-**Token:** 极低
+### 边界情况
+
+- **未提交变更**: auto-stash before switch, restore on abort
+- **同名分支存在**: error + 建议使用已有分支
+- **不在 feature 分支**: merge/review/abort 需要当前在 feature 分支
 
 ---
 
 ## 5. /tool-plan — 需求和实现规划
 
 > Requirements and implementation planning | 默认成本: Medium
+
+> **定义文件**: `commands/tool-plan.md`
 
 ### 路由判断
 
@@ -364,30 +356,24 @@ caveman lite
 
 ```
 caveman full
-  → /gsd-explore "I have an idea: $IDEA"
-      ├─ 苏格拉底式提问
-      ├─ 探索想法 → 澄清需求
+  → /gsd-explore (可选: 想法不清晰时)
+      ├─ 苏格拉底式提问 → 澄清需求
       └─ 输出: 明确的需求描述
-  → /superpowers:brainstorming
-      ├─ 项目上下文探索
-      ├─ 多轮提问 (一次一个)
+  → /superpowers:brainstorming (可选)
       ├─ 2-3 方案 + tradeoffs
-      ├─ 设计分节呈现 → 用户批准
-      ├─ 写 spec → 自检 → 用户审查
-      └─ 终态: 调用 writing-plans ↓
-  → /superpowers:writing-plans
-      ├─ 文件结构映射
-      ├─ TDD 任务分解 (每个 step 2-5 分钟)
-      ├─ 完整代码, 无占位符
-      └─ 输出: docs/superpowers/plans/xxx.md
-  → 路由到执行
-      ├─ 简单: /gsd-fast
+      └─ 终态: 调用 writing-plans
+  → /superpowers:writing-plans (可选)
+      ├─ 文件结构映射 + 任务分解
+      └─ 输出: 计划文档
+  → /plan 或 /prp-plan (结构化计划 + verification criteria)
+  → 路由到执行:
+      ├─ 简单: /tool-quick 或 /tool-feat
       ├─ 中等: /tool-feat (跳过 plan 阶段)
-      └─ 暂存: /gsd-pause-work
+      └─ 暂存: 暂停/backlog
 ```
 
-**调用工具:** caveman + gsd (explore) + superpowers (brainstorm, plans)
-**不经过:** gsd-plan-phase, gsd-review
+**可能调用的工具:** caveman + gsd (explore) + superpowers (brainstorm, plans, /plan, /prp-plan)
+**不经过:** gsd (plan-phase, review)
 
 ### --deep (多方案/多阶段项目)
 
@@ -443,6 +429,8 @@ caveman full
 
 > Behavior-preserving cleanup | 默认成本: Medium
 
+> **定义文件**: `commands/tool-refactor.md`
+
 ### 路由判断
 
 ```
@@ -470,14 +458,12 @@ caveman lite
 caveman full
   → 运行现有测试 (建立基线, 全绿才继续)
   → 执行重构 (小步, 每次一个逻辑单元)
-  → /superpowers:tdd-workflow
-      └─ 每步后运行测试, 确认行为不变
+  → /superpowers:tdd-workflow (可选: 每步验证)
   → 语言测试/构建
-  → /caveman:caveman-review                      ← 压缩审查
-  → git commit (每步原子提交)
+  → /tool-review --fast or default
 ```
 
-**调用工具:** caveman + superpowers (tdd) + ecc (语言测试)
+**可能调用的工具:** caveman + superpowers (tdd) + ecc (语言测试)
 **不经过:** gsd, code-review-graph
 
 ### --deep (架构级重构)
@@ -485,24 +471,22 @@ caveman full
 ```
 caveman full/ultra
   → 运行现有测试 (基线)
-  → /superpowers:writing-plans                    ← 重构计划
-      └─ 分阶段重构, 每阶段独立可验证
-  → /gsd-execute-phase                            ← gsd 阶段执行
-      └─ 波次并行, 每阶段测试 → commit
+  → /superpowers:writing-plans (可选: 分阶段重构计划)
+  → 逐步执行, 每阶段独立可验证
   → /superpowers:tdd-workflow
   → 语言测试/构建
-  → /review-work (5 并行审查 agent)               ← 深度审查
-      ├─ 目标/约束验证 (行为不变)
-      ├─ 代码质量
-      ├─ 安全审计
-      ├─ 实操 QA
-      └─ 上下文挖掘
-  → /e2e-testing (if applicable)                  ← E2E 回归
-  → git commit
+  → /refactor + /review-work (深度审查)
+  → /e2e-testing (if applicable)
 ```
 
-**调用工具:** caveman + superpowers (plans, tdd) + gsd (execute-phase) + ecc (语言测试, review-work, e2e)
+**可能调用的工具:** caveman + superpowers (plans, tdd) + gsd (execute-phase, 可选) + ecc (语言测试, review-work, e2e)
 **不经过:** code-review-graph
+
+### 停止条件 (参考 `commands/tool-refactor.md`)
+
+- 基线测试失败 → 先 `/tool-fix`
+- 行为变更 → 拆分到 `/tool-feat`
+- 性能不降 → 对比基准性能
 
 ### 重构核心原则
 
@@ -510,8 +494,7 @@ caveman full/ultra
 1. 不改行为 → 测试是安全网, 先确保测试全绿
 2. 小步提交 → 每次重构一个逻辑单元, 原子提交
 3. 不混入新功能 → refactor + feature 分开提交
-4. 性能不降 → 重构后对比基准性能
-5. 审查必须有 → 重构容易引入隐蔽 bug
+4. 审查必须有 → 重构容易引入隐蔽 bug
 ```
 
 ### Token 消耗分布
@@ -530,6 +513,8 @@ caveman full/ultra
 ## 7. /tool-review — 代码审查
 
 > Local diff, PR, or post-implementation review | 默认成本: Low → High by mode
+
+> **定义文件**: `commands/tool-review.md`
 
 ### 模式选择
 
@@ -558,21 +543,18 @@ caveman full
 
 ```
 caveman full
-  → gh pr view <url>                              ← 获取 PR 信息
-  → code-review-graph: pr-review                  ← 知识图谱分析
+  → gh pr view <url>                              ← 获取 PR 信息 (if PR)
+  → git diff (if local diff)
+  → /code-review 或 /review-pr $ARGUMENTS          ← 结构化审查
       ├─ 分析变更影响范围
       ├─ 检查依赖关系
       ├─ 识别潜在风险
       └─ 输出: 结构化审查报告
-  → code-review-graph: exploring                  ← 代码探索
-      ├─ 追踪调用链
-      ├─ 理解上下文
-      └─ 识别遗漏测试
-  → /caveman:caveman-review                      ← 压缩输出
+  → /caveman:caveman-review (可选)                ← 压缩输出
   → 输出: 审查意见 + 合并建议
 ```
 
-**调用工具:** caveman + code-review-graph (pr-review, exploring) + ecc (github-ops)
+**可能调用的工具:** caveman + code-review-graph (pr-review, exploring) + ecc (github-ops)
 **不经过:** gsd, superpowers
 
 ### --deep (深度审查)
@@ -585,13 +567,13 @@ caveman full/ultra
       ├─ agent3: 安全审计 (Oracle)
       ├─ agent4: 实操 QA
       └─ agent5: 上下文挖掘
-  → code-review-graph: pr-review + exploring      ← 知识图谱辅助
-  → /security-review (if security-sensitive)      ← 安全审查
-  → /caveman:caveman-review                      ← 压缩汇总
+  → code-review-graph: pr-review + exploring (可选) ← 知识图谱辅助
+  → /security-review (if security-sensitive)
+  → /caveman:caveman-review (可选)
   → 输出: 全面审查报告 + 行动项
 ```
 
-**调用工具:** caveman + ecc (review-work, security-review) + code-review-graph (pr-review, exploring)
+**可能调用的工具:** caveman + ecc (review-work, security-review) + code-review-graph (pr-review, exploring)
 **不经过:** gsd, superpowers
 
 ### Token 消耗分布
@@ -609,6 +591,8 @@ caveman full/ultra
 ## 8. /tool-brainstorm — 头脑风暴
 
 > Explore unclear ideas before building | 默认成本: Low → Medium
+
+> **定义文件**: `commands/tool-brainstorm.md`
 
 ### 路由判断
 
@@ -687,6 +671,8 @@ caveman full
 
 > Multi-step, multi-session projects | 默认成本: High
 
+> **定义文件**: `commands/tool-blueprint.md`
+
 ### 路由判断
 
 ```
@@ -727,22 +713,14 @@ caveman full/ultra
   → /superpowers:brainstorming
   → /superpowers:writing-plans
   → /blueprint $PROJECT "$OBJECTIVE"
-      └─ 同上, 但:
-          ├─ 更多并行步骤
-          ├─ 依赖图更复杂
-          └─ adversarial review 更严格
-  → /gsd-new-project "$OBJECTIVE"                 ← gsd 项目管理
-      ├─ PROJECT.md (目标/范围/里程碑)
-      ├─ ROADMAP.md (阶段执行计划)
-      └─ 初始化 .planning/ 目录
-  → /gsd-plan-phase (per phase)                   ← 逐阶段规划
-  → /gsd-execute-phase (per phase)                ← 逐阶段执行
-  → /gsd-verify-work                              ← UAT 验证
-  → /gsd-pr-branch → /gsd-ship                    ← PR + 合并
-  → /gsd-milestone-summary                        ← 里程碑报告
+  → GSD project → discuss/plan/execute phases     ← gsd 介入
+      ├─ 初始化 .planning/ 目录
+      ├─ 逐阶段规划 + 执行
+      ├─ UAT 验证
+      └─ PR + merge + milestone summary
 ```
 
-**调用工具:** caveman + superpowers (brainstorm, plans) + ecc (blueprint) + gsd (new-project, plan-phase, execute-phase, verify-work, pr-branch, ship, milestone-summary)
+**可能调用的工具:** caveman + superpowers (brainstorm, plans) + ecc (blueprint) + gsd (new-project, plan-phase, execute-phase, verify-work, pr-branch, ship, milestone-summary)
 **不经过:** code-review-graph
 
 ### Token 消耗: 最高
@@ -761,75 +739,66 @@ caveman full/ultra
 
 > Current-state technical research | 默认成本: Low → High by mode
 
-### 路由判断
+> **定义文件**: `commands/tool-research.md`
+
+### 模式说明
+
+实际命令使用 `--quick` / `--web` / `--deep` 三种模式 (非标准 `--fast` / `--standard`):
 
 ```
 研究深度?
-├─ 快速查证 (1-2 个问题)    → --fast
-├─ 需要对比和推荐           → --standard
-└─ 多源深度研究 + 引用      → --deep
+├─ 快速查证 (本地文档/已知库) → --quick (默认)
+├─ 需要当前事实/官方文档     → --web
+└─ 战略决策/多源深度研究     → --deep
 ```
 
-### --fast (快速查证)
+### --quick (快速查证) ← 默认
 
 ```
-caveman lite
-  → MiniMax_web_search(query="$TOPIC")            ← web 搜索
-  → 简要总结 + 链接
+搜本地文档、已知库文档 → 简要总结 + 引用来源
+路由到 /tool-plan、/tool-feat、/tool-quick 或文档
 ```
 
-**调用工具:** caveman + web search
+**可能调用的工具:** web search, context7 库文档 (搜索已知库)
+**不经过:** gsd, superpowers, code-review-graph
 **Token:** 低
 
-### --standard (对比研究) ← 默认
+### --web (当前事实/官方文档)
 
 ```
-caveman full
-  → 多个搜索源:
-      ├─ MiniMax_web_search (web)
-      ├─ context7_resolve-library-id + context7_query-docs (库文档)
-      └─ GitHub code search (代码示例)
-  → 评估候选方案:
-      ├─ 功能性 / 维护性 / 社区 / 文档 / 许可证
-      └─ 输出: 结构化对比表 + 推荐
-  → 路由到 /tool-feat 或 /tool-plan
+web/docs 搜索 + 简洁综合
+→ 评估候选方案: 功能性 / 维护性 / 社区 / 文档 / 许可证
+→ 结构化对比表 + 推荐
+→ 路由到 /tool-plan 或 /tool-feat
 ```
 
-**调用工具:** caveman + web search + context7 + GitHub search
+**可能调用的工具:** web search, context7, GitHub code search
 **不经过:** gsd, superpowers, code-review-graph
+**Token:** 中
 
-### --deep (深度研究 + 引用)
+### --deep (多源深度研究)
 
 ```
-caveman full/ultra
-  → /deep-research "$TOPIC"
-      ├─ 分解为 3-5 个子问题
-      ├─ 多源搜索 (firecrawl + exa MCP)
-      │   ├─ firecrawl_search (每个子问题)
-      │   ├─ web_search_exa (多关键词变体)
-      │   └─ 目标: 15-30 个独立来源
-      ├─ 深度阅读 3-5 个关键源
-      │   ├─ firecrawl_scrape (全文)
-      │   └─ crawling_exa (5000 tokens)
-      ├─ 综合报告:
-      │   ├─ Executive Summary
-      │   ├─ 主题分析 (带引用)
-      │   ├─ Key Takeaways
-      │   └─ 来源列表 + 方法论
-      └─ 输出: cited report
-  → /council (if conflicting recommendations)     ← 决策
-  → 路由到 /tool-plan 或 /tool-feat
+多源搜索 → 全文阅读 → 综合报告:
+  ├─ Executive Summary
+  ├─ 主题分析 (带引用)
+  ├─ Key Takeaways
+  ├─ 冲突标注和置信度
+  └─ 来源列表 (cite or name sources)
+→ 路由到 /tool-plan、/tool-feat、/tool-quick 或文档
+→ 可选: /council (冲突推荐时)
 ```
 
-**调用工具:** caveman + ecc (deep-research, firecrawl/exa MCP) + ecc (council, 可选)
+**可能调用的工具:** /deep-research (firecrawl + exa MCP), /council
 **不经过:** gsd, superpowers, code-review-graph
+**Token:** 高
 
 ### Token 消耗分布
 
 | 阶段 | 工具 | Token 消耗 | 备注 |
 |------|------|-----------|------|
-| 快速搜索 | web search | 低 | --fast |
-| 库文档 | context7 | 低 | --standard |
+| 快速搜索 | web search | 低 | --quick |
+| 库文档 | context7 | 低 | --web |
 | 深度搜索 | firecrawl + exa | **高** | --deep, 多源 |
 | 深度阅读 | firecrawl_scrape | **高** | 全文抓取 |
 | 综合报告 | LLM 生成 | 中 | --deep |
@@ -840,6 +809,8 @@ caveman full/ultra
 ## 11. /tool-graph — 知识图谱操作
 
 > code-review-graph status, full build, incremental update, rebuild, watch | 默认成本: Low
+
+> **定义文件**: `commands/tool-graph.md`
 
 ### 子命令
 
@@ -922,23 +893,43 @@ caveman lite
 
 > Sync and update installation | 默认成本: Low
 
-### 流程
+> **定义文件**: `commands/tool-update.md`
+
+### 模式说明
+
+实际命令使用 `--check` / `--full` 模式，支持 `--target opencode|claude|both`:
 
 ```
-caveman lite
-  → gsd-update                                   ← 更新 GSD
-      ├─ 检查远程版本
-      ├─ 拉取最新代码
-      ├─ 显示 changelog
-      └─ 确认 → 更新
-  → configure-ecc (可选)                          ← 更新 ECC
-      ├─ 检查已安装 skills
-      ├─ 对比远程版本
-      └─ 确认 → 更新
-  → 显示: 更新摘要 + 版本号
+/tool-update --check                 ← 只读比较+检查
+/tool-update --full                  ← 全量更新
+/tool-update --full --target claude  ← 指定目标
 ```
 
-**调用工具:** caveman + gsd (update) + ecc (configure-ecc, 可选)
+### --check (只读检查) ← 默认
+
+```
+检测已安装位置 (基于 --target)
+  → 本地文件与 repo 最新版比较
+  → 报告: 缺失 / 过期 / 多余的 files
+  → 检查 base tools: git, python3, pipx, node, npx, opencode, claude
+  → 检查 Full-mode 组件: code-review-graph, GSD, superpowers, Caveman, RTK, ECC
+  → 安全检查: MCP 策略 (不自动启用需凭证的服务)、备份 JSON config、不启动后台进程
+  → 显示: 检查摘要
+```
+
+### --full (全量更新 + 修复)
+
+```
+--check 全部步骤
+  → 覆盖已安装 files 为最新版
+  → 安装/配置缺失的低风险组件 (使用官方 installer)
+  → code-review-graph: 可能配置 MCP/rules (上游支持)
+  → superpowers: 作为 plugin/skills provider 配置 (无独立 MCP 步骤)
+  → ECC: 不自动启用 bundled MCP (可能需凭证或重复)
+  → 更新后验证安装完整性
+```
+
+**调用工具:** 自定义文件同步逻辑 + 组件官方 installer
 **Token:** 低
 
 ---
@@ -949,134 +940,120 @@ caveman lite
 
 | 命令 | --fast | --standard | --deep |
 |------|--------|-----------|--------|
-| **quick** | caveman | caveman + ecc(测试) | N/A (转 feat/fix) |
-| **fix** | caveman | caveman + gsd(debug) + superpowers(sysdbg,tdd) + ecc(测试,regression) | + gsd(code-fixer) + ecc(security,review-work) |
-| **feat** | caveman | caveman + superpowers(brainstorm,plans,tdd) + ecc(search,测试) | + gsd(execute-phase) + ecc(review-work) |
-| **branch** | caveman + ecc(git) | caveman + code-review-graph(pr-review) | N/A |
-| **plan** | caveman + gsd(note) | caveman + gsd(explore) + superpowers(brainstorm,plans) | + gsd(plan-phase,review) |
-| **refactor** | caveman + ecc(测试) | caveman + superpowers(tdd) + ecc(测试) | + superpowers(plans) + gsd(execute-phase) + ecc(review-work,e2e) |
-| **review** | caveman(caveman-review) | caveman + code-review-graph(pr-review,exploring) + ecc(github-ops) | + ecc(review-work,security-review) |
-| **brainstorm** | caveman + gsd(note) | caveman + gsd(explore) + superpowers(brainstorming) | + ecc(council,deep-research) |
-| **blueprint** | N/A (转 feat) | caveman + superpowers(brainstorm,plans) + ecc(blueprint) | + gsd(new-project,plan-phase,execute-phase,verify,ship) |
-| **research** | caveman + web-search | + context7 + GitHub-search | + deep-research(firecrawl,exa) + council |
-| **graph** | caveman + code-review-graph(只读) | caveman + code-review-graph(build/update) + rtk | N/A |
-| **update** | caveman + gsd(update) + ecc(configure-ecc) | N/A | N/A |
+| **quick** | caveman | caveman + ecc(测试/构建) | N/A (转 feat/fix) |
+| **fix** | caveman + ecc(测试) | caveman + gsd(debug, 可选) + superpowers(sysdbg,tdd, 可选) + ecc(测试) | + ecc(security,review-work, 可选) |
+| **feat** | caveman + ecc(测试) | caveman + superpowers(brainstorm,plans,tdd, 可选) + ecc(search,测试) | + gsd(execute-phase, 可选) + ecc(review-work) |
+| **branch** | caveman + scripts/branch-workflow.sh | caveman + scripts/branch-workflow.sh + code-review-graph(可选) | N/A |
+| **plan** | caveman (inline plan) | caveman + gsd(explore,可选) + superpowers(/plan, /prp-plan) | + gsd(plan-phase, review, 可选) + /blueprint |
+| **refactor** | caveman + ecc(测试) | caveman + superpowers(tdd, 可选) + ecc(测试) | + superpowers(plans, 可选) + gsd(execute-phase, 可选) + ecc(review-work,e2e) |
+| **review** | caveman(caveman-review) | caveman + /code-review or /review-pr + ecc(github-ops) + code-review-graph(可选) | + ecc(review-work,security-review) |
+| **brainstorm** | caveman + gsd(note) | caveman + gsd(explore) + superpowers(brainstorming, 可选) | + ecc(council) |
+| **blueprint** | N/A (转 feat) | caveman + superpowers(brainstorm,plans, 可选) + ecc(blueprint) | + gsd(project, phases, verify, ship) |
+| **research** (--quick/--web/--deep) | caveman + web-search | + context7 + GitHub-search | + /deep-research(firecrawl,exa) + council(可选) |
+| **graph** | caveman + code-review-graph(只读) | caveman + code-review-graph(build/update) | N/A |
+| **update** (--check/--full) | caveman + 自定义文件同步 | caveman + 组件 installer + health checks | N/A |
 
 ### 按工具的触发条件 (12 命令)
 
-| 工具 | 触发的命令 |
-|------|-----------|
-| **caveman lite** | quick(--fast), fix(--fast), feat(--fast), branch(全部), plan(--fast), refactor(--fast), review(--fast), brainstorm(--fast), research(--fast), graph(status/watch), update |
-| **caveman full** | quick(--standard), fix(--standard), feat(--standard), branch(review), plan(--standard), refactor(--standard), review(--standard), brainstorm(--standard), blueprint(--standard), research(--standard), graph(build/update/rebuild) |
+工具调用是**场景驱动的可选组合**，命令只定义范围和升级路径，不硬编码工具链路:
+
+| 工具 | 典型触发场景 (非必须) |
+|------|----------------------|
+| **caveman lite** | quick(--fast), fix(--fast), feat(--fast), branch(create/status/merge/abort), plan(--fast), refactor(--fast), review(--fast), brainstorm(--fast), research(--quick), graph(status/watch), update(--check/--full) |
+| **caveman full** | quick(--standard), fix(--standard), feat(--standard), branch(review), plan(--standard), refactor(--standard), review(--standard), brainstorm(--standard), blueprint(--standard), research(--web), graph(build/update/rebuild) |
 | **caveman ultra** | fix(--deep), feat(--deep), refactor(--deep), review(--deep), brainstorm(--deep), blueprint(--deep), research(--deep) |
-| **rtk** | fix(可选), feat(可选), refactor(可选), graph(build/update/rebuild, 可选) |
-| **superpowers: brainstorming** | feat(--standard+), plan(--standard+), brainstorm(--standard+), blueprint(--standard+) |
-| **superpowers: writing-plans** | feat(--standard+), plan(--standard+), brainstorm(--standard+), blueprint(--standard+), refactor(--deep) |
-| **superpowers: tdd-workflow** | fix(--standard+), feat(--standard+), refactor(--standard+) |
-| **superpowers: systematic-debugging** | fix(--standard+), 内嵌在 gsd-debug 中 |
-| **superpowers: search-first** | feat(--standard+) |
+| **rtk** | git/test/build 噪声输出时启用 (按需, 非必须) |
+| **superpowers: brainstorming** | feat(需求不明确), plan(需要方向时), brainstorm(--standard), blueprint(需求澄清) |
+| **superpowers: writing-plans** | feat(需要结构化计划), plan(需要计划文档), brainstorm(终态路由), blueprint(整体计划), refactor(--deep, 分阶段) |
+| **superpowers: tdd-workflow** | fix(需要回归), feat(常规开发), refactor(每步验证) |
+| **superpowers: systematic-debugging** | fix(chained with gsd-debug) |
+| **superpowers: search-first** | feat(常规开发) |
 | **gsd: note** | plan(--fast), brainstorm(--fast) |
-| **gsd: explore** | plan(--standard+), brainstorm(--standard+) |
-| **gsd: debug** | fix(--standard+) |
-| **gsd: code-fixer** | fix(--deep) |
-| **gsd: execute-phase** | feat(--deep), refactor(--deep), blueprint(--deep) |
+| **gsd: explore** | plan(想法不清晰时), brainstorm(--standard) |
+| **gsd: debug** | fix(复杂 bug 调查) |
 | **gsd: plan-phase** | plan(--deep), blueprint(--deep) |
-| **gsd: review** | plan(--deep) |
-| **gsd: new-project** | blueprint(--deep) |
-| **gsd: verify-work** | blueprint(--deep) |
-| **gsd: pr-branch / ship** | blueprint(--deep) |
-| **gsd: milestone-summary** | blueprint(--deep) |
-| **gsd: update** | update |
+| **gsd: execute-phase** | feat(--deep, 可选), refactor(--deep, 可选), blueprint(--deep) |
+| **gsd: verify/ship** | blueprint(--deep) |
 | **ecc: 语言测试/构建** | quick(--standard), fix(全部), feat(全部), refactor(全部) |
-| **ecc: search-first** | feat(--standard+) |
-| **ecc: review-work** | fix(--deep), feat(--deep), refactor(--deep), review(--deep) |
-| **ecc: security-review** | fix(--deep, if security), review(--deep, if security) |
-| **ecc: ai-regression-testing** | fix(--standard+) |
+| **ecc: review-work** | fix(--deep, 可选), feat(--deep), refactor(--deep), review(--deep) |
+| **ecc: security-review** | fix(安全相关), review(安全敏感) |
 | **ecc: blueprint** | blueprint(--standard+) |
-| **ecc: council** | brainstorm(--deep), research(--deep) |
-| **ecc: deep-research** | brainstorm(--deep), research(--deep) |
-| **ecc: github-ops** | branch(create/merge), review(--standard+) |
-| **ecc: configure-ecc** | update |
-| **code-review-graph** | branch(review), review(--standard+), graph(全部) |
+| **ecc: council** | brainstorm(--deep), research(--deep, 可选) |
+| **ecc: deep-research** | research(--deep) |
+| **ecc: github-ops** | branch(merge via gh pr create), review(--standard+) |
+| **code-review-graph** | branch(review, 可选), review(--standard+, 辅助), graph(全部) |
 
 ### Token 消耗总览
 
-| 命令 | --fast | --standard | --deep |
-|------|--------|-----------|--------|
-| quick | 极低 | 低 | - |
-| fix | 低 | 中 | 高 |
-| feat | 低 | 中-高 | 最高 |
-| branch | 极低 | 低 | - |
-| plan | 极低 | 中 | 中-高 |
-| refactor | 低 | 中 | 高 |
-| review | 低 | 中 | 高 |
-| brainstorm | 极低 | 中 | 中 |
-| blueprint | - | 高 | 最高 |
-| research | 低 | 中 | 高 |
-| graph | 极低 | 中 | - |
-| update | 低 | - | - |
+| 命令 | 低开销 | 中开销 | 高开销 |
+|------|--------|--------|--------|
+| quick | `--fast` (极低) | `--standard` (低) | - |
+| fix | `--fast` (低) | `--standard` (中) | `--deep` (高) |
+| feat | `--fast` (低) | `--standard` (中-高) | `--deep` (最高) |
+| branch | create/status/merge/abort (极低) | review (低) | - |
+| plan | `--fast` (极低) | `--standard` (中) | `--deep` (中-高) |
+| refactor | `--fast` (低) | `--standard` (中) | `--deep` (高) |
+| review | `--fast` (低) | `--standard` (中) | `--deep` (高) |
+| brainstorm | `--fast` (极低) | `--standard` (中) | `--deep` (中) |
+| blueprint | - | `--standard` (高) | `--deep` (最高) |
+| research | `--quick` (低) | `--web` (中) | `--deep` (高) |
+| graph | status/watch (极低) | build/update/rebuild (中) | - |
+| update | `--check` (低) | `--full` (低) | - |
 
 ---
 
 ## 最大化利用建议
 
-### 1. 从 --fast 开始, 按需升级
+### 1. 从最低成本开始, 按需升级
 
 ```
-不确定复杂度? 先试 --fast
+不确定复杂度? 先试最低成本模式
   → 够用? 完成
-  → 不够? 升级到 --standard
-  → 还不够? 升级到 --deep
+  → 不够? 升级到标准模式
+  → 还不够? 升级到深度模式
 ```
 
-### 2. caveman 全程开启
+> 注意: `/tool-research` 用 `--quick`/`--web`/`--deep`; `/tool-update` 用 `--check`/`--full`; 其余命令用 `--fast`/`--standard`/`--deep`.
 
-无论哪个模式, caveman 都应该激活:
-- `--fast` 用 `lite` (保持可读性)
-- `--standard` 用 `full` (平衡压缩和可读)
-- `--deep` 用 `full`, 长上下文时切 `ultra`
+### 2. caveman 建议使用
+
+caveman 压缩可以按场景选用:
+- 小范围改动 `--fast` 可用 `lite` (保持可读性)
+- 常规开发 `--standard` 可用 `full` (平衡压缩和可读)
+- 长上下文/多 agent 时可用 `ultra`
 
 ### 3. rtk 按需启用
 
-只在有噪声输出时启用:
-- git log/diff 输出很长
-- 测试输出大量日志
-- 构建输出冗长
+只在有噪声输出时启用 (git log/diff 长、测试日志多、构建输出冗长)。
 
 ### 4. code-review-graph 的使用场景
 
-code-review-graph 只在三个命令中触发:
-- `/tool-review --standard+` — PR 审查
-- `/tool-branch review` — 分支审查
+code-review-graph 主要在这些场景中有用:
+- `/tool-review --standard+` — PR 审查辅助
+- `/tool-branch review` — 分支 diff 分析
 - `/tool-graph` — 专门操作知识图谱
 
-其他命令不直接调用它, 但可以通过 `/tool-graph build` 预构建图谱, 让后续 review 命令获得更好的上下文。
+其他命令可通过 `/tool-graph build` 预构建图谱, 让后续 review 命令获得更好的上下文。
 
-### 5. gsd 的触发边界
+### 5. gsd 的调用场景
 
-gsd 重量级流程的触发条件:
-- `--fast` 模式: 完全不调用 gsd (除 note)
-- `--standard` 模式: 只调用轻量 gsd (explore, debug, note)
-- `--deep` 模式: 调用重量级 gsd (execute-phase, plan-phase, code-fixer)
+gsd 重量级流程的场景 (非硬编码):
+- `--fast` 模式: 通常不调用 gsd (note 除外)
+- `--standard` 模式: 可能调用轻量 gsd (explore, debug, note)
+- `--deep` 模式: 可能调用重量级 gsd (execute-phase, plan-phase 等)
 
-### 6. superpowers 是 --standard 的核心骨架
+### 6. superpowers 的使用场景
 
-`--standard` 模式主要依赖 superpowers 的结构化工作流:
-- brainstorming → 探索需求
-- writing-plans → 生成计划
-- tdd-workflow → 测试驱动
-- systematic-debugging → 科学调试
-
-gsd 只在需要更强的项目管理时才介入。
+superpowers 提供结构化工作流 (`brainstorming`, `writing-plans`, `tdd-workflow`), 在需求不明确或需要计划时有用。具体是否调用取决于场景, 非强制。
 
 ### 7. 命令间路由
 
 ```
 /tool-brainstorm → 明确后 → /tool-plan 或 /tool-feat
-/tool-plan → 审查后 → /tool-feat 或 /gsd-execute-phase
+/tool-plan → 审查后 → /tool-feat 或 GSD 执行
 /tool-research → 决策后 → /tool-plan 或 /tool-feat
 /tool-blueprint → 逐步 → /tool-feat 或 /tool-quick (per step)
-/tool-fix --diagnose → 确认后 → /tool-fix (修复) 或 /tool-refactor (重构)
+/tool-fix --deep → 确认后 → /tool-fix (修复) 或 /tool-refactor (重构)
 ```
 
 ---
