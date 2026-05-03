@@ -119,7 +119,7 @@ Engineer Shovel 在 `--full` 模式下会安装并配置这些上游工具。
 
 | 工具 | 仓库 | 当前参考版本 | 作用 |
 |---|---|---:|---|
-| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0-rc.1 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
+| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
 | GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven 规划、阶段执行、验证和上下文工程 |
 | superpowers | https://github.com/obra/superpowers | v5.0.7 | 强制技能工作流：brainstorming、TDD、planning、review、branch finishing |
 | code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | 本地代码知识图谱、MCP review context、影响面分析 |

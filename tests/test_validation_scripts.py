@@ -114,7 +114,7 @@ def test_command_set_stays_at_twelve_with_graph_replacing_statistic():
 
 def test_readmes_list_upstream_tool_versions():
     expected = {
-        "ECC": "v2.0.0-rc.1",
+        "ECC": "v1.10.0",
         "GSD": "v1.39.0",
         "superpowers": "v5.0.7",
         "code-review-graph": "v2.3.2",

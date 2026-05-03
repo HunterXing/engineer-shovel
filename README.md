@@ -149,7 +149,7 @@ Engineer Shovel integrates and configures these upstream tools in `--full` mode.
 
 | Tool | Repository | Current referenced version | Role |
 |---|---|---:|---|
-| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0-rc.1 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
+| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
 | GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven planning, phase execution, verification, and context engineering |
 | superpowers | https://github.com/obra/superpowers | v5.0.7 | Mandatory skill workflows: brainstorming, TDD, planning, review, branch finishing |
 | code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
