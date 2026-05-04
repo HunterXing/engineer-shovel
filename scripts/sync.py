@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -202,6 +203,108 @@ def print_check_report(check_result: dict, verbose: bool = False) -> None:
     print(f"\n  Status: {status} ({summary['up_to_date']}/{summary['total']} files current)")
 
 
+def extract_version(skill_md_path: Path) -> str | None:
+    """Extract metadata.version from SKILL.md YAML frontmatter."""
+    if not skill_md_path.exists():
+        return None
+    content = skill_md_path.read_text()
+    m = re.search(r'version:\s*"([^"]+)"', content)
+    return m.group(1) if m else None
+
+
+def check_remote_updates() -> dict:
+    """Fetch from remote and check if local repo has newer commits available."""
+    result = {
+        "fetched": False,
+        "behind": False,
+        "behind_count": 0,
+        "remote_version": None,
+        "local_version": None,
+        "error": None,
+    }
+
+    result["local_version"] = extract_version(ROOT / "SKILL.md")
+
+    try:
+        proc = subprocess.run(
+            ["git", "fetch", "origin"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        if proc.returncode != 0:
+            result["error"] = f"git fetch failed: {proc.stderr.strip()}"
+            return result
+        result["fetched"] = True
+    except FileNotFoundError:
+        result["error"] = "git not found"
+        return result
+
+    try:
+        upstream_ref = _get_upstream_ref()
+        proc = subprocess.run(
+            ["git", "rev-list", "--count", f"HEAD..{upstream_ref}"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        if proc.returncode == 0 and proc.stdout.strip().isdigit():
+            behind = int(proc.stdout.strip())
+            if behind > 0:
+                result["behind"] = True
+                result["behind_count"] = behind
+
+                remote_skill = subprocess.run(
+                    ["git", "show", f"{upstream_ref}:SKILL.md"],
+                    cwd=str(ROOT), capture_output=True, text=True, check=False
+                )
+                if remote_skill.returncode == 0:
+                    result["remote_version"] = extract_version_str(remote_skill.stdout)
+    except Exception:
+        pass
+
+    return result
+
+
+def _get_upstream_ref() -> str:
+    """Resolve the upstream tracking ref, falling back to origin/<current-branch>."""
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "@{upstream}"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        if proc.returncode == 0 and proc.stdout.strip():
+            return "@{upstream}"
+    except Exception:
+        pass
+
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        if proc.returncode == 0 and proc.stdout.strip():
+            return f"origin/{proc.stdout.strip()}"
+    except Exception:
+        pass
+
+    return "origin/main"
+
+
+def extract_version_str(content: str) -> str | None:
+    """Extract version from SKILL.md content string."""
+    m = re.search(r'version:\s*"([^"]+)"', content)
+    return m.group(1) if m else None
+
+
+def pull_repo() -> bool:
+    """Pull latest changes from remote. Returns True on success."""
+    try:
+        proc = subprocess.run(
+            ["git", "pull", "--ff-only"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        return proc.returncode == 0
+    except Exception:
+        return False
+
+
 def run_health(command: str, target: str, dry_run: bool = False) -> int:
     health_command = "check" if command == "check" else "repair"
     args = [sys.executable, str(ROOT / "scripts" / "health.py"), health_command, "--target", target]
@@ -247,14 +350,37 @@ def main() -> int:
         action="store_true",
         help="Only sync Engineer Shovel files; skip external component health checks"
     )
+    parser.add_argument(
+        "--skip-fetch",
+        action="store_true",
+        help="Skip checking remote for updates (offline mode)"
+    )
     
     args = parser.parse_args()
     
     targets = ["opencode", "claude"] if args.target == "both" else [args.target]
+
+    remote_status = None
+    if not args.skip_fetch:
+        remote_status = check_remote_updates()
+        if remote_status["behind"]:
+            lv = remote_status["local_version"] or "?"
+            rv = remote_status["remote_version"] or "?"
+            print(f"⚠  Remote has {remote_status['behind_count']} new commit(s) (local: v{lv}, remote: v{rv})")
     
     if args.command == "check":
         all_ok = True
+        
+        if remote_status and remote_status["behind"]:
+            all_ok = False
+        
         for target in targets:
+            installed_version = extract_version(
+                INSTALL_PATHS[target][args.scope]["skill"] / "SKILL.md"
+            )
+            if installed_version:
+                print(f"\n{target.upper()} installed: v{installed_version}")
+            
             result = check_installation(target, args.scope)
             print_check_report(result, verbose=args.verbose)
             if result["summary"]["issues"] > 0:
@@ -273,6 +399,18 @@ def main() -> int:
             return 1
     
     elif args.command == "sync":
+        if remote_status and remote_status["behind"]:
+            print("\n⟳ Pulling latest from remote...")
+            if not args.dry_run:
+                if pull_repo():
+                    print("✔ Repo updated to latest")
+                else:
+                    print("✘ Failed to pull latest changes from remote")
+                    print("  Try: cd /data/newSkills && git pull")
+                    return 1
+            else:
+                print("  DRY-RUN: Would pull latest from remote")
+        
         total_updated = 0
         for target in targets:
             print(f"\nSyncing {target.upper()} ({args.scope})...")
@@ -289,6 +427,14 @@ def main() -> int:
             print(f"\nDRY-RUN: Would update {total_updated} file(s)")
         else:
             print(f"\n✔ Updated {total_updated} file(s)")
+            
+            if total_updated > 0:
+                for target in targets:
+                    new_ver = extract_version(
+                        INSTALL_PATHS[target][args.scope]["skill"] / "SKILL.md"
+                    )
+                    if new_ver:
+                        print(f"  {target.upper()} now at v{new_ver}")
         
         if not args.skip_health:
             health_rc = run_health("sync", args.target, dry_run=args.dry_run)
