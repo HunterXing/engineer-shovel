@@ -1219,6 +1219,12 @@ body {
   color: var(--text-secondary);
 }
 
+.cost-tag-default {
+  background: rgba(79,142,247,0.12) !important;
+  color: var(--accent-blue) !important;
+  border-color: rgba(79,142,247,0.3) !important;
+}
+
 /* ---- Mode Cards Enhanced ---- */
 .mode-card:hover {
   border-color: var(--border-bright);

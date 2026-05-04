@@ -856,7 +856,11 @@ function renderCommands() {
     card.style.setProperty('--cmd-color', cmd.color);
 
     const modeLabels = label.modes || [];
-    const modeTagsHTML = modeLabels.map(m => `<span class="cost-tag">${m}</span>`).join('');
+    const def = cmd.defaultMode || '';
+    const modeTagsHTML = modeLabels.map(m => {
+      const isDef = m === def || m.includes(def.replace('--',''));
+      return `<span class="cost-tag${isDef ? ' cost-tag-default' : ''}">${m}</span>`;
+    }).join('');
 
     card.innerHTML = `
       <div class="cmd-card-header">
