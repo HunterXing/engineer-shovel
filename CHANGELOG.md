@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0 (2026-05-04)
+
+### Changed
+- **P0**: 所有 8 个活跃命令添加具体 CRG MCP 工具调用指令 (`semantic_search_nodes`, `get_impact_radius`, `query_graph`, `get_affected_flows`, `detect_changes`, `get_review_context`, `refactor_tool`, `get_architecture_overview`)，替换模糊的 "use graph for impact analysis"。
+- **P0**: SKILL.md 新增 `Caveman Mode Mapping (Enforced)` 统一映射表，消除 6 个命令间的模式不一致。
+- **P1**: `/tool-feat` 和 `/tool-fix` 新增 GSD 验证闭环：`--standard` 用 `gsd-verify-work → caveman-review`，`--deep` 用 `gsd-verify-work → gsd-code-review → gsd-ship`。
+- **P1**: Security Gate 集中化到 SKILL.md (`Cross-cutting Security Gate`)；命令文件保留自包含 1 行版本，独立可用。
+- RTK 触发改为智能策略：仅预期输出 >500 行时使用，替换无差别调用。
+- ECC 子层拆分：L4a Pattern Reference (自动加载), L4b Specialized Process, L4c Operational。
+- 旧 `L4: ecc:xxx` / `L5: superpowers:xxx` / `L6: gsd-xxx` 前缀统一为 `skill(name="xxx")`。
+- `docs/architecture.md` 全面更新：Cost Mode Routing、Command×Tool Matrix、Exclusive Routing、RTK Trigger Points、Token Consumption 表对齐新架构。
+
 ## 1.4.0 (2026-05-03)
 
 ### Changed

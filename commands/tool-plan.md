@@ -15,34 +15,37 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 **Input**: $ARGUMENTS
 
 Unified planning entry point. Auto-detects complexity and escalates:
-- **≤3 PR**: inline plan or `superpowers:writing-plans`
-- **>3 PR**: `ecc:blueprint` (code-level dependency graph)
-- **Milestone-scale**: `gsd project` (discuss → plan → execute phases)
+- **≤3 PR**: inline plan or `skill(name="writing-plans")`
+- **>3 PR**: `skill(name="blueprint")` (code-level dependency graph)
+- **Milestone-scale**: `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
 
-Compression: caveman lite for short plans, caveman full for file-backed plans. Use rtk for shell evidence.
+Compression: `/caveman lite` for short plans, `/caveman full` for file-backed plans (per SKILL.md enforced mapping). Use RTK only for large shell outputs.
 
 ## Phase 0: Brainstorm (auto-triggered when direction unclear)
 
 If the goal description is vague or missing concrete targets, enter clarification first:
-- **Product direction unclear** ("what to build") → L6: `gsd-explore`
-- **Technical approach unclear** ("how to build") → L5: `superpowers:brainstorming`
-- **Multiple viable paths or architecture decision** → L6: `ecc:council`
+- **Product direction unclear** ("what to build") → `skill(name="gsd-explore")`
+- **Technical approach unclear** ("how to build") → `skill(name="brainstorming")`
+- **Multiple viable paths or architecture decision** → `skill(name="council")`
 
 ## Cost Modes
 
 - `--fast`: small task, clear scope → short inline plan → route to `/tool-quick` or `/tool-feat`.
-- `--standard` or default: medium work → Phase 0 if needed → `superpowers:writing-plans`.
+- `--standard` or default: medium work → Phase 0 if needed → `skill(name="writing-plans")`.
 - `--deep`: auto-classify complexity:
-  - **≤3 PR code work** → `ecc:blueprint` + `superpowers:writing-plans`
-  - **>3 PR or milestone-scale** → L6: `gsd project` (discuss → plan → execute phases)
-  - **Architecture change** → L6: `ecc:council` before blueprint
+- **≤3 PR code work** → `skill(name="blueprint")` + `skill(name="writing-plans")`
+- **>3 PR or milestone-scale** → `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
+- **Architecture change** → `skill(name="council")` for structured go/no-go before blueprint
 
 ## Flow
 
 1. Restate the goal and non-goals.
-2. Identify files/modules likely affected. Code-review-graph (L2, auto-refreshed): run `detect-changes` for impact assessment.
+2. Identify files/modules likely affected via code-review-graph (L2, auto-refreshed):
+   - `detect_changes` to assess impact scope from the diff baseline
+   - `get_impact_radius(target="<key_module>")` to understand blast radius
+   - `get_architecture_overview` for module boundaries (deep mode only)
 3. Define verification commands and exit criteria.
-4. If the work touches auth, user data, or security-sensitive paths, add L4: `ecc:security-review` as a planning checkpoint.
+4. If the work touches auth, user data, or security-sensitive paths, add `skill(name="security-review")` as a planning checkpoint.
 5. For file-backed plans, request review before execution.
 6. Execute only after the plan is clear enough to verify.
 

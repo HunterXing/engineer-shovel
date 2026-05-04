@@ -16,18 +16,21 @@ when-to-use: Use for behavior-preserving cleanup where baseline and post-change 
 
 Behavior must remain identical. Do not mix feature work into a refactor.
 
-Compression: caveman full by default, lite for `--fast`, ultra for broad diffs. Call `rtk gain` before test/build commands.
+Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman ultra` for broad diffs (per SKILL.md mapping). Wrap large test/build commands with `rtk gain`.
 
 ## Cost Modes
 
 - `--fast`: 1-2 file cleanup → baseline tests → refactor → verify → `/tool-review --fast`.
 - `--standard` or default: normal refactor → baseline tests → refactor (small steps) → tests/build → local review.
-- `--deep`: broad, risky, security-sensitive, or performance-critical → L6: `gsd-execute-phase` (mandatory phase management) → L4: `ecc:review-work` + E2E if applicable.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → `skill(name="gsd-execute-phase")` (mandatory phase management) → `skill(name="review-work")` + E2E if applicable.
 
 ## Flow
 
-1. Run baseline tests before any edits. Call `rtk gain` before test runs.
-2. Code-review-graph (L2, auto-refreshed): use impact analysis to understand affected callers before refactoring. Also identify existing codebase patterns for reference.
+1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites.
+2. Code-review-graph (L2, auto-refreshed):
+   - `get_impact_radius(target="<function_or_module>")` to understand affected callers before refactoring
+   - `refactor_tool` to check for dead code or plan renames safely
+   - `semantic_search_nodes(query="<similar_pattern>")` to identify existing codebase patterns for reference
 3. Refactor one logical unit at a time.
 4. Re-run the same verification after each step.
 5. Compare behavior, public APIs, and performance-sensitive paths.
@@ -35,7 +38,7 @@ Compression: caveman full by default, lite for `--fast`, ultra for broad diffs. 
 
 ## Security Gate
 
-If the change touches auth, security-sensitive paths, or data handling, add L4: `ecc:security-review` regardless of cost mode.
+If change touches auth, security-sensitive paths, or data handling → escalate to `skill(name="security-review")`.
 
 ## Stop Conditions
 

@@ -16,18 +16,20 @@ when-to-use: Use when a decision needs local, official, current, or multi-source
 
 Start narrow. Add sources only when the answer needs current or external evidence.
 
-Compression: follow `docs/token-cost.md`; use full for normal research, ultra for deep synthesis, and RTK only for shell/tool output.
+Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (per SKILL.md mapping). Skip RTK (research is document-heavy, not shell-heavy).
 
 ## Cost Modes
 
-- `--quick` or default: local docs, known library, simple comparison → targeted docs/search. Supplement with code-review-graph (L2) for existing codebase architecture context.
-- `--web`: current facts or official docs needed → web/docs search + concise synthesis. Include code-review-graph context for how the current codebase relates.
-- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → code-review-graph architecture exploration → L4: load matching ECC research skills → multi-source research (ecc:deep-research) + examples + tradeoff report.
+- `--quick` or default: local docs, known library, simple comparison → targeted docs/search. Supplement with code-review-graph: `semantic_search_nodes(query="<topic>")` for existing codebase context.
+- `--web`: current facts or official docs needed → web/docs search + concise synthesis. Include code-review-graph: `query_graph(imports_of="<related_module>")` for how the current codebase relates.
+- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → code-review-graph: `get_architecture_overview` + `semantic_search_nodes` to map codebase → load matching ECC research skills → `skill(name="deep-research")` → tradeoff report.
 
 ## Flow
 
 1. Define the exact decision the research should inform.
-2. Query code-review-graph (L2) for relevant existing implementation and patterns.
+2. Query code-review-graph (L2) for relevant existing implementation and patterns:
+   - `semantic_search_nodes(query="<topic_keywords>")` to find related functions/classes
+   - `query_graph(callees_of="<related_node>")` to understand dependency context
 3. Search the smallest source set likely to answer it.
 4. Cite or name sources when facts are current/external.
 5. Highlight conflicts and confidence.

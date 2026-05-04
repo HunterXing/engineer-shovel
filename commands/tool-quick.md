@@ -16,7 +16,7 @@ when-to-use: Use for obvious low-risk work such as typos, tiny config edits, or 
 
 Use this for obvious, low-risk work. Do not run planning, deep research, or broad review for quick tasks.
 
-Compression: caveman lite by default. Call `rtk gain` before tests/validation to compress tool output.
+Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/caveman full` for `--standard`. Wrap large test/build output with `rtk gain`; skip RTK for small diffs.
 
 ## Cost Modes
 
@@ -25,7 +25,10 @@ Compression: caveman lite by default. Call `rtk gain` before tests/validation to
 
 ## Flow
 
-0. Get code-review-graph minimal context: `get_minimal_context_tool` for the target file(s) (L2, auto-refreshed by git hooks).
+0. Get code-review-graph context (L2, auto-refreshed by git hooks):
+   - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")`
+   - For file-level context: `query_graph(imports_of="<file_path>")` to see dependencies
+   - For structural overview: `get_architecture_overview` (only when target files are unclear)
    If project language is known, load matching L4 ECC pattern reference from `docs/language-reference.md`.
 1. Confirm the target file or symbol from context.
 2. Make the smallest safe change.
@@ -35,7 +38,7 @@ Compression: caveman lite by default. Call `rtk gain` before tests/validation to
 
 ## Security Gate
 
-If the change touches auth, user input parsing, file system, network, secrets, cookies, or SQL, add L4: `ecc:security-review` regardless of cost mode.
+If change touches auth, user input, file system, network, secrets, cookies, or SQL → escalate to `skill(name="security-review")`.
 
 ## Avoid
 

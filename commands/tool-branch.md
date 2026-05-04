@@ -22,7 +22,7 @@ Manage feature branch lifecycle with automatic type detection, diff review, and 
 |---|---|---|
 | `create` | Create branch from current | `/tool-branch create feat add login` |
 | `status` | Show branch info and diff stats | `/tool-branch status` |
-| `review` | Show full diff + L3 CRG blast-radius analysis | `/tool-branch review` |
+| `review` | Show full diff + CRG blast-radius analysis | `/tool-branch review` |
 | `merge` | Squash merge, L2 caveman-commit message, delete branch | `/tool-branch merge` |
 | `abort` | Discard branch, return to source | `/tool-branch abort` |
 
@@ -30,7 +30,7 @@ Manage feature branch lifecycle with automatic type detection, diff review, and 
 
 1. **Start task**: `/tool-branch create [description]` — auto-detects type (feat/fix/refactor/docs)
 2. **Work**: Make commits on the feature branch
-3. **Review**: `/tool-branch review` — shows diff vs source branch with L3 CRG blast-radius analysis
+3. **Review**: `/tool-branch review` — shows diff vs source branch with CRG analysis: `detect_changes` + `get_impact_radius` for blast radius
 4. **Confirm**: `/tool-branch merge` — squash merge, prompts for commit message, deletes branch
 5. **Or discard**: `/tool-branch abort` — abandon branch, return to source
 
@@ -61,7 +61,7 @@ bash scripts/branch-workflow.sh <subcommand> [args...]
 
 ## Compression
 
-Use `/caveman lite` (L2) for branch operations output. Use `/caveman-commit` (L2) for merge commit messages.
+Use `/caveman lite` (L2) for branch operations output (per SKILL.md mapping for `--fast`-equivalent operations). Use `/caveman-commit` (L2) for merge commit messages.
 
 ## Edge Cases
 

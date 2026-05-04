@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -44,7 +44,7 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 
 - If the change is obvious and touches at most 2 files, use `/tool-quick`.
 - If something is broken, use `/tool-fix`; only escalate to GSD debugging when the cause crosses files or is not reproducible locally.
-- If you need to build a feature, use `/tool-feat` — it auto-brainstorms when requirements are unclear.
+- If you need to build a feature, use `/tool-feat` — it auto-brainstorms when requirements are unclear. After implementation, it runs GSD verification gates (verify → review → ship for `--deep`).
 - If starting any non-trivial task, `/tool-feat` and `/tool-fix` auto-create a feature branch.
 - If behavior must remain identical, use `/tool-refactor` and verify before/after.
 - If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work.
@@ -63,13 +63,26 @@ Engineer Shovel is a lightweight router for AI-assisted software engineering. It
 
 Default to the cheapest mode that still verifies the outcome. Escalate only when evidence shows the lighter mode is insufficient.
 
-## Compression Defaults
+## Caveman Mode Mapping (Enforced)
 
-- Use Caveman by default because it reduces prompt/context verbosity before and during workflows.
-- `--fast`: prefer `/caveman lite` so tiny tasks stay readable.
-- `--standard`: prefer `/caveman full` to reduce repeated workflow and verification chatter.
-- `--deep`: prefer `/caveman full`; switch to `/caveman ultra` for multi-agent, long-context, or context-pressure work.
-- RTK is complementary when installed: it compresses Bash/tool output before it enters context, while Caveman compresses LLM communication and prompt verbosity.
+ALL commands MUST follow this mapping. Individual commands MUST NOT override it.
+
+| Cost Mode | Caveman Mode | Escalation Trigger |
+|-----------|-------------|-------------------|
+| `--fast` | `/caveman lite` | Never escalate |
+| `--standard` | `/caveman full` | Never escalate |
+| `--deep` | `/caveman full` | Switch to `/caveman ultra` when: subagent count ≥3, OR context usage >50%, OR multi-session work |
+
+## RTK Policy
+
+RTK compresses Bash/tool output (git, tests, builds, logs) before it enters LLM context. Skip RTK when the expected output is small — wrapping short outputs adds latency with no benefit.
+
+| RTK trigger | When |
+|-------------|------|
+| `rtk gain` | Full test suites, large builds, git logs >100 lines |
+| Skip RTK | Single-file tests, lint, short diffs, small directory listings |
+
+RTK + Caveman stack independently: Caveman compresses LLM communication, RTK compresses tool output. Neither replaces the other.
 
 ## Core Principles
 
@@ -80,13 +93,38 @@ Default to the cheapest mode that still verifies the outcome. Escalate only when
 5. Use Caveman or compact handoffs when context usage grows.
 6. Code-review-graph is auto-refreshed by git hooks — never manually refresh during workflow.
 
+## Cross-cutting Security Gate
+
+Enforced on ALL `/tool-*` commands regardless of cost mode. If any change touches:
+**auth, user input parsing, file system paths, network I/O, secrets, cookies, SQL, or serialization** —
+immediately escalate to `skill(name="security-review")`.
+
+Individual command files reference this gate with one line; do not repeat the full text.
+
+## GSD Completion Pipeline
+
+For non-trivial implementation work (`/tool-feat`, `/tool-fix`), verification is structured through GSD gates instead of ad-hoc tests.
+
+### `--standard` completion
+1. `skill(name="gsd-verify-work")` — confirm behavior against the original requirement or bug description
+2. `skill(name="caveman-review")` — compressed code quality check on the diff
+3. Offer `/caveman-commit` suggestion — **NEVER** auto-commit without explicit user request
+
+### `--deep` completion
+1. `skill(name="gsd-verify-work")` — structured acceptance verification against plan/requirements
+2. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings
+3. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge
+4. Offer `/caveman-commit` suggestion
+
+`/tool-quick` and `/tool-refactor` use lighter verification (formatter/lint/test) and skip full GSD gates unless risk escalates.
+
 ## Token Guidance
 
 - This file is a router, not the full manual. Detailed docs live in `docs/`.
 - Use `/tool-quick` or `/tool-review --fast` with `/caveman lite` for routine work.
-- Use RTK-enabled Bash output for noisy commands such as git, tests, builds, and logs when the environment supports it.
+- RTK is only for noisy commands (large test suites, builds, long git logs); skip for small outputs.
 - Use `/tool-research --deep`, `/review-work`, and GSD phase workflows deliberately; they can launch multiple agents and consume substantially more context.
-- If context exceeds 50%, use `/caveman full` or `/strategic-compact` before continuing long work; use `/caveman ultra` when context pressure is severe.
+- If context exceeds 50%, switch to `/caveman ultra` before continuing long work.
 
 ## References
 
