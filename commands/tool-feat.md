@@ -30,24 +30,26 @@ Route result to the appropriate cost mode below. Do not implement until directio
 ## Cost Modes
 
 - `--fast`: known area, small feature → `semantic_search_nodes` to confirm patterns → implement → tests → caveman review.
-- `--standard` or default: normal feature, 3-8 files → `get_architecture_overview` + `semantic_search_nodes` for patterns → implement → gsd-verify-work.
-- `--deep`: ambiguous, external deps, multi-system → Phase 0 brainstorm → plan → implement → gsd-verify-work → gsd-code-review → gsd-ship.
+- `--standard` or default: normal feature, 3-8 files → targeted CRG context + optional OpenSpec spec when acceptance criteria need durable agreement → implement → native tests/build → light review.
+- `--deep`: ambiguous, external deps, multi-system → Phase 0 brainstorm → OpenSpec/plan when needed → implement → gsd-verify-work → gsd-code-review → gsd-ship.
 
 ## Flow
 
 0. Record baseline: run `/caveman-stats` (L2) to capture session starting token count.
-   Verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
-1. Explore architecture via code-review-graph (L2, auto-refreshed):
+   Before editing, verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
+1. Explore via code-review-graph (L2, auto-refreshed):
    - `get_architecture_overview` for high-level structure and module boundaries
    - `semantic_search_nodes(query="<similar_feature_or_pattern>")` to find existing implementations
    - `query_graph(imports_of="<target_module>")` to understand dependencies
+   If CRG MCP tools are unavailable in the current harness, use `code-review-graph` CLI or fall back to targeted Glob/Grep/Read.
    Auto-load matching ECC pattern skill (e.g. `skill(name="golang-patterns")`, `skill(name="python-patterns")`). Use `docs/language-reference.md` for mapping.
 2. Search existing code for matching patterns before adding new structure.
 3. **Shortcut**: If the feature description already names specific files, classes, and expected behavior, skip Phase 0 and go directly to implement → verify.
 4. If requirements are unclear (less than specific files+classes+behavior), run **Phase 0: Brainstorm** above.
-5. Implement using project conventions.
-6. Run diagnostics, related tests, typecheck/build. Wrap large test/build output with `rtk gain`.
-7. Run `/caveman-stats` (L2) to report session token consumption and savings.
+5. If acceptance criteria need durable agreement, create an OpenSpec change (`/opsx:propose` or `openspec init` first if the project is not initialized). Do not run `openspec init` automatically from this command.
+6. Implement using project conventions.
+7. Run diagnostics, related tests, typecheck/build. Wrap large test/build output with `rtk gain`.
+8. Run `/caveman-stats` (L2) to report session token consumption and savings.
    For `--standard` features, use `/tool-review --fast` after implementation.
    For `--deep` features, skip `/tool-review` (GSD gates handle review in completion pipeline).
 
@@ -57,15 +59,15 @@ Route result to the appropriate cost mode below. Do not implement until directio
 8. Run project-native test/build → `skill(name="caveman-review")` → report. Done.
 
 ### `--standard`
-8. `skill(name="gsd-verify-work")` — confirm feature behavior against requirements.
-9. `skill(name="caveman-review")` — compressed code quality check on the diff.
-10. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
+9. Run project-native verification against the requirement or OpenSpec tasks/specs.
+10. `/tool-review --fast` or `skill(name="caveman-review")` — compressed code quality check on the diff.
+11. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
 
 ### `--deep`
-8. `skill(name="gsd-verify-work")` — structured acceptance verification against plan.
-9. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings.
-10. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge.
-11. Offer `/caveman-commit` suggestion.
+9. `skill(name="gsd-verify-work")` — structured acceptance verification against plan/spec.
+10. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings.
+11. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge.
+12. Offer `/caveman-commit` suggestion.
 
 ## Security Gate
 

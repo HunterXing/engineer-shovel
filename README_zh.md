@@ -2,7 +2,7 @@
 
 <p align="center">
   <b>面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器。</b><br>
-  <sub>快速任务 · Bug 修复 · 新功能 · 分支 · 规划 · 重构 · 审查 · 头脑风暴 · 蓝图 · 研究 · 代码图谱 · 同步</sub>
+  <sub>快速任务 · Bug 修复 · 新功能 · 分支 · 规划 · 重构 · 审查 · 研究 · 代码图谱 · 同步</sub>
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
   <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-  <img alt="Commands" src="https://img.shields.io/badge/commands-12-5865F2?style=flat-square">
+  <img alt="Commands" src="https://img.shields.io/badge/commands-10_active-5865F2?style=flat-square">
   <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
 </p>
@@ -27,7 +27,7 @@
 
 ## 能力边界
 
-Engineer Shovel 原生安装的是轻量路由器和 `/tool-*` 命令（8 个活跃 + 2 个已废弃）。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
+Engineer Shovel 原生安装的是轻量路由器和 `/tool-*` 命令（10 个活跃 + 2 个兼容重定向）。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：OpenSpec、ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
 
 Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Caveman、RTK 或 code-review-graph 等外部能力，需要对应工具已经安装并处于健康状态。
 
@@ -49,7 +49,7 @@ bash install.sh --target all
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # 其他模式
-./install.sh --target opencode --recommended  # Skill + 命令 + Caveman
+./install.sh --target opencode --recommended  # 核心栈：Caveman、RTK、CRG、superpowers、OpenSpec
 ./install.sh --target opencode --minimal      # 只安装 Skill + 命令
 ./install.sh --target opencode --full --with-graph-build  # 同时构建初始 code-review-graph 索引
 ```
@@ -61,7 +61,7 @@ bash install.sh --target all
 这轮优化保持了公开接口不变：
 
 - `skill(name="engineer-shovel")` 不变。
-- 12 个 `/tool-*` 指令名称不变。
+- `/tool-*` 指令名称保持兼容；10 个活跃命令 + 2 个 legacy 重定向仍会安装。
 - `--minimal`、`--recommended`、`--full`、`--dry-run` 不变。
 - 新增 `--target opencode|claude|all|auto`，新机器可以明确选择安装到 OpenCode、Claude Code 或两者都装。
 
@@ -91,8 +91,8 @@ skill(name="engineer-shovel")
 | 模式 | 适用场景 |
 |---|---|
 | `--fast` | 低风险、目标明确、小改动 |
-| `--standard` | 普通开发任务 |
-| `--deep` | 高风险、跨模块、复杂研究或架构决策 |
+| `--standard` | 普通开发任务；可选 OpenSpec 规格层；原生测试 + 轻量审查 |
+| `--deep` | 高风险、跨模块、复杂研究、架构决策或 GSD 阶段编排 |
 
 Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`deep` 用 full/ultra。RTK 如果已安装，则用于压缩 git、测试、构建、日志等 Bash/tool 输出；它不是模型回复压缩器，而是工具输出压缩层。
 
@@ -116,8 +116,9 @@ Engineer Shovel 在 `--full` 模式下会安装并配置这些上游工具。
 
 | 工具 | 仓库 | 当前参考版本 | 作用 |
 |---|---|---:|---|
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | latest | 规格驱动产物：proposal、specs、design、tasks、verify、archive |
 | ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven 规划、阶段执行、验证和上下文工程 |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | 深度项目编排、阶段执行、验证和上下文工程 |
 | superpowers | https://github.com/obra/superpowers | v5.0.7 | 强制技能工作流：brainstorming、TDD、planning、review、branch finishing |
 | code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | 本地代码知识图谱、MCP review context、影响面分析 |
 | Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 输出 token 压缩、精简 review/commit、MCP shrink |

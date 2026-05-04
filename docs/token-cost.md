@@ -6,7 +6,7 @@ Engineer Shovel uses cost-aware escalation: start cheap, verify, escalate only w
 
 1. Large always-loaded skill files.
 2. Repeated workflow definitions in both skill and command files.
-3. Multi-agent commands (`/review-work`, GSD phase execution).
+3. Durable spec and multi-agent commands (OpenSpec artifacts, `/review-work`, GSD phase execution).
 4. Multi-source research workflows.
 5. Loading broad skill sets for small tasks.
 
@@ -15,8 +15,8 @@ Engineer Shovel uses cost-aware escalation: start cheap, verify, escalate only w
 | Tier | Typical trigger | Examples |
 |------|----------------|----------|
 | Low | Known file, small diff | `/caveman lite`, `/tool-quick`, `/tool-review --fast` |
-| Medium | Normal feature/fix/refactor | `/caveman full`, `/tool-feat`, `/tool-fix`, `/tool-plan` |
-| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-plan --deep`, `/tool-research --deep`, `/review-work` |
+| Medium | Normal feature/fix/refactor | `/caveman full`, `/tool-feat`, `/tool-fix`, optional OpenSpec, `/tool-plan` |
+| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-plan --deep`, GSD, `/tool-research --deep`, `/review-work` |
 
 ## Caveman Defaults
 
@@ -26,7 +26,7 @@ Caveman is the default compression layer. Mode is chosen by workflow risk:
 |----------|-------------------|-----|
 | `/tool-quick --fast` | `/caveman lite` | Tiny edits readable, boilerplate trimmed |
 | `/tool-fix --standard` | `/caveman full` | Bug context grows through logs/tests |
-| `/tool-feat --standard` | `/caveman full` | Reduces planning/verification chatter |
+| `/tool-feat --standard` | `/caveman full` | Keeps normal feature work compact while avoiding deep GSD gates |
 | `/tool-refactor --standard` | `/caveman full` | Before/after verification compact |
 | `/tool-review --fast` | Caveman review mode | Review findings compress well |
 | `/tool-plan --deep` | `/caveman full` | Plans and dependency graphs verbose |
@@ -44,7 +44,8 @@ Use RTK for: git status/diff/log, test/build output, long directory listings, re
 
 - Low-cost tools for small, deterministic work.
 - Standard workflows for normal implementation.
-- High-cost agents only for high-risk reasoning, security, architecture, broad refactors, or repeated failures.
+- Use OpenSpec only when requirements/specs/design/tasks need durable reviewable artifacts.
+- High-cost agents only for high-risk reasoning, security, architecture, broad refactors, milestone work, or repeated failures.
 - Targeted verification before broad review.
 - Caveman compression before escalating to broader agents.
 - RTK-wrapped shell output for noisy commands.
@@ -59,5 +60,6 @@ Use upstream tools directly:
 - Caveman statistics: `/caveman-stats`.
 - RTK statistics: `rtk gain --project --format json` (project), `rtk gain` (global), `rtk session` (adoption).
 - code-review-graph: `/tool-graph status`.
+- OpenSpec: `openspec --version`; initialize per project with `openspec init` only when specs are needed.
 - RTK hook audit: `rtk hook-audit` (requires `RTK_HOOK_AUDIT=1`).
 - Avoid `rtk gain --history` (may panic on non-ASCII paths in RTK 0.37.2).

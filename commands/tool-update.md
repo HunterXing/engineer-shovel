@@ -18,7 +18,7 @@ Synchronize Engineer Shovel files and verify supporting component health.
 
 ## Modes
 
-- `--check` or default: Compare installed Engineer Shovel files and check base dependencies plus Full-mode components. Read-only.
+- `--check` or default: Compare installed Engineer Shovel files and check base dependencies plus recommended/full components. Read-only.
 - `--full`: Update Engineer Shovel files, then install/configure missing low-risk components using official installers.
 
 ## Target Scope
@@ -32,7 +32,7 @@ Synchronize Engineer Shovel files and verify supporting component health.
 1. Detect installed locations based on target(s).
 2. Compare local installed files with latest repo versions.
 3. Report missing, outdated, or extra files.
-4. Check component health for base tools and Full-mode integrations.
+4. Check component health for base tools and recommended/full integrations.
 5. If `--full`: overwrite installed files and repair missing/unconfigured components.
 6. Verify installation integrity after update.
 
@@ -40,7 +40,12 @@ Synchronize Engineer Shovel files and verify supporting component health.
 
 Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, plus selected runtimes (`opencode`, `claude`).
 
-Checks Full-mode components: L1: RTK, L2: Caveman, L3: code-review-graph, L4: ECC, L5: Superpowers, L6: GSD.
+Checks recommended/full components: RTK, Caveman, code-review-graph, superpowers, OpenSpec, ECC, and GSD.
+
+OpenSpec policy:
+- Install/check the global CLI only (`openspec`).
+- Do not run `openspec init` automatically because it writes project files.
+- If Node.js is older than 20.19.0, report an actionable warning and skip repair.
 
 MCP policy:
 - `code-review-graph install` may configure MCP/rules because upstream explicitly supports this.
@@ -55,7 +60,7 @@ Safety:
 
 ## Missing Component Guidance
 
-When a Full-mode component is missing or broken, suggest the install command (e.g. `pipx install code-review-graph`, `npx get-shit-done-cc@latest`) instead of silently skipping.
+When a component is missing or broken, suggest the install command (e.g. `pipx install code-review-graph`, `npm install -g @fission-ai/openspec@latest`, `npx get-shit-done-cc@latest`) instead of silently skipping.
 
 ## Compression
 

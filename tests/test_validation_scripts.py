@@ -146,10 +146,12 @@ def test_installer_dry_run_mentions_all_full_mode_integrations():
         "install_superpowers",
         "install_caveman_for_target",
         "install_rtk",
+        "install_openspec",
         "install_code_review_graph",
         "rtk init",
         "code-review-graph install",
         "code-review-graph build",
+        "@fission-ai/openspec",
     ):
         assert marker in install_text
 
@@ -244,6 +246,17 @@ def test_health_code_review_graph_missing_when_binary_absent(monkeypatch):
     assert result.name == "code-review-graph"
     assert result.status == "missing"
     assert "pipx install code-review-graph" in result.repair
+
+
+def test_health_openspec_missing_when_binary_absent(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: None)
+
+    result = module.check_openspec()
+
+    assert result.name == "openspec"
+    assert result.status == "missing"
+    assert "@fission-ai/openspec" in result.repair
 
 
 def test_health_repair_code_review_graph_uses_official_commands(monkeypatch):

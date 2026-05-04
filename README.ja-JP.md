@@ -2,7 +2,7 @@
 
 <p align="center">
   <b>Token-aware AI エージェント開発ワークフロールーター</b><br>
-  <sub>クイックタスク · バグ修正 · 新機能 · ブランチ · プラン · リファクタリング · レビュー · ブレインストーミング · ブループリント · リサーチ · グラフ · 同期</sub>
+  <sub>クイックタスク · バグ修正 · 新機能 · ブランチ · プラン · リファクタリング · レビュー · リサーチ · グラフ · 同期</sub>
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
   <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-  <img alt="Commands" src="https://img.shields.io/badge/commands-12-5865F2?style=flat-square">
+  <img alt="Commands" src="https://img.shields.io/badge/commands-10_active-5865F2?style=flat-square">
   <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square"></a>
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
 </p>
@@ -31,7 +31,7 @@ Engineer Shovel は、OpenCode と Claude Code 向けの軽量スキル + スラ
 
 ## 能力の境界
 
-Engineer Shovel のネイティブインストールは、軽量ルーターと12の `/tool-*` コマンドです。フルワークフローで宣伝されているより深い機能は、recommended/full モードでインストールまたは構成されたオプションの外部ツールから提供されます：ECC、GSD、superpowers、code-review-graph、Caveman、RTK。
+Engineer Shovel のネイティブインストールは、軽量ルーター、10 個のアクティブな `/tool-*` コマンド、互換性用リダイレクトです。より深い機能は recommended/full モードでインストールまたは構成されたオプションの外部ツールから提供されます：OpenSpec、ECC、GSD、superpowers、code-review-graph、Caveman、RTK。
 
 Minimal インストールは意図的に小さく保たれています。ワークフローで GSD、ECC、Caveman、RTK、code-review-graph などの外部コマンドが言及されている場合、これらの機能には対応するオプションツールがインストールされ正常動作している必要があります。
 
@@ -53,7 +53,7 @@ bash install.sh --target all
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # その他のモード
-./install.sh --target opencode --recommended  # Skill + コマンド + Caveman
+./install.sh --target opencode --recommended  # Core stack: Caveman + RTK + CRG + superpowers + OpenSpec
 ./install.sh --target opencode --minimal      # Skill + コマンドのみ
 ./install.sh --target opencode --full --with-graph-build  # 初期 code-review-graph インデックスも構築
 ```
@@ -65,7 +65,7 @@ bash install.sh --target all
 この最適化サイクルは、公開インターフェースを安定に保ちます：
 
 - `skill(name="engineer-shovel")` は変更されません。
-- 12 の `/tool-*` コマンドはすべて同じ名前で維持されます。
+- `/tool-*` コマンド名は互換性を維持します。10 個がアクティブで、2 個は legacy redirect です。
 - `--minimal`、`--recommended`、`--full`、`--dry-run` は変更されません。
 - `--target opencode|claude|all|auto` により、新しいマシンは OpenCode、Claude Code、またはその両方を明示的に選択できます。
 
@@ -95,8 +95,8 @@ skill(name="engineer-shovel")
 | モード | 使用タイミング | 典型的なパス |
 |---|---|---|
 | `--fast` | 低リスク、既知のターゲット | `/caveman lite`、直接編集、`/gsd-fast`、Caveman レビュー |
-| `--standard` | 通常の開発 | `/caveman full`、ターゲット検索、実装、テスト/ビルド |
-| `--deep` | 曖昧、高リスク、マルチシステム | `/caveman full` または `ultra`、GSD、深いリサーチ、Oracle/review-work |
+| `--standard` | 通常の開発 | `/caveman full`、ターゲット検索、任意の OpenSpec、実装、テスト/ビルド、軽量レビュー |
+| `--deep` | 曖昧、高リスク、マルチシステム | `/caveman full` または `ultra`、OpenSpec/blueprint/GSD、深いリサーチ、review-work |
 
 RTK はインストールされている場合、git、テスト、ビルド、ログなどのノイズの多い Bash/tool 出力をモデルコンテキストに入る前に圧縮する дополнение です。
 
@@ -121,7 +121,7 @@ RTK はインストールされている場合、git、テスト、ビルド、�
 
 ```
 engineer-shovel/
-├── commands/          # 12 の実行可能スラッシュコマンド
+├── commands/          # 10 個のアクティブコマンド + legacy redirects
 ├── docs/              # ランタイムコンテキストから分離された長文リファレンス
 ├── scripts/           # 同期とバリデーションのユーティリティ
 ├── SKILL.md           # 軽量ルーター

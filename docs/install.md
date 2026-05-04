@@ -35,14 +35,14 @@ Skill + slash commands only. No external dependencies.
 ```
 
 ### `--recommended`
-Skill + commands + Caveman. Best token-saving baseline without full stack.
+Skill + commands + Caveman + RTK + code-review-graph + superpowers + OpenSpec. Best default engineering stack without ECC/GSD orchestration.
 
 ```bash
 ./install.sh --target opencode --recommended
 ```
 
 ### `--full` (default)
-All components: ECC, GSD, superpowers, Caveman, RTK, code-review-graph.
+Recommended components plus ECC and GSD. Use this when you want the full capability library and deep project orchestration.
 
 ```bash
 ./install.sh --target opencode --full
@@ -55,11 +55,21 @@ All components: ECC, GSD, superpowers, Caveman, RTK, code-review-graph.
 |-----------|---|---|---|
 | Engineer Shovel | ✓ | ✓ | Always installed |
 | ECC | ✓ (global) | ✓ (global) | Skipped for local scope |
-| GSD | ✓ | ✓ | Via `npx get-shit-done-cc@latest` |
+| OpenSpec | ✓ | ✓ | CLI only; project init remains explicit via `openspec init` |
+| GSD | ✓ | ✓ | Via `npx get-shit-done-cc@latest`; full mode only |
 | code-review-graph | ✓ | ✓ | Via `pipx` or `pip`, then configured |
 | Caveman | ✓ | ✓ | Uses upstream installer |
 | superpowers | ✓ | ✓ | Plugin entry per target |
 | RTK | ✓ | ✓ | System binary, always global |
+
+OpenSpec requires Node.js 20.19.0 or newer. If Node is too old, installation continues with an actionable warning; run `npm install -g @fission-ai/openspec@latest` after upgrading Node.
+
+Engineer Shovel does not automatically run `openspec init` because that writes project files. Initialize OpenSpec per repository only when durable specs are useful:
+
+```bash
+openspec init
+/opsx:propose "add dark mode"
+```
 
 ## Dry Run
 

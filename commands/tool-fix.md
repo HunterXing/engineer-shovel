@@ -21,7 +21,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 ## Cost Modes
 
 - `--fast`: known file/function, obvious cause → `semantic_search_nodes` to confirm location → direct fix + targeted test.
-- `--standard` or default: reproducible bug, local scope → full CRG trace pipeline (semantic_search → get_affected_flows → query_graph) → fix → gsd-verify-work.
+- `--standard` or default: reproducible bug, local scope → full CRG trace pipeline (semantic_search → get_affected_flows → query_graph) → fix → failing test + regression verification → light review.
 - `--deep`: flaky, cross-module, security, or unknown root cause → CRG trace pipeline → `skill(name="deep-research")` if unfamiliar domain → `skill(name="systematic-debugging")` (superpowers, 4-phase) → `skill(name="gsd-debug")` if persistent state needed → `skill(name="security-review")`.
 
 ## Flow
@@ -32,6 +32,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
    - `semantic_search_nodes(query="<failing_function>")` to locate the entry point
    - `get_affected_flows(entry_point="<node_id>")` to trace the full execution path
    - `query_graph(callers_of="<suspected_root>", depth=2)` to confirm upstream dependencies
+   If CRG MCP tools are unavailable in the current harness, use `code-review-graph detect-changes/status` where possible or fall back to targeted Glob/Grep/Read.
 3. `get_impact_radius(target="<root_cause_node>")` to check blast radius before fixing.
 4. Apply a surgical fix.
 5. Run the failing test first, then related tests/build. Wrap large test output with `rtk gain`.
@@ -44,7 +45,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 8. Run project-native test/build. Report: what changed, what was verified. Done.
 
 ### `--standard`
-8. `skill(name="gsd-verify-work")` — confirm the bug is fixed and no regression introduced.
+8. Re-run the failing test first, then related regression tests/build.
 9. `skill(name="caveman-review")` — compressed code quality check on the diff.
 10. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
 

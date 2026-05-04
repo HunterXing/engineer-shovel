@@ -2,7 +2,7 @@
 
 <p align="center">
   <b>Token-aware AI agent development workflow router</b><br>
-  <sub>Quick Tasks · Bug Fix · Feature · Branch · Plan · Refactor · Review · Brainstorm · Blueprint · Research · Graph · Sync</sub>
+  <sub>Quick Tasks · Bug Fix · Feature · Branch · Plan · Refactor · Review · Research · Graph · Sync</sub>
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
   <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-  <img alt="Commands" src="https://img.shields.io/badge/commands-12-5865F2?style=flat-square">
+  <img alt="Commands" src="https://img.shields.io/badge/commands-10_active-5865F2?style=flat-square">
   <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
 </p>
@@ -31,7 +31,7 @@ The runtime `SKILL.md` is intentionally small; long-form documentation lives in 
 
 ## Capability Boundary
 
-Native Engineer Shovel installs the lightweight router and 12 `/tool-*` commands. The deeper capabilities advertised in full workflows come from optional external tools installed or configured by recommended/full modes: ECC, GSD, superpowers, code-review-graph, Caveman, and RTK.
+Native Engineer Shovel installs the lightweight router and `/tool-*` commands. Deeper capabilities come from optional external tools installed or configured by recommended/full modes: OpenSpec, ECC, GSD, superpowers, code-review-graph, Caveman, and RTK.
 
 Minimal installs are intentionally small. If a workflow mentions external commands such as GSD, ECC, Caveman, RTK, or code-review-graph behavior, those capabilities require the corresponding optional tool to be installed and healthy.
 
@@ -53,7 +53,7 @@ bash install.sh --target all
 # curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # Other modes
-./install.sh --target opencode --recommended  # Skill + commands + Caveman
+./install.sh --target opencode --recommended  # Core stack: Caveman, RTK, CRG, superpowers, OpenSpec
 ./install.sh --target opencode --minimal      # Skill + commands only
 ./install.sh --target opencode --full --with-graph-build  # Also build initial code-review-graph index
 ```
@@ -65,7 +65,7 @@ The installer verifies pinned external repository SHAs before staging optional d
 This optimization cycle keeps the public interface stable:
 
 - `skill(name="engineer-shovel")` is unchanged.
-- All 12 `/tool-*` commands remain installed with the same names.
+- All `/tool-*` command names remain stable; 10 are active and 2 legacy redirects remain installed for compatibility.
 - `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
 - `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
 
@@ -95,8 +95,8 @@ or call a command directly:
 | Mode | Use when | Typical path |
 |---|---|---|
 | `--fast` | low-risk, known target | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
-| `--standard` | normal development | `/caveman full`, targeted search, implementation, tests/build |
-| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, GSD, deep research, Oracle/review-work |
+| `--standard` | normal development | `/caveman full`, targeted search, optional OpenSpec, implementation, tests/build, light review |
+| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, OpenSpec/blueprint/GSD, deep research, review-work |
 
 RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context.
 
@@ -111,17 +111,17 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 | `/tool-plan` | Requirements and planning (auto-escalates to blueprint/gsd) |
 | `/tool-refactor` | Behavior-preserving cleanup |
 | `/tool-review` | Local diff, PR, or deep review |
-| `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` |
-| `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` |
 | `/tool-research` | Evidence gathering and synthesis (codebase-aware) |
 | `/tool-graph` | code-review-graph diagnostics (auto-refreshed) |
 | `/tool-update` | Sync and update installation |
+
+Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/tool-blueprint`.
 
 ## Structure
 
 ```text
 engineer-shovel/
-├── commands/          # 12 executable slash commands
+├── commands/          # 10 active slash commands + legacy redirects
 ├── docs/              # long-form references kept out of runtime context
 ├── scripts/           # sync and validation utilities
 ├── SKILL.md           # lightweight router
@@ -148,8 +148,9 @@ Engineer Shovel integrates and configures these upstream tools in `--full` mode.
 
 | Tool | Repository | Current referenced version | Role |
 |---|---|---:|---|
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | latest | Spec-driven artifacts: proposal, specs, design, tasks, verify, archive |
 | ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec-driven planning, phase execution, verification, and context engineering |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Deep project orchestration, phase execution, verification, and context engineering |
 | superpowers | https://github.com/obra/superpowers | v5.0.7 | Mandatory skill workflows: brainstorming, TDD, planning, review, branch finishing |
 | code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
 | Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | Output-token compression, terse review/commit helpers, MCP shrink |

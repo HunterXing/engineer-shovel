@@ -1,13 +1,13 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.5.0 · Mode tabs · CRG-aware · GSD pipeline
+   v1.6.0 · Mode tabs · CRG-aware · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.5.0 · MIT License',
+    'hero.badge': 'v1.6.0 · MIT License',
     'hero.subtitle': 'Token-aware AI development workflow router for OpenCode / Claude Code',
-    'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, Caveman-enforced compression, GSD structured verification — from quick edit to blueprint shipment.',
+    'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.',
     'copy': 'Copy',
     'copied': 'copied',
     'wf.close': 'Close'
@@ -24,9 +24,9 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.5.0 · MIT License',
+    'hero.badge': 'v1.6.0 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器',
-    'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、Caveman 强制压缩、GSD 结构化验证闭环 — 从快速编辑到蓝图发布。',
+    'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、OpenSpec 持久规格、Caveman/RTK 压缩，GSD 仅用于深度编排。',
     'commands.title': '10 个命令',
     'commands.sub': '点击命令卡片查看每个模式的完整工作流。选对工具+模式，用最少的 token 完成验证。',
     'modes.title': '成本模式',
@@ -36,40 +36,41 @@ const i18n = {
     'modes.fast.2': '1-2 文件手术编辑',
     'modes.fast.3': '已知位置的小改动',
     'modes.standard.title': '常规开发任务',
-    'modes.standard.1': '新功能实现 (3-8 files)',
+    'modes.standard.1': '新功能实现 (可选 OpenSpec)',
     'modes.standard.2': '可复现 Bug 修复',
     'modes.standard.3': '中等重构 / PR review',
     'modes.deep.title': '高风险 · 跨系统 · 模糊',
     'modes.deep.1': '架构决策 / 跨模块',
     'modes.deep.2': '深度研究 / 复杂调试',
-    'modes.deep.3': '蓝图 + GSD 阶段编排',
+    'modes.deep.3': 'OpenSpec / 蓝图 / GSD 阶段编排',
     'start.title': '快速开始',
     'start.sub': '下载 → 检查 → 运行，三步完成安装。',
     'start.step1.title': '下载安装脚本',
     'start.step1.desc': '先下载、检查内容，再执行。默认全量安装所有组件。',
     'start.step2.title': '选择安装模式',
-    'start.step2.desc': '支持 OpenCode / Claude Code，minimal / recommended / full 多种模式。',
+    'start.step2.desc': '支持 OpenCode / Claude Code。recommended 安装核心栈；full 额外安装 ECC 和 GSD。',
     'start.step3.title': '开始使用',
     'start.step3.desc': '在会话中加载技能或直接调用命令。',
     'upstream.title': '上游工具',
-    'upstream.sub': 'Engineer Shovel 在 --full 模式下会安装并配置这 6 个上游工具。',
+    'upstream.sub': 'recommended 安装核心栈；full 额外加入 ECC 和 GSD 做深度编排。',
     'upstream.col.tool': '工具',
     'upstream.col.ver': '版本',
     'upstream.col.role': '作用',
-    'upstream.ecc': 'AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 (L4)',
-    'upstream.gsd': 'Spec-driven 规划、阶段执行、结构化验证闭环 (verify-work / code-review / ship) (L5)',
+    'upstream.openspec': '规格驱动产物：proposal、specs、design、tasks、verify、archive。只安装 CLI，不自动初始化项目。',
+    'upstream.ecc': '按需能力库：skills、rules、hooks、MCP、安全与 research-first 工作流 (L4)',
+    'upstream.gsd': '深度项目编排：阶段执行、结构化验证闭环 (verify-work / code-review / ship) (L5)',
     'upstream.sp': '强制技能工作流：brainstorming、TDD、planning、review、branch finishing (L3)',
     'upstream.crg': '本地代码知识图谱、MCP review context、影响面分析 (L2, auto-refreshed)',
     'upstream.caveman': 'LLM 输出 token 压缩 (lite/full/ultra 三模式强制映射) (L1)',
     'upstream.rtk': 'Shell/tool 输出压缩代理，智能触发策略 (输出 >500 行) (L1)',
     'boundary.title': '能力边界',
     'boundary.core.title': '原生安装（最小模式）',
-    'boundary.core.desc': 'Engineer Shovel 原生安装的是轻量路由器和 10 个 /tool-* 命令。',
+    'boundary.core.desc': 'Engineer Shovel 原生安装的是轻量路由器、10 个活跃 /tool-* 命令和 legacy 重定向。',
     'boundary.core.1': '轻量级 SKILL.md 路由层',
-    'boundary.core.2': '10 个 /tool-* 命令',
+    'boundary.core.2': '10 个活跃 /tool-* 命令',
     'boundary.core.3': 'install.sh 安装脚本',
     'boundary.ext.title': '可选外部工具（recommended / full 模式）',
-    'boundary.ext.desc': '完整工作流里更深的能力来自 recommended / full 模式安装或配置的可选外部工具。',
+    'boundary.ext.desc': '推荐/完整工作流里更深的能力来自 recommended / full 模式安装或配置的可选外部工具。',
     'footer.docs': '文档',
     'footer.install': '安装',
     'footer.cost': '成本模型',
@@ -152,20 +153,20 @@ const commandLabels = {
     zh: { usefor: 'Bug 修复、失败测试、回归 — 证明根因', modes: ['--fast (已知位置)', '--standard (CRG 追踪)', '--deep (调试管线)'] }
   },
   'cmd.feat': {
-    en: { usefor: 'New features with built-in brainstorm Phase 0', modes: ['--fast (small, known)', '--standard (with GSD verify)', '--deep (verify→review→ship)'] },
-    zh: { usefor: '新功能实现，内置需求澄清 Phase 0', modes: ['--fast (小型/已知)', '--standard (含 GSD 验证)', '--deep (验证→审查→发布)'] }
+    en: { usefor: 'New features with built-in brainstorm Phase 0', modes: ['--fast (small, known)', '--standard (optional OpenSpec + light review)', '--deep (spec/verify→review→ship)'] },
+    zh: { usefor: '新功能实现，内置需求澄清 Phase 0', modes: ['--fast (小型/已知)', '--standard (可选 OpenSpec + 轻审查)', '--deep (规格/验证→审查→发布)'] }
   },
   'cmd.branch': {
     en: { usefor: 'Branch lifecycle: create, review, merge, abort', modes: ['create', 'status', 'review (CRG)', 'merge', 'abort'] },
     zh: { usefor: '分支生命周期：创建、审查、合并、放弃', modes: ['create', 'status', 'review (含 CRG)', 'merge', 'abort'] }
   },
   'cmd.plan': {
-    en: { usefor: 'Requirements & planning — auto-escalates to blueprint/GSD', modes: ['--fast (inline)', '--standard (file-backed)', '--deep (blueprint/gsd)'] },
-    zh: { usefor: '需求与实现规划 — 自动升级到 blueprint/GSD', modes: ['--fast (内联)', '--standard (文件化)', '--deep (蓝图/gsd)'] }
+    en: { usefor: 'Requirements, specs, and planning — OpenSpec/blueprint/GSD when needed', modes: ['--fast (inline)', '--standard (OpenSpec or plan)', '--deep (blueprint/gsd)'] },
+    zh: { usefor: '需求、规格与实现规划 — 按需 OpenSpec/blueprint/GSD', modes: ['--fast (内联)', '--standard (OpenSpec 或计划)', '--deep (蓝图/gsd)'] }
   },
   'cmd.refactor': {
-    en: { usefor: 'Behavior-preserving cleanup with before/after verification', modes: ['--fast (1-2 files)', '--standard (CRG impact)', '--deep (gsd phase)'] },
-    zh: { usefor: '行为保持不变的重构，含前后验证', modes: ['--fast (1-2 文件)', '--standard (CRG 影响)', '--deep (gsd 阶段)'] }
+    en: { usefor: 'Behavior-preserving cleanup with before/after verification', modes: ['--fast (1-2 files)', '--standard (CRG impact)', '--deep (plan first)'] },
+    zh: { usefor: '行为保持不变的重构，含前后验证', modes: ['--fast (1-2 文件)', '--standard (CRG 影响)', '--deep (先规划)'] }
   },
   'cmd.review': {
     en: { usefor: 'Local diff, PR, or post-implementation review by risk', modes: ['--fast (caveman)', '--standard (CRG+standards)', '--deep (security+review-work)'] },
@@ -231,7 +232,7 @@ const commandWorkflows = {
   '/tool-fix': {
     tag: 'Low→High',
     sub: { en: 'Broken behavior, failing tests, regressions. Find root cause, prove fix.', zh: '行为异常、测试失败、回归。找到根因，证明修复。' },
-    tools: { en: 'Tools: CRG trace pipeline · GSD verify · Caveman review', zh: '工具: CRG 追踪管线 · GSD 验证 · Caveman 审查' },
+    tools: { en: 'Tools: CRG trace pipeline · native regression verification · Caveman review', zh: '工具: CRG 追踪管线 · 原生回归验证 · Caveman 审查' },
     modes: {
       '--fast': {
         label: { en: 'Quick fix', zh: '快速修复' },
@@ -265,9 +266,9 @@ const commandWorkflows = {
           { phase: '05', label: { en: 'Coverage', zh: '覆盖率' },
             desc: { en: 'query_graph(tests_for="fixed_node") — verify test coverage.', zh: 'query_graph(tests_for="修复节点") — 验证测试覆盖。' },
             tools: ['CRG'] },
-          { phase: '06', label: { en: 'GSD Verify', zh: 'GSD 验证' },
-            desc: { en: 'skill(gsd-verify-work) → confirm bug fixed. No regression.', zh: 'skill(gsd-verify-work) → 确认修复，无回归。' },
-            tools: ['GSD'] },
+          { phase: '06', label: { en: 'Regression Verify', zh: '回归验证' },
+            desc: { en: 'Re-run failing test first, then related regression tests/build.', zh: '先重跑失败测试，再跑相关回归测试/构建。' },
+            tools: [] },
           { phase: '07', label: { en: 'Review', zh: '审查' },
             desc: { en: 'skill(caveman-review) → offer /caveman-commit (no auto-commit).', zh: 'skill(caveman-review) → 提示 /caveman-commit (不自动提交)。' },
             tools: ['Caveman'] }
@@ -307,7 +308,7 @@ const commandWorkflows = {
   '/tool-feat': {
     tag: 'Medium',
     sub: { en: 'New functionality. Built-in brainstorm Phase 0. Smallest verifiable slice.', zh: '新功能开发。内置需求澄清 Phase 0。最小可验证切片。' },
-    tools: { en: 'Tools: CRG explore · caveman-stats · GSD verify/ship', zh: '工具: CRG 探索 · caveman-stats · GSD 验证/发布' },
+    tools: { en: 'Tools: CRG explore · optional OpenSpec · caveman-stats · light review', zh: '工具: CRG 探索 · 可选 OpenSpec · caveman-stats · 轻量审查' },
     modes: {
       '--fast': {
         label: { en: 'Small feature', zh: '小功能' },
@@ -333,22 +334,19 @@ const commandWorkflows = {
             desc: { en: 'caveman-stats + branch check.', zh: 'caveman-stats + 分支检查。' },
             tools: ['Caveman'] },
           { phase: '01', label: { en: 'CRG Explore', zh: 'CRG 探索' },
-            desc: { en: 'get_architecture_overview + semantic_search_nodes + query_graph(imports_of). Auto-load ECC pattern skill.', zh: 'get_architecture_overview + semantic_search_nodes + query_graph(imports_of)。自动加载 ECC pattern skill。' },
+            desc: { en: 'Targeted CRG context: semantic_search_nodes + query_graph(imports_of). Use architecture overview only if boundaries are unclear.', zh: '定向 CRG 上下文: semantic_search_nodes + query_graph(imports_of)。边界不清时才用架构概览。' },
             tools: ['CRG', 'ECC'] },
           { phase: '02', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if unclear) skill(gsd-explore) / skill(brainstorming) / skill(council)', zh: '(需求不清时) skill(gsd-explore) / skill(brainstorming) / skill(council)' },
-            tools: ['GSD', 'Superpowers', 'ECC'] },
+            desc: { en: '(if unclear) brainstorm; if acceptance needs durable agreement, create OpenSpec proposal/specs.', zh: '(需求不清时) 先澄清；验收需要持久共识时创建 OpenSpec proposal/specs。' },
+            tools: ['OpenSpec', 'Superpowers', 'ECC'] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Search existing patterns first. Implement with project conventions.', zh: '先搜索现有模式。按项目规范实现。' },
             tools: [] },
           { phase: '04', label: { en: 'Test', zh: '测试' },
             desc: { en: 'Tests/build. rtk gain for large output. /caveman-stats report.', zh: '测试/构建。大输出用 rtk gain。/caveman-stats 报告。' },
             tools: ['RTK', 'Caveman'] },
-          { phase: '05', label: { en: 'GSD Verify', zh: 'GSD 验证' },
-            desc: { en: 'skill(gsd-verify-work) — confirm against requirements.', zh: 'skill(gsd-verify-work) — 对照需求验收。' },
-            tools: ['GSD'] },
-          { phase: '06', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'skill(caveman-review) → offer /caveman-commit (no auto-commit).', zh: 'skill(caveman-review) → 提示 /caveman-commit (不自动提交)。' },
+          { phase: '05', label: { en: 'Light Review', zh: '轻量审查' },
+            desc: { en: '/tool-review --fast or skill(caveman-review). Offer /caveman-commit, no auto-commit.', zh: '/tool-review --fast 或 skill(caveman-review)。提示 /caveman-commit，不自动提交。' },
             tools: ['Caveman'] }
         ]
       },
@@ -361,9 +359,9 @@ const commandWorkflows = {
           { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
             desc: { en: 'Brainstorm mandatory. Clarify product/technical direction before planning.', zh: '必走需求澄清。先明确产品/技术方向，再规划。' },
             tools: ['GSD', 'Superpowers', 'ECC'] },
-          { phase: '02', label: { en: 'CRG + Plan', zh: 'CRG + 规划' },
-            desc: { en: 'get_architecture_overview + full CRG explore → write plan.', zh: 'get_architecture_overview + 完整 CRG 探索 → 编写计划。' },
-            tools: ['CRG', 'ECC'] },
+          { phase: '02', label: { en: 'Spec + Plan', zh: '规格 + 规划' },
+            desc: { en: 'OpenSpec for durable requirements when needed; CRG architecture context → blueprint/GSD plan.', zh: '需要持久需求时用 OpenSpec；CRG 架构上下文 → blueprint/GSD 计划。' },
+            tools: ['OpenSpec', 'CRG', 'ECC'] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Follow plan. Surgical changes per step.', zh: '按计划执行。每步手术改动。' },
             tools: [] },
@@ -441,8 +439,8 @@ const commandWorkflows = {
   },
   '/tool-plan': {
     tag: 'Medium',
-    sub: { en: 'Requirements & planning. Auto-escalates to blueprint or GSD.', zh: '需求与规划。自动升级到 blueprint 或 GSD。' },
-    tools: { en: 'Tools: CRG detect_changes · writing-plans · blueprint · gsd-new-milestone', zh: '工具: CRG detect_changes · writing-plans · blueprint · gsd-new-milestone' },
+    sub: { en: 'Requirements, specs, and planning. Uses OpenSpec, blueprint, or GSD only when needed.', zh: '需求、规格与规划。仅按需使用 OpenSpec、blueprint 或 GSD。' },
+    tools: { en: 'Tools: OpenSpec · CRG detect_changes · writing-plans · blueprint · gsd-new-milestone', zh: '工具: OpenSpec · CRG detect_changes · writing-plans · blueprint · gsd-new-milestone' },
     modes: {
       '--fast': {
         label: { en: 'Inline plan', zh: '内联计划' },
@@ -464,9 +462,9 @@ const commandWorkflows = {
           { phase: '02', label: { en: 'CRG Impact', zh: 'CRG 影响' },
             desc: { en: 'detect_changes + get_impact_radius(target="module").', zh: 'detect_changes + get_impact_radius(target="模块")。' },
             tools: ['CRG'] },
-          { phase: '03', label: { en: 'Write Plan', zh: '编写计划' },
-            desc: { en: 'skill(writing-plans): restate goal → identify files → define verification → review before execute.', zh: 'skill(writing-plans): 重申目标 → 识别文件 → 定义验证 → 执行前审查。' },
-            tools: ['Superpowers'] },
+          { phase: '03', label: { en: 'Spec or Plan', zh: '规格或计划' },
+            desc: { en: 'Use OpenSpec for durable requirements OR writing-plans for implementation order. Do not use both by default.', zh: '持久需求用 OpenSpec；实现顺序用 writing-plans。默认不要两者都用。' },
+            tools: ['OpenSpec', 'Superpowers'] },
           { phase: '04', label: { en: 'Security', zh: '安全' },
             desc: { en: 'Check: if touches auth/data/FS → skill(security-review).', zh: '检查: 涉及 auth/data/FS → skill(security-review)。' },
             tools: ['ECC'] }
@@ -479,8 +477,8 @@ const commandWorkflows = {
             desc: { en: '(if vague) clarify direction first.', zh: '(需求模糊时) 先澄清方向。' },
             tools: ['GSD', 'Superpowers'] },
           { phase: '02', label: { en: 'Classify', zh: '分级' },
-            desc: { en: 'Auto-classify: ≤3 PR → blueprint+writing-plans, >3 PR → gsd-new-milestone, architecture → council→blueprint.', zh: '自动分级: ≤3 PR → blueprint+writing-plans, >3 PR → gsd-new-milestone, 架构变更 → council→blueprint。' },
-            tools: ['ECC', 'GSD'] },
+            desc: { en: 'Auto-classify: spec-first → OpenSpec, ≤3 PR → blueprint OR writing-plans, >3 PR → gsd-new-milestone, architecture → council→blueprint.', zh: '自动分级: 规格优先 → OpenSpec, ≤3 PR → blueprint 或 writing-plans, >3 PR → gsd-new-milestone, 架构变更 → council→blueprint。' },
+            tools: ['OpenSpec', 'ECC', 'GSD'] },
           { phase: '03', label: { en: 'CRG Arch', zh: 'CRG 架构' },
             desc: { en: 'get_architecture_overview for module boundaries (deep mode).', zh: 'get_architecture_overview 了解模块边界 (deep 模式)。' },
             tools: ['CRG'] },
@@ -494,7 +492,7 @@ const commandWorkflows = {
   '/tool-refactor': {
     tag: 'Medium',
     sub: { en: 'Behavior-preserving cleanup. Baseline before/after must match.', zh: '行为保持不变的重构。前后基线必须一致。' },
-    tools: { en: 'Tools: CRG impact · refactor_tool · GSD execute-phase', zh: '工具: CRG 影响分析 · refactor_tool · GSD execute-phase' },
+    tools: { en: 'Tools: CRG impact · refactor_tool · deep plan when broad', zh: '工具: CRG 影响分析 · refactor_tool · 广泛重构先深度规划' },
     modes: {
       '--fast': {
         label: { en: 'Quick clean', zh: '快速清理' },
@@ -539,9 +537,9 @@ const commandWorkflows = {
           { phase: '01', label: { en: 'Baseline', zh: '基线' },
             desc: { en: 'Full baseline + CRG full analysis.', zh: '完整基线 + CRG 完整分析。' },
             tools: ['CRG', 'RTK'] },
-          { phase: '02', label: { en: 'GSD Phase', zh: 'GSD 阶段' },
-            desc: { en: 'skill(gsd-execute-phase) — mandatory phase management for broad refactors.', zh: 'skill(gsd-execute-phase) — 广泛重构的强制阶段管理。' },
-            tools: ['GSD'] },
+          { phase: '02', label: { en: 'Deep Plan', zh: '深度规划' },
+            desc: { en: '/tool-plan --deep first. Use OpenSpec/blueprint/GSD only if the refactor needs durable boundaries or phase state.', zh: '先 /tool-plan --deep。仅当需要持久边界或阶段状态时使用 OpenSpec/blueprint/GSD。' },
+            tools: ['OpenSpec', 'GSD', 'ECC'] },
           { phase: '03', label: { en: 'Review', zh: '审查' },
             desc: { en: 'skill(review-work) + E2E tests if applicable.', zh: 'skill(review-work) + E2E 测试 (如适用)。' },
             tools: ['ECC'] }
@@ -702,8 +700,8 @@ const commandWorkflows = {
   },
   '/tool-update': {
     tag: 'Low',
-    sub: { en: 'Sync and update engineer-shovel. Check component health for all 6 upstream tools.', zh: '同步更新 engineer-shovel。检查所有 6 个上游组件健康度。' },
-    tools: { en: 'Checks: L1 RTK · L2 Caveman · L3 CRG · L4 ECC · L5 Superpowers · L6 GSD', zh: '检查: L1 RTK · L2 Caveman · L3 CRG · L4 ECC · L5 Superpowers · L6 GSD' },
+    sub: { en: 'Sync and update engineer-shovel. Check component health for all 7 upstream tools.', zh: '同步更新 engineer-shovel。检查所有 7 个上游组件健康度。' },
+    tools: { en: 'Checks: RTK · Caveman · CRG · superpowers · OpenSpec · ECC · GSD', zh: '检查: RTK · Caveman · CRG · superpowers · OpenSpec · ECC · GSD' },
     modes: {
       '--check': {
         label: { en: 'Read-only', zh: '只读检查' },
@@ -715,7 +713,7 @@ const commandWorkflows = {
             desc: { en: 'Compare installed files with latest repo versions.', zh: '对比已安装文件与最新仓库版本。' },
             tools: [] },
           { phase: '03', label: { en: 'Health', zh: '健康' },
-            desc: { en: 'Check L1-L6 component health. Report missing/outdated/extra files.', zh: '检查 L1-L6 组件健康度。报告缺失/过时/多余文件。' },
+            desc: { en: 'Check component health. Report missing/outdated/extra files.', zh: '检查组件健康度。报告缺失/过时/多余文件。' },
             tools: [] }
         ]
       },

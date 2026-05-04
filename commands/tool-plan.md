@@ -15,8 +15,8 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 **Input**: $ARGUMENTS
 
 Unified planning entry point. Auto-detects complexity and escalates:
-- **≤3 PR**: inline plan or `skill(name="writing-plans")`
-- **>3 PR**: `skill(name="blueprint")` (code-level dependency graph)
+- **Durable requirement/spec needed**: OpenSpec (`/opsx:propose`, then `/opsx:verify` after implementation)
+- **≤3 PR implementation work**: inline plan or `skill(name="writing-plans")` / `skill(name="blueprint")`
 - **Milestone-scale**: `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
 
 Compression: `/caveman lite` for short plans, `/caveman full` for file-backed plans (per SKILL.md enforced mapping). Use RTK only for large shell outputs.
@@ -31,9 +31,10 @@ If the goal description is vague or missing concrete targets, enter clarificatio
 ## Cost Modes
 
 - `--fast`: small task, clear scope → short inline plan → route to `/tool-quick` or `/tool-feat`.
-- `--standard` or default: medium work → Phase 0 if needed → `skill(name="writing-plans")`.
+- `--standard` or default: medium work → Phase 0 if needed → OpenSpec for durable specs OR `skill(name="writing-plans")` for implementation order. Do not use both by default.
 - `--deep`: auto-classify complexity:
-- **≤3 PR code work** → `skill(name="blueprint")` + `skill(name="writing-plans")`
+- **Spec-first code work** → OpenSpec artifacts first, then plan from accepted specs
+- **≤3 PR code work** → `skill(name="blueprint")` OR `skill(name="writing-plans")` based on dependency density
 - **>3 PR or milestone-scale** → `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
 - **Architecture change** → `skill(name="council")` for structured go/no-go before blueprint
 
@@ -44,10 +45,12 @@ If the goal description is vague or missing concrete targets, enter clarificatio
    - `detect_changes` to assess impact scope from the diff baseline
    - `get_impact_radius(target="<key_module>")` to understand blast radius
    - `get_architecture_overview` for module boundaries (deep mode only)
+   If CRG MCP tools are unavailable, use the `code-review-graph` CLI where possible or fall back to targeted Glob/Grep/Read.
 3. Define verification commands and exit criteria.
-4. If the work touches auth, user data, or security-sensitive paths, add `skill(name="security-review")` as a planning checkpoint.
-5. For file-backed plans, request review before execution.
-6. Execute only after the plan is clear enough to verify.
+4. If the work needs agreed requirements, create or update an OpenSpec change. Do not auto-run `openspec init`; ask the user to initialize the project or run it only with explicit approval.
+5. If the work touches auth, user data, or security-sensitive paths, add `skill(name="security-review")` as a planning checkpoint.
+6. For file-backed plans/specs, request review before execution.
+7. Execute only after the plan is clear enough to verify.
 
 ## Escalation
 

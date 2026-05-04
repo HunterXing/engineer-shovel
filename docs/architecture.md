@@ -1,31 +1,32 @@
 # Toolchain Architecture
 
-Engineer Shovel commands are organized around a **5-layer tool architecture**, with each layer solving a distinct problem class.
+Engineer Shovel commands are organized around a **default core plus escalation layers**. Routine work stays light; specs, capability libraries, and project orchestration load only when risk requires them.
 
 ---
 
-## 5-Layer Architecture
+## Layer Architecture
 
 ```
-Layer 1: Communication Compression (always-on, no command)
+Layer 0: Compression (always-on, no command)
   caveman → LLM output compression (lite/full/ultra — enforced by cost mode)
   rtk    → Tool output compression (rtk gain for large outputs only: builds, full suites, long logs)
 
-Layer 2: Code Intelligence (auto-refreshed via git hooks, no manual command)
+Layer 1: Code Intelligence (default when useful)
   code-review-graph → semantic_search_nodes / query_graph / get_impact_radius
                       get_affected_flows / detect_changes / get_review_context
                       get_architecture_overview / refactor_tool
   /tool-graph reserved for manual diagnostics only
 
-Layer 3: Development Methodology (process enforcement, on-demand)
+Layer 2: Development Methodology (on-demand)
   superpowers → brainstorming / writing-plans / tdd-workflow / systematic-debugging / verification
 
-Layer 4: Domain Expertise (technical implementation, on-demand)
-  L4a (Pattern Reference): language/framework skills (golang-patterns, python-patterns, etc.) — auto-loaded
-  L4b (Specialized Process): security-review / review-work / deep-research / blueprint / council
-  L4c (Operational): github-ops / deployment-patterns
+Layer 3: Spec Layer (on-demand durable artifacts)
+  OpenSpec → proposal / specs / design / tasks / verify / archive
 
-Layer 5: Project Management (stateful orchestration, multi-phase only)
+Layer 4: Capability Library (on-demand)
+  ECC → language/framework skills, security-review, review-work, deep-research, council, github-ops
+
+Layer 5: Project Orchestration (deep/milestone only)
   gsd → explore / discuss-phase / plan-phase / execute-phase / debug
         verify-work / code-review / ship / workstreams / health
 ```
@@ -34,10 +35,11 @@ Layer 5: Project Management (stateful orchestration, multi-phase only)
 
 1. Escalate bottom-up — commands move up layers as complexity increases.
 2. Compression layer always on — caveman controls LLM verbosity, rtk controls tool output noise (large outputs only).
-3. Code intelligence auto-maintained — code-review-graph refreshed by git hooks, queried silently by commands using concrete MCP tool names.
-4. ECC sub-layers — L4a auto-loads pattern references (free), L4b invokes costly process workflows, L4c handles operational tasks.
-5. superpowers vs gsd — superpowers defines methodological discipline (session-scoped), gsd manages project phase state (cross-session persistent).
-6. GSD completion gates — `/tool-feat` and `/tool-fix` end with gsd-verify-work (→ caveman-review for --standard, → gsd-code-review → gsd-ship for --deep).
+3. Code intelligence auto-maintained — use CRG MCP tools when available, CRG CLI when not, and Glob/Grep/Read as fallback.
+4. OpenSpec creates durable agreement about what to build; it does not replace code graph context or project orchestration.
+5. ECC is a capability library, not a default workflow path.
+6. superpowers vs gsd — superpowers defines session-scoped methodology, gsd manages cross-session project phase state.
+7. GSD completion gates are deep-only by default; standard feature/fix work uses native verification plus light review.
 
 ---
 
@@ -49,8 +51,9 @@ Layer 5: Project Management (stateful orchestration, multi-phase only)
 | **rtk** | Tool output compression | `rtk gain` before test/build/git | Noisy output compression |
 | **code-review-graph** | Code knowledge graph | Git hooks auto-refresh, queried silently | Low (~100-500 tokens/query) |
 | **superpowers** | Development methodology | When requirements unclear or discipline needed | Medium-High (multi-turn) |
-| **ecc** | Domain expertise | Language commands, security review, deep research, review orchestration, blueprint, architecture decisions | Low-High |
-| **gsd** | Project management | Multi-phase/milestone/persistent state | High (subagent parallelism) |
+| **OpenSpec** | Durable spec artifacts | Requirements/spec/design/tasks need reviewable files | Medium |
+| **ecc** | Capability library | Language skills, security review, deep research, review orchestration, architecture decisions | Low-High |
+| **gsd** | Project orchestration | Multi-phase/milestone/persistent state | High (subagent parallelism) |
 
 ---
 
@@ -58,9 +61,9 @@ Layer 5: Project Management (stateful orchestration, multi-phase only)
 
 | Mode | Compression | Code Intelligence | Methodology | Domain Expertise | Project Mgmt |
 |------|-------------|-------------------|-------------|-----------------|--------------|
-| `--fast` | caveman lite + RTK (large outputs) | CRG | skip | L4a (auto-load) | skip |
-| `--standard` | caveman full + RTK (large outputs) | CRG | optional (brainstorm/tdd) | L4a + L4b (security if needed) | gsd-verify-work (feat/fix completion) |
-| `--deep` | caveman full/ultra + RTK (large outputs) | CRG | optional (plans/tdd) | L4a + L4b + L4c | gsd-verify-work → gsd-code-review → gsd-ship |
+| `--fast` | caveman lite + RTK (large outputs) | CRG only if target unclear | skip | skip | security only if sensitive | skip |
+| `--standard` | caveman full + RTK (large outputs) | CRG targeted | optional (brainstorm/tdd) | optional OpenSpec | patterns/security/research only if needed | skip by default |
+| `--deep` | caveman full/ultra + RTK (large outputs) | CRG architecture | plans/tdd/debug | OpenSpec when specs matter | L4 skills/review/research | gsd verify→review→ship |
 
 ---
 
@@ -68,33 +71,33 @@ Layer 5: Project Management (stateful orchestration, multi-phase only)
 
 When multiple tools could solve the same problem, choose ONE based on context:
 
-| Scenario | superpowers | gsd | ecc | Decision Criteria |
-|----------|------------|-----|-----|-------------------|
-| Requirement clarification | brainstorming (technical design) | gsd-explore (product direction) | council (multi-path architecture) | Implementation vs. business goal vs. high-risk decision |
-| Planning | writing-plans (implementation) | gsd-plan-phase (phase planning) | blueprint (code dependency graph) | ≤3 files vs. multi-phase vs. dense dependencies |
-| Parallel execution | subagent-driven-development | gsd-execute-phase | — | Ad-hoc parallel vs. phase wave orchestration |
-| Debugging | systematic-debugging (methodology) | gsd-debug (persistent state) | deep-research (new domain) | Single session vs. cross-context vs. unknown tech |
-| Code review | — | gsd-code-review (phase review) | review-work (5-agent parallel) | Phase-scoped vs. heavy parallel review |
-| Project planning | — | gsd-new-milestone (milestone) | blueprint (code PR) | Milestone engineering vs. code-level multi-PR |
-| Completion verification | — | gsd-verify-work (structured) | — | Post-implementation acceptance for feat/fix |
-| Ship/merge | — | gsd-ship (PR+gates) | github-ops (manual PR) | Automated pipeline vs. manual PR management |
+| Scenario | superpowers | OpenSpec | gsd | ecc | Decision Criteria |
+|----------|------------|----------|-----|-----|-------------------|
+| Requirement clarification | brainstorming (technical design) | proposal/specs when agreement must persist | gsd-explore (product direction) | council (multi-path architecture) | Chat clarification vs. durable spec vs. product/milestone |
+| Planning | writing-plans (implementation) | specs/design/tasks | gsd-plan-phase (phase planning) | blueprint (code dependency graph) | Implementation order vs. durable requirements vs. multi-phase vs. dense dependencies |
+| Parallel execution | subagent-driven-development | — | gsd-execute-phase | — | Ad-hoc parallel vs. phase wave orchestration |
+| Debugging | systematic-debugging (methodology) | — | gsd-debug (persistent state) | deep-research (new domain) | Single session vs. cross-context vs. unknown tech |
+| Code review | — | opsx verify (if spec exists) | gsd-code-review (phase review) | review-work (5-agent parallel) | Spec conformance vs. phase-scoped vs. heavy parallel review |
+| Project planning | — | specs/design/tasks | gsd-new-milestone (milestone) | blueprint (code PR) | Milestone engineering vs. code-level multi-PR |
+| Completion verification | — | opsx verify (spec conformance) | gsd-verify-work (deep structured) | — | Spec conformance vs. deep acceptance |
+| Ship/merge | — | archive completed specs | gsd-ship (PR+gates) | github-ops (manual PR) | Spec lifecycle vs. automated pipeline vs. manual PR management |
 
 ---
 
 ## Command × Tool Matrix
 
-| Command | caveman | rtk | code-review-graph | superpowers | gsd | ecc |
-|---------|---------|-----|-------------------|-------------|-----|-----|
-| **quick** | ✅ lite/full | ✅ large outputs | ✅ context | ❌ | ❌ | ✅ L4a auto-load |
-| **fix** | ✅ tiered | ✅ large outputs | ✅ trace/impact | ✅ sysdbg | ✅ verify-work (std)/verify→review→ship (deep) | ✅ L4a/L4b |
-| **feat** | ✅ tiered | ✅ large outputs | ✅ explore | ✅ brain/plans | ✅ verify-work (std)/verify→review→ship (deep) | ✅ L4a/L4b/council |
-| **plan** | ✅ tiered | ❌ | ✅ impact | ✅ brain/plans | ✅ new-milestone (deep) | ✅ council/blueprint |
-| **refactor** | ✅ tiered | ✅ large outputs | ✅ impact/patterns | ✅ tdd | ✅ execute-phase (deep) | ✅ review-work (deep) |
-| **review** | ✅ tiered | ✅ large diffs/logs | ✅ pr-review | ✅ receiving-review | ❌ | ✅ github-ops/review-work |
-| **research** | ✅ tiered | ❌ | ✅ codebase context | ❌ | ❌ | ✅ deep-research/council |
-| **graph** | ✅ lite | ✅ build/update | ✅ all | ❌ | ❌ | ❌ |
-| **branch** | ✅ lite | ❌ | ✅ pr-review | ❌ | ❌ | ❌ |
-| **update** | ✅ lite | ❌ | ⚠️ install | ⚠️ install | ⚠️ install | ⚠️ install |
+| Command | caveman | rtk | code-review-graph | superpowers | OpenSpec | gsd | ecc |
+|---------|---------|-----|-------------------|-------------|----------|-----|-----|
+| **quick** | yes lite/full | large outputs | only if target unclear | no | no | no | patterns/security only if needed |
+| **fix** | yes tiered | large outputs | trace/impact | sysdbg if needed | no | deep only | patterns/security/research if needed |
+| **feat** | yes tiered | large outputs | explore | brain/plans if unclear | optional standard/deep | deep only | patterns/council/security if needed |
+| **plan** | yes tiered | no | impact | brain/plans | optional standard/deep | milestone only | council/blueprint |
+| **refactor** | yes tiered | large outputs | impact/patterns | tdd if needed | deep plan if behavior boundaries need spec | milestone only | review-work deep |
+| **review** | yes tiered | large diffs/logs | pr-review | receiving-review | verify if spec exists | no | github-ops/review-work |
+| **research** | yes tiered | no | codebase context | no | no | no | deep-research/council |
+| **graph** | lite | build/update | all | no | no | no | no |
+| **branch** | lite | no | pr-review | no | no | no | no |
+| **update** | lite | no | install health | install health | install health | install health | install health |
 
 ---
 
@@ -103,8 +106,8 @@ When multiple tools could solve the same problem, choose ONE based on context:
 | Command | Low Overhead | Medium Overhead | High Overhead |
 |---------|-------------|-----------------|---------------|
 | quick | --fast (very low) | --standard (low) | — |
-| fix | --fast (low) | --standard (medium + gsd-verify-work) | --deep (high + gsd-verify→review→ship) |
-| feat | --fast (low) | --standard (medium + gsd-verify-work) | --deep (high + gsd-verify→review→ship) |
+| fix | --fast (low) | --standard (medium + native regression verify) | --deep (high + gsd-verify→review→ship) |
+| feat | --fast (low) | --standard (medium + optional OpenSpec + light review) | --deep (high + OpenSpec/gsd-verify→review→ship) |
 | plan | --fast (very low) | --standard (medium) | --deep (medium-high) |
 | refactor | --fast (low) | --standard (medium) | --deep (high) |
 | review | --fast (low) | --standard (medium) | --deep (high) |
@@ -128,5 +131,5 @@ When multiple tools could solve the same problem, choose ONE based on context:
 
 ---
 
-*Based on ECC + GSD + superpowers + code-review-graph + Caveman + RTK deep integration*
-*Last updated: 2026-05-04 — v1.5.0*
+*Based on OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK integration*
+*Last updated: 2026-05-04 — v1.6.0*

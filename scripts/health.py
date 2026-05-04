@@ -163,6 +163,19 @@ def check_rtk(runner: CommandRunner) -> CheckResult:
     return CheckResult("rtk", STATUS_OK, path, target="component")
 
 
+def check_openspec() -> CheckResult:
+    path = which("openspec")
+    if path:
+        return CheckResult("openspec", STATUS_OK, path, target="component")
+    return CheckResult(
+        "openspec",
+        STATUS_MISSING,
+        "not found in PATH",
+        "npm install -g @fission-ai/openspec@latest && openspec init  # per project",
+        "component",
+    )
+
+
 def check_gsd(target: str) -> CheckResult:
     command_dir = HOME / ".config/opencode/commands" if target == "opencode" else HOME / ".claude/commands"
     if target == "opencode":
@@ -198,7 +211,7 @@ def check_ecc(target: str, runner: CommandRunner) -> CheckResult:
 
 
 def check_components(targets: list[str], runner: CommandRunner) -> list[CheckResult]:
-    checks = [check_code_review_graph(runner), check_rtk(runner)]
+    checks = [check_code_review_graph(runner), check_rtk(runner), check_openspec()]
     for target in targets:
         checks.extend([
             check_superpowers(target, runner),
@@ -266,6 +279,11 @@ def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
             runner.run(["rtk", "init", "-g"])
 
 
+def repair_openspec(runner: CommandRunner, targets: list[str]) -> None:
+    del targets
+    runner.run(["npm", "install", "-g", "@fission-ai/openspec@latest"])
+
+
 def repair_gsd(runner: CommandRunner, targets: list[str]) -> None:
     if set(targets) == {"opencode", "claude"}:
         runner.run(["npx", "-y", "get-shit-done-cc@latest", "--all", "--global"])
@@ -288,6 +306,8 @@ def repair_components(checks: list[CheckResult], targets: list[str], runner: Com
         repair_code_review_graph(runner, targets)
     if "rtk" in names:
         repair_rtk(runner, targets)
+    if "openspec" in names:
+        repair_openspec(runner, targets)
     if "gsd" in names:
         repair_gsd(runner, targets)
     if "caveman" in names:

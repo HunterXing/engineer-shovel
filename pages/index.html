@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🪖 Engineer Shovel — AI Dev Workflow Router</title>
-  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 12 commands covering the full dev lifecycle.">
+  <title>Engineer Shovel — AI Dev Workflow Router</title>
+  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 10 active commands with optional OpenSpec specs and deep GSD orchestration.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
@@ -34,20 +34,20 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.5.0 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.6.0 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
     </h1>
     <p class="hero-subtitle" data-i18n="hero.subtitle">Token-aware AI development workflow router for OpenCode / Claude Code</p>
-    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, Caveman-enforced compression, GSD structured verification — from quick edit to blueprint shipment.</p>
+    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.</p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
       <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
     </div>
     <div class="hero-stats">
       <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
-      <div class="stat"><span class="stat-num">6</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
+      <div class="stat"><span class="stat-num">7</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
       <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
       <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
     </div>
@@ -103,7 +103,8 @@
           <span class="tool-tag">/caveman full</span>
           <span class="tool-tag">CRG trace</span>
           <span class="tool-tag">RTK (large)</span>
-          <span class="tool-tag">GSD verify</span>
+          <span class="tool-tag">OpenSpec optional</span>
+          <span class="tool-tag">light review</span>
         </div>
       </div>
       <div class="mode-card" data-mode="deep">
@@ -119,6 +120,7 @@
         <div class="mode-tools">
           <span class="tool-tag">/caveman ultra</span>
           <span class="tool-tag">CRG arch</span>
+          <span class="tool-tag">OpenSpec/blueprint</span>
           <span class="tool-tag">GSD pipeline</span>
           <span class="tool-tag">review-work</span>
         </div>
@@ -154,13 +156,13 @@ less install.sh">
         <div class="step-num">02</div>
         <div class="step-content">
           <h3 class="step-title" data-i18n="start.step2.title">Choose Install Mode</h3>
-          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code, minimal / recommended / full modes.</p>
+          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code. Recommended installs the core stack; full adds ECC and GSD.</p>
           <div class="code-block">
             <div class="code-lang">bash</div>
             <pre><code># OpenCode full install (default)
 bash install.sh --target opencode
 
-# Skill + commands + Caveman
+# Core stack: Caveman + RTK + CRG + superpowers + OpenSpec
 bash install.sh --target opencode --recommended
 
 # Skill + commands only
@@ -212,7 +214,7 @@ skill(name="engineer-shovel")
   <section class="section section-dark" id="upstream">
     <div class="section-header">
       <h2 class="section-title" data-i18n="upstream.title">Upstream Tools</h2>
-      <p class="section-sub" data-i18n="upstream.sub">Engineer Shovel installs these upstream tools in --full mode.</p>
+      <p class="section-sub" data-i18n="upstream.sub">Recommended mode installs the core stack. Full mode adds ECC and GSD for deep orchestration.</p>
     </div>
     <div class="upstream-table">
       <div class="ut-header">
@@ -220,15 +222,20 @@ skill(name="engineer-shovel")
         <span data-i18n="upstream.col.ver">Version</span>
         <span data-i18n="upstream.col.role">Role</span>
       </div>
+      <div class="ut-row" data-tool="OpenSpec">
+        <span class="ut-name">OpenSpec</span>
+        <span class="ut-ver">latest</span>
+        <span class="ut-desc" data-i18n="upstream.openspec">Spec-driven artifacts: proposal, specs, design, tasks, verify, archive. CLI installed; project init stays explicit.</span>
+      </div>
       <div class="ut-row" data-tool="ECC">
         <span class="ut-name">ECC</span>
         <span class="ut-ver">v1.10.0</span>
-        <span class="ut-desc" data-i18n="upstream.ecc">AI agent skills, rules, hooks, MCP, security-review, deep-research, blueprint, council (L4a/L4b/L4c)</span>
+        <span class="ut-desc" data-i18n="upstream.ecc">On-demand capability library: skills, rules, hooks, MCP, security-review, deep-research, blueprint, council</span>
       </div>
       <div class="ut-row" data-tool="GSD">
         <span class="ut-name">GSD</span>
         <span class="ut-ver">v1.39.0</span>
-        <span class="ut-desc" data-i18n="upstream.gsd">Spec-driven planning, phase execution, structured verification pipeline (verify-work → code-review → ship)</span>
+        <span class="ut-desc" data-i18n="upstream.gsd">Deep project orchestration: phase execution, structured verification pipeline (verify-work → code-review → ship)</span>
       </div>
       <div class="ut-row" data-tool="superpowers">
         <span class="ut-name">superpowers</span>
@@ -261,10 +268,10 @@ skill(name="engineer-shovel")
     <div class="boundary-layout">
       <div class="boundary-core">
         <h3 class="boundary-title" data-i18n="boundary.core.title">Native Install (Minimal)</h3>
-        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 12 /tool-* commands.</p>
+        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 10 active /tool-* commands plus legacy redirects.</p>
         <div class="boundary-list">
           <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.1">Lightweight SKILL.md router</span></div>
-          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">12 /tool-* commands</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">10 active /tool-* commands</span></div>
           <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.3">install.sh installer</span></div>
         </div>
       </div>
@@ -275,8 +282,9 @@ skill(name="engineer-shovel")
         <h3 class="boundary-title" data-i18n="boundary.ext.title">Optional External Tools (recommended / full)</h3>
         <p class="boundary-desc" data-i18n="boundary.ext.desc">Deeper capabilities come from optional external tools configured by recommended / full mode.</p>
         <div class="boundary-list">
-          <div class="b-item"><span class="b-dot b-ext"></span>ECC — AI agent harness performance</div>
-          <div class="b-item"><span class="b-dot b-ext"></span>GSD — Spec-driven planning &amp; execution</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>OpenSpec — Durable spec artifacts</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>ECC — On-demand capability library</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>GSD — Deep project orchestration</div>
           <div class="b-item"><span class="b-dot b-ext"></span>superpowers — Enforced skill workflows</div>
           <div class="b-item"><span class="b-dot b-ext"></span>code-review-graph — Local code knowledge graph</div>
           <div class="b-item"><span class="b-dot b-ext"></span>Caveman — Output token compression</div>
@@ -291,7 +299,7 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.5.0 · MIT License</span>
+        <span class="footer-version">v1.6.0 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>

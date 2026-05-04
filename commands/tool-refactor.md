@@ -22,7 +22,7 @@ Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman
 
 - `--fast`: 1-2 file cleanup → baseline tests → refactor → verify → `/tool-review --fast`.
 - `--standard` or default: normal refactor → baseline tests → refactor (small steps) → tests/build → local review.
-- `--deep`: broad, risky, security-sensitive, or performance-critical → `skill(name="gsd-execute-phase")` (mandatory phase management) → `skill(name="review-work")` + E2E if applicable.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → `/tool-plan --deep` first (OpenSpec/blueprint/GSD as appropriate) → execute in small verified steps → `skill(name="review-work")` + E2E if applicable.
 
 ## Flow
 

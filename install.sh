@@ -11,6 +11,7 @@ REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 RTK_REPO="https://github.com/rtk-ai/rtk"
 CODE_REVIEW_GRAPH_REPO="https://github.com/tirth8205/code-review-graph"
+OPENSPEC_REPO="https://github.com/Fission-AI/OpenSpec"
 
 ECC_SHA="841beea45cb25ba51f29fa45b7e272938d19b80a"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
@@ -42,9 +43,10 @@ Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|a
 
 Modes:
   --minimal      Install only engineer-shovel skill and slash commands.
-  --recommended Install skill, commands, and Caveman plugin.
-  --full         Install ECC, GSD, superpowers, code-review-graph, Caveman, RTK,
-                 engineer-shovel skill, and commands.
+  --recommended Install skill, commands, Caveman, RTK, code-review-graph,
+                 superpowers, and OpenSpec.
+  --full         Install recommended components plus ECC and GSD,
+                  engineer-shovel skill, and commands.
                   Interactive default.
   --dry-run      Print planned actions without writing files or cloning repos.
   --with-graph-build
@@ -137,8 +139,8 @@ prompt_mode() {
   local choice
   cat <<'PROMPT'
 Select install mode:
-   1) Full: ECC, GSD, superpowers, code-review-graph, Caveman, RTK, engineer-shovel skill, and commands (default)
-  2) Recommended: skill + commands + Caveman
+   1) Full: recommended components plus ECC and GSD (default)
+  2) Recommended: skill + commands + Caveman + RTK + code-review-graph + superpowers + OpenSpec
   3) Minimal: skill + commands only
 PROMPT
   printf 'Mode [1]: '
@@ -263,6 +265,28 @@ check_prereqs() {
   fi
 }
 
+node_version_at_least() {
+  local min_major="$1"
+  local min_minor="$2"
+  local min_patch="$3"
+
+  command -v node >/dev/null 2>&1 || return 1
+  local raw version major minor patch
+  raw="$(node -v 2>/dev/null || true)"
+  version="${raw#v}"
+  IFS=. read -r major minor patch <<<"$version"
+  major="${major:-0}"
+  minor="${minor:-0}"
+  patch="${patch:-0}"
+
+  [[ "$major" =~ ^[0-9]+$ && "$minor" =~ ^[0-9]+$ && "$patch" =~ ^[0-9]+$ ]] || return 1
+  if (( major > min_major )); then return 0; fi
+  if (( major < min_major )); then return 1; fi
+  if (( minor > min_minor )); then return 0; fi
+  if (( minor < min_minor )); then return 1; fi
+  (( patch >= min_patch ))
+}
+
 resolve_targets() {
   TARGETS=()
   case "$TARGET" in
@@ -360,7 +384,7 @@ install_commands() {
     count=$((count + 1))
   done
 
-  ok "Installed ${count} slash commands → ${COMMAND_DIR}/"
+  ok "Installed ${count} slash command files (${count} total: 10 active + 2 legacy redirects) → ${COMMAND_DIR}/"
 }
 
 # ---------- Caveman: Official installer ----------
@@ -765,6 +789,41 @@ install_code_review_graph() {
   fi
 }
 
+install_openspec() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: npm install -g @fission-ai/openspec@latest"
+    info "DRY-RUN: Not running openspec init; initialize per project with: openspec init"
+    return 0
+  fi
+
+  if command -v openspec >/dev/null 2>&1; then
+    ok "OpenSpec already installed"
+    return 0
+  fi
+
+  if ! command -v npm >/dev/null 2>&1; then
+    record_failure "OpenSpec requires npm. Install manually after Node.js setup: npm install -g @fission-ai/openspec@latest"
+    return 1
+  fi
+
+  if ! node_version_at_least 20 19 0; then
+    record_failure "OpenSpec requires Node.js >=20.19.0. Skipping CLI install; see ${OPENSPEC_REPO}"
+    return 1
+  fi
+
+  info "Installing OpenSpec CLI via npm..."
+  local openspec_output
+  if openspec_output="$(npm install -g @fission-ai/openspec@latest 2>&1)"; then
+    printf '%s\n' "$openspec_output"
+    ok "OpenSpec installed"
+    info "OpenSpec is not initialized automatically. Run 'openspec init' inside each project that needs specs."
+  else
+    local openspec_rc=$?
+    printf '%s\n' "$openspec_output" >&2
+    record_failure "OpenSpec install failed (exit ${openspec_rc}). Manual: npm install -g @fission-ai/openspec@latest"
+  fi
+}
+
 configure_memory_hint() {
   local file=""
   if [[ "$ENV" == "opencode" ]]; then
@@ -812,6 +871,8 @@ verify_install() {
 
   if [[ "$missing_count" -eq 0 && "$FAILURES" -eq 0 ]]; then
     ok "Verification passed"
+  elif [[ "$missing_count" -eq 0 ]]; then
+    warn "Verification passed for Engineer Shovel files with ${FAILURES} optional setup warning(s)"
   else
     err "Verification failed: missing installed files or ${FAILURES} non-fatal setup failure(s)"
     exit 1
@@ -839,7 +900,11 @@ main() {
     minimal)
       ;;
     recommended)
+      install_superpowers
+      install_code_review_graph
       _install_caveman_for_targets
+      install_rtk
+      install_openspec
       ;;
     full)
       install_ecc
@@ -848,6 +913,7 @@ main() {
       install_code_review_graph
       _install_caveman_for_targets
       install_rtk
+      install_openspec
       ;;
   esac
 

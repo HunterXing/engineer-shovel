@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 (2026-05-04)
+
+### Changed
+- Added OpenSpec as an optional durable spec layer for `/tool-plan` and `/tool-feat`.
+- Changed recommended install mode to include the core engineering stack: Caveman, RTK, code-review-graph, superpowers, and OpenSpec.
+- Changed standard feature/fix completion from GSD-heavy gates to native verification plus light review. GSD gates are now deep/milestone-oriented by default.
+- Updated GitHub Pages and multilingual README content to describe 10 active commands, 7 upstream tools, and the lighter standard path.
+
+### Security
+- OpenSpec installation checks Node.js >=20.19.0 and never auto-runs `openspec init`, avoiding surprise project writes.
+
 ## 1.5.0 (2026-05-04)
 
 ### Changed
