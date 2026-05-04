@@ -130,16 +130,16 @@ function initLanguageToggle() {
 
 // ---- Command Data ---- (10 active, no deprecated)
 const commands = [
-  { name: '/tool-feat',     color: '#4f8ef7', key: 'cmd.feat',     tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-quick',    color: '#3dd590', key: 'cmd.quick',    tag: 'Low',        modes: ['--fast','--standard'] },
-  { name: '/tool-fix',      color: '#f56f6f', key: 'cmd.fix',      tag: 'Low→High',   modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-branch',   color: '#9b6dff', key: 'cmd.branch',   tag: 'Low',        subcommands: ['create','status','review','merge','abort'] },
-  { name: '/tool-plan',     color: '#f5a84f', key: 'cmd.plan',     tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-refactor', color: '#3dd6f5', key: 'cmd.refactor', tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-review',   color: '#4f8ef7', key: 'cmd.review',   tag: 'Low→High',   modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-research', color: '#3dd6f5', key: 'cmd.research', tag: 'Low→High',   modes: ['--quick','--web','--deep'] },
-  { name: '/tool-graph',    color: '#3dd590', key: 'cmd.graph',    tag: 'Low',        subcommands: ['status','build','update','rebuild','watch'] },
-  { name: '/tool-update',   color: '#4f8ef7', key: 'cmd.update',   tag: 'Low',        modes: ['--check','--full'] }
+  { name: '/tool-feat',     color: '#4f8ef7', key: 'cmd.feat',     tag: 'Medium',   modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
+  { name: '/tool-quick',    color: '#3dd590', key: 'cmd.quick',    tag: 'Low',      modes: ['--fast','--standard'],            defaultMode: '--fast' },
+  { name: '/tool-fix',      color: '#f56f6f', key: 'cmd.fix',      tag: 'Low→High', modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
+  { name: '/tool-branch',   color: '#9b6dff', key: 'cmd.branch',   tag: 'Low',      subcommands: ['create','status','review','merge','abort'], defaultMode: 'review' },
+  { name: '/tool-plan',     color: '#f5a84f', key: 'cmd.plan',     tag: 'Medium',   modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
+  { name: '/tool-refactor', color: '#3dd6f5', key: 'cmd.refactor', tag: 'Medium',   modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
+  { name: '/tool-review',   color: '#4f8ef7', key: 'cmd.review',   tag: 'Low→High', modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
+  { name: '/tool-research', color: '#3dd6f5', key: 'cmd.research', tag: 'Low→High', modes: ['--quick','--web','--deep'],       defaultMode: '--quick' },
+  { name: '/tool-graph',    color: '#3dd590', key: 'cmd.graph',    tag: 'Low',      subcommands: ['status','build','update','rebuild','watch'], defaultMode: 'status' },
+  { name: '/tool-update',   color: '#4f8ef7', key: 'cmd.update',   tag: 'Low',      modes: ['--check','--full'],               defaultMode: '--check' }
 ];
 
 const commandLabels = {
@@ -909,6 +909,7 @@ function openWorkflowModal(cmd) {
   tabsEl.innerHTML = '';
 
   if (modeKeys.length > 0) {
+    const defMode = cmd.defaultMode && modeKeys.includes(cmd.defaultMode) ? cmd.defaultMode : modeKeys[0];
     modeKeys.forEach(m => {
       const tab = document.createElement('span');
       tab.className = 'mode-tab';
@@ -917,10 +918,11 @@ function openWorkflowModal(cmd) {
       tab.addEventListener('click', () => switchMode(m, wf, body, cmd.color));
       tabsEl.appendChild(tab);
     });
-    activeMode = modeKeys[0];
-    tabsEl.querySelector('.mode-tab').classList.add('active');
-    switchMode(modeKeys[0], wf, body, cmd.color);
+    activeMode = defMode;
+    tabsEl.querySelector(`[data-mode="${defMode}"]`).classList.add('active');
+    switchMode(defMode, wf, body, cmd.color);
   } else if (subKeys.length > 0) {
+    const defSub = cmd.defaultMode && subKeys.includes(cmd.defaultMode) ? cmd.defaultMode : subKeys[0];
     subKeys.forEach(s => {
       const tab = document.createElement('span');
       tab.className = 'mode-tab';
@@ -929,9 +931,9 @@ function openWorkflowModal(cmd) {
       tab.addEventListener('click', () => switchSubcommand(s, wf, body, cmd.color));
       tabsEl.appendChild(tab);
     });
-    activeMode = subKeys[0];
-    tabsEl.querySelector('.mode-tab').classList.add('active');
-    switchSubcommand(subKeys[0], wf, body, cmd.color);
+    activeMode = defSub;
+    tabsEl.querySelector(`[data-mode="${defSub}"]`).classList.add('active');
+    switchSubcommand(defSub, wf, body, cmd.color);
   }
 
   modal.classList.add('open');
