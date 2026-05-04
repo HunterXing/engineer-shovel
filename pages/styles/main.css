@@ -1109,3 +1109,109 @@ body {
 @media (max-width: 768px) {
   .wf-modal-panel { max-height: 90vh; }
 }
+
+/* ---- Mode Tabs ---- */
+.wf-modal-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 24px;
+  margin-top: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.wf-modal-tabs::-webkit-scrollbar { display: none; }
+
+.mode-tab {
+  flex-shrink: 0;
+  padding: 7px 18px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.mode-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--border-bright);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.mode-tab.active {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 16px rgba(79,142,247,0.35);
+  transform: translateY(-1px);
+}
+
+/* ---- Tools Row ---- */
+.wf-modal-tools-row {
+  padding: 8px 24px 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  opacity: 0.75;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Tool Chips ---- */
+.wf-step-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.wf-tool-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  background: rgba(79,142,247,0.08);
+  color: var(--accent-blue);
+  border: 1px solid rgba(79,142,247,0.2);
+}
+
+/* ---- Workflow Step Spacing ---- */
+.wf-step:last-child .wf-step-content { padding-bottom: 0; }
+
+/* ---- Command Card Hover Glow ---- */
+.cmd-card:hover {
+  border-color: var(--cmd-color, var(--accent-blue));
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 24px rgba(79,142,247,0.1);
+}
+
+/* ---- Cost Tags in Cards ---- */
+.cmd-card:hover .cost-tag {
+  border-color: var(--border-bright);
+  color: var(--text-secondary);
+}
+
+/* ---- Mode Cards Enhanced ---- */
+.mode-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+
+/* ---- Tool Tags Hover ---- */
+.tool-tag:hover {
+  border-color: var(--border-bright);
+  color: var(--text-primary);
+}
+
+/* ---- Upstream Row Hover ---- */
+.ut-row:hover { border-left: 2px solid var(--accent-blue); }

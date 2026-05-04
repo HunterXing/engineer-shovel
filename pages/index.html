@@ -34,19 +34,19 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.3.0 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.5.0 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
     </h1>
     <p class="hero-subtitle" data-i18n="hero.subtitle">Token-aware AI development workflow router for OpenCode / Claude Code</p>
-    <p class="hero-desc" data-i18n="hero.desc">12 commands covering quick tasks, bug fixes, features, branch, planning, refactoring, review, brainstorming, blueprints, research, graph, and sync. Use the cheapest path that verifies the result.</p>
+    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, Caveman-enforced compression, GSD structured verification — from quick edit to blueprint shipment.</p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
       <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span class="stat-num">12</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
       <div class="stat"><span class="stat-num">6</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
       <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
       <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
@@ -60,7 +60,7 @@
   <!-- ===================== COMMANDS ===================== -->
   <section class="section" id="commands">
     <div class="section-header">
-      <h2 class="section-title" data-i18n="commands.title">12 Commands</h2>
+      <h2 class="section-title" data-i18n="commands.title">10 Commands</h2>
       <p class="section-sub" data-i18n="commands.sub">Each command maps to a specific development scenario. Pick the right tool, spend the fewest tokens.</p>
     </div>
     <div class="commands-grid" id="commands-grid"></div>
@@ -85,7 +85,8 @@
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman lite</span>
-          <span class="tool-tag">direct edit</span>
+          <span class="tool-tag">CRG search</span>
+          <span class="tool-tag">skip RTK</span>
         </div>
       </div>
       <div class="mode-card" data-mode="standard">
@@ -100,7 +101,9 @@
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman full</span>
-          <span class="tool-tag">targeted verify</span>
+          <span class="tool-tag">CRG trace</span>
+          <span class="tool-tag">RTK (large)</span>
+          <span class="tool-tag">GSD verify</span>
         </div>
       </div>
       <div class="mode-card" data-mode="deep">
@@ -115,7 +118,9 @@
         </ul>
         <div class="mode-tools">
           <span class="tool-tag">/caveman ultra</span>
-          <span class="tool-tag">GSD</span>
+          <span class="tool-tag">CRG arch</span>
+          <span class="tool-tag">GSD pipeline</span>
+          <span class="tool-tag">review-work</span>
         </div>
       </div>
     </div>
@@ -218,12 +223,12 @@ skill(name="engineer-shovel")
       <div class="ut-row" data-tool="ECC">
         <span class="ut-name">ECC</span>
         <span class="ut-ver">v1.10.0</span>
-        <span class="ut-desc" data-i18n="upstream.ecc">AI agent harness performance: skills, rules, hooks, MCP, security, research-first workflow</span>
+        <span class="ut-desc" data-i18n="upstream.ecc">AI agent skills, rules, hooks, MCP, security-review, deep-research, blueprint, council (L4a/L4b/L4c)</span>
       </div>
       <div class="ut-row" data-tool="GSD">
         <span class="ut-name">GSD</span>
         <span class="ut-ver">v1.39.0</span>
-        <span class="ut-desc" data-i18n="upstream.gsd">Spec-driven planning, phase execution, verification, context engineering</span>
+        <span class="ut-desc" data-i18n="upstream.gsd">Spec-driven planning, phase execution, structured verification pipeline (verify-work → code-review → ship)</span>
       </div>
       <div class="ut-row" data-tool="superpowers">
         <span class="ut-name">superpowers</span>
@@ -238,12 +243,12 @@ skill(name="engineer-shovel")
       <div class="ut-row" data-tool="Caveman">
         <span class="ut-name">Caveman</span>
         <span class="ut-ver">v1.7.0</span>
-        <span class="ut-desc" data-i18n="upstream.caveman">Output token compression, concise review/commit, MCP shrink</span>
+        <span class="ut-desc" data-i18n="upstream.caveman">LLM output token compression with enforced 3-tier mode mapping (lite/full/ultra per cost mode)</span>
       </div>
       <div class="ut-row" data-tool="RTK">
         <span class="ut-name">RTK</span>
         <span class="ut-ver">v0.38.0</span>
-        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression proxy and command rewrite hooks</span>
+        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression with smart trigger (output >500 lines only)</span>
       </div>
     </div>
   </section>
@@ -286,7 +291,7 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.3.0 · MIT License</span>
+        <span class="footer-version">v1.5.0 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>
@@ -311,6 +316,8 @@ skill(name="engineer-shovel")
         </button>
       </div>
       <p class="wf-modal-sub" id="wf-modal-sub"></p>
+      <div class="wf-modal-tools-row" id="wf-modal-tools"></div>
+      <div class="wf-modal-tabs" id="wf-modal-tabs"></div>
       <div class="wf-modal-body" id="wf-modal-body"></div>
     </div>
   </div>
