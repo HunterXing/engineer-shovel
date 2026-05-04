@@ -81,7 +81,7 @@ skill(name="engineer-shovel")
 
 - `README.md`：项目概览、安装、能力边界。
 - `SKILL.md`：轻量运行时路由器。
-- `docs/workflows.md`：`/tool-*` 命令长文档。
+- `docs/architecture.md`：工具链架构与路由规则。
 - `docs/token-cost.md`：Caveman/RTK 成本模型。
 - `docs/language-reference.md`：语言和框架命令参考。
 

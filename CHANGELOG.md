@@ -28,7 +28,7 @@
 - Reduced default use of high-cost workflows such as `/review-work`, `/gsd-debug`, and deep research.
 
 ### Added
-- `docs/workflows.md`, `docs/token-cost.md`, `docs/install.md`, and `docs/language-reference.md`.
+- `docs/architecture.md`, `docs/token-cost.md`, `docs/install.md`, and `docs/language-reference.md`.
 - CI guardrails for command frontmatter, token-efficiency footers, skill size, docs presence, and shell syntax.
 - `/tool-graph` command for manual code-review-graph status, full build, incremental update, rebuild, and watch workflows.
 - `/tool-branch` command for feature branch workflow management with squash merge and diff review.

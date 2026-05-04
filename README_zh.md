@@ -104,8 +104,7 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 
 ## 文档
 
-- 完整工作流：[`docs/workflows.md`](docs/workflows.md)
-- 工具链架构：[`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
+- 工具链架构：[`docs/architecture.md`](docs/architecture.md)
 
 ## License
 

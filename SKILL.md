@@ -90,8 +90,7 @@ Default to the cheapest mode that still verifies the outcome. Escalate only when
 
 ## References
 
-- Full workflows: `docs/workflows.md`
-- Toolchain architecture: `docs/12-commands-toolchain.md`
+- Toolchain architecture: `docs/architecture.md`
 - Token cost model: `docs/token-cost.md`
 - Installation modes: `docs/install.md`
 - Language command reference: `docs/language-reference.md`

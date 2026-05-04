@@ -133,11 +133,10 @@ engineer-shovel/
 
 ## 문서
 
-- 전체 워크플로: [`docs/workflows.md`](docs/workflows.md)
+- 툴체인 아키텍처: [`docs/architecture.md`](docs/architecture.md)
 - Token 비용 모델: [`docs/token-cost.md`](docs/token-cost.md)
 - 설치 모드: [`docs/install.md`](docs/install.md)
 - 언어 참조: [`docs/language-reference.md`](docs/language-reference.md)
-- 툴체인 아키텍처: [`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## 라이선스
 

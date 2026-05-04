@@ -133,11 +133,10 @@ engineer-shovel/
 
 ## Documentation
 
-- Full workflows: [`docs/workflows.md`](docs/workflows.md)
+- Toolchain architecture: [`docs/architecture.md`](docs/architecture.md)
 - Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
 - Installation modes: [`docs/install.md`](docs/install.md)
 - Language reference: [`docs/language-reference.md`](docs/language-reference.md)
-- Toolchain architecture: [`docs/12-commands-toolchain.md`](docs/12-commands-toolchain.md)
 
 ## License
 

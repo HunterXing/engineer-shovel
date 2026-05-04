@@ -36,4 +36,4 @@ Compression: Caveman review style for `--fast`, full by default, ultra for deep 
 
 ## Security-Sensitive Code
 
-Apply Decision Tree 4 from `docs/decision-trees.md`: evaluate scope → route to L4: `ecc:security-review` or `ecc:security-scan`.
+Route to L4: `ecc:security-review` or `ecc:security-scan` based on scope.
