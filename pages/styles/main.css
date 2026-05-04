@@ -357,8 +357,20 @@ body {
 /* ---- Commands Grid ---- */
 .commands-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+@media (min-width: 900px) {
+  .commands-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .cmd-card {
+    padding: 16px 18px;
+  }
+  .cmd-name {
+    font-size: 0.78rem;
+  }
 }
 
 .cmd-card {
