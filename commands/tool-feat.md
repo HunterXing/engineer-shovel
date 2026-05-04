@@ -25,6 +25,9 @@ If the feature description does not name specific files, classes, and expected b
 - **Technical approach unclear** ("how to build") → `skill(name="brainstorming")`
 - **Multiple viable paths for architecture** → `skill(name="council")`
 
+Before implementing, search claude-mem for related prior decisions and patterns:
+- `npx claude-mem search "<feature_keywords>"` for cross-session context on similar work.
+
 Route result to the appropriate cost mode below. Do not implement until direction is clear.
 
 ## Cost Modes

@@ -163,6 +163,28 @@ def check_rtk(runner: CommandRunner) -> CheckResult:
     return CheckResult("rtk", STATUS_OK, path, target="component")
 
 
+def check_claude_mem(target: str) -> CheckResult:
+    has_bun = which("bun") is not None
+    if target == "opencode":
+        config = HOME / ".config/opencode/opencode.json"
+        if config.exists():
+            try:
+                raw = config.read_text(encoding="utf-8")
+                if "claude-mem" in raw.lower():
+                    return CheckResult("claude-mem", STATUS_OK, str(config), target=target)
+            except Exception:
+                return CheckResult("claude-mem", STATUS_UNCONFIGURED, "config unreadable", "npx claude-mem install --ide opencode", target)
+        if not has_bun:
+            return CheckResult("claude-mem", STATUS_BLOCKED, "Bun required", "curl -fsSL https://bun.sh/install | bash", target)
+        return CheckResult("claude-mem", STATUS_MISSING, "not installed for OpenCode", "npx claude-mem install --ide opencode", target)
+    result = CommandRunner(dry_run=False).run(["claude", "plugin", "list"])
+    if result.returncode == 0 and "claude-mem" in result.stdout.lower():
+        return CheckResult("claude-mem", STATUS_OK, "Claude plugin installed", target=target)
+    if not has_bun:
+        return CheckResult("claude-mem", STATUS_BLOCKED, "Bun required", "curl -fsSL https://bun.sh/install | bash", target)
+    return CheckResult("claude-mem", STATUS_MISSING, "not installed for Claude Code", "npx claude-mem install --ide claude", target)
+
+
 def check_openspec() -> CheckResult:
     path = which("openspec")
     if path:
@@ -216,6 +238,7 @@ def check_components(targets: list[str], runner: CommandRunner) -> list[CheckRes
         checks.extend([
             check_superpowers(target, runner),
             check_caveman(target, runner),
+            check_claude_mem(target),
             check_gsd(target),
             check_ecc(target, runner),
         ])
@@ -279,6 +302,12 @@ def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
             runner.run(["rtk", "init", "-g"])
 
 
+def repair_claude_mem(runner: CommandRunner, targets: list[str]) -> None:
+    for target in targets:
+        ide = "--ide opencode" if target == "opencode" else "--ide claude"
+        runner.run(["npx", "-y", "claude-mem", "install", ide])
+
+
 def repair_openspec(runner: CommandRunner, targets: list[str]) -> None:
     del targets
     runner.run(["npm", "install", "-g", "@fission-ai/openspec@latest"])
@@ -315,6 +344,8 @@ def repair_components(checks: list[CheckResult], targets: list[str], runner: Com
     for target in targets:
         if any(check.name == "superpowers" and check.target == target and check.needs_repair for check in checks):
             repair_superpowers(runner, target)
+    if "claude-mem" in names:
+        repair_claude_mem(runner, targets)
     if "ecc" in names:
         repair_ecc(runner, targets)
 

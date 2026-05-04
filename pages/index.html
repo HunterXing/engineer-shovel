@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Engineer Shovel — AI Dev Workflow Router</title>
-  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 10 active commands with optional OpenSpec specs and deep GSD orchestration.">
+  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
@@ -34,20 +34,20 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.6.0 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.7.0 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
     </h1>
     <p class="hero-subtitle" data-i18n="hero.subtitle">Token-aware AI development workflow router for OpenCode / Claude Code</p>
-    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.</p>
+    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.</p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
       <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
     </div>
     <div class="hero-stats">
       <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
-      <div class="stat"><span class="stat-num">7</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
+      <div class="stat"><span class="stat-num">8</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
       <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
       <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
     </div>
@@ -86,6 +86,7 @@
         <div class="mode-tools">
           <span class="tool-tag">/caveman lite</span>
           <span class="tool-tag">CRG search</span>
+          <span class="tool-tag">mem capture</span>
           <span class="tool-tag">skip RTK</span>
         </div>
       </div>
@@ -102,6 +103,7 @@
         <div class="mode-tools">
           <span class="tool-tag">/caveman full</span>
           <span class="tool-tag">CRG trace</span>
+          <span class="tool-tag">mem search</span>
           <span class="tool-tag">RTK (large)</span>
           <span class="tool-tag">OpenSpec optional</span>
           <span class="tool-tag">light review</span>
@@ -120,6 +122,7 @@
         <div class="mode-tools">
           <span class="tool-tag">/caveman ultra</span>
           <span class="tool-tag">CRG arch</span>
+          <span class="tool-tag">mem search</span>
           <span class="tool-tag">OpenSpec/blueprint</span>
           <span class="tool-tag">GSD pipeline</span>
           <span class="tool-tag">review-work</span>
@@ -247,6 +250,11 @@ skill(name="engineer-shovel")
         <span class="ut-ver">v2.3.2</span>
         <span class="ut-desc" data-i18n="upstream.crg">Local code knowledge graph, MCP review context, impact analysis</span>
       </div>
+      <div class="ut-row" data-tool="claude-mem">
+        <span class="ut-name">claude-mem</span>
+        <span class="ut-ver">v12.6.0</span>
+        <span class="ut-desc" data-i18n="upstream.cmem">Auto-capture cross-session memory: decisions, preferences, bug history. Progressive disclosure (search → timeline → get_observations). SQLite + Chroma.</span>
+      </div>
       <div class="ut-row" data-tool="Caveman">
         <span class="ut-name">Caveman</span>
         <span class="ut-ver">v1.7.0</span>
@@ -287,6 +295,7 @@ skill(name="engineer-shovel")
           <div class="b-item"><span class="b-dot b-ext"></span>GSD — Deep project orchestration</div>
           <div class="b-item"><span class="b-dot b-ext"></span>superpowers — Enforced skill workflows</div>
           <div class="b-item"><span class="b-dot b-ext"></span>code-review-graph — Local code knowledge graph</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>claude-mem — Cross-session memory auto-capture</div>
           <div class="b-item"><span class="b-dot b-ext"></span>Caveman — Output token compression</div>
           <div class="b-item"><span class="b-dot b-ext"></span>RTK — Shell output compression</div>
         </div>
@@ -299,7 +308,7 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.6.0 · MIT License</span>
+        <span class="footer-version">v1.7.0 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>

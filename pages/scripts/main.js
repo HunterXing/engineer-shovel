@@ -1,13 +1,13 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.6.0 · Mode tabs · CRG-aware · OpenSpec-aware
+   v1.7.0 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.6.0 · MIT License',
+    'hero.badge': 'v1.7.0 · MIT License',
     'hero.subtitle': 'Token-aware AI development workflow router for OpenCode / Claude Code',
-    'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.',
+    'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.',
     'copy': 'Copy',
     'copied': 'copied',
     'wf.close': 'Close'
@@ -24,9 +24,9 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.6.0 · MIT License',
+    'hero.badge': 'v1.7.0 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器',
-    'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、OpenSpec 持久规格、Caveman/RTK 压缩，GSD 仅用于深度编排。',
+    'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、claude-mem 跨会话记忆、OpenSpec 持久规格、Caveman/RTK 压缩，GSD 仅用于深度编排。',
     'commands.title': '10 个命令',
     'commands.sub': '点击命令卡片查看每个模式的完整工作流。选对工具+模式，用最少的 token 完成验证。',
     'modes.title': '成本模式',
@@ -61,6 +61,7 @@ const i18n = {
     'upstream.gsd': '深度项目编排：阶段执行、结构化验证闭环 (verify-work / code-review / ship) (L5)',
     'upstream.sp': '强制技能工作流：brainstorming、TDD、planning、review、branch finishing (L3)',
     'upstream.crg': '本地代码知识图谱、MCP review context、影响面分析 (L2, auto-refreshed)',
+    'upstream.cmem': '自动捕获跨会话记忆: 决策、偏好、bug 历史。渐进式披露。SQLite + Chroma 双存储 (L1.5)',
     'upstream.caveman': 'LLM 输出 token 压缩 (lite/full/ultra 三模式强制映射) (L1)',
     'upstream.rtk': 'Shell/tool 输出压缩代理，智能触发策略 (输出 >500 行) (L1)',
     'boundary.title': '能力边界',
@@ -700,8 +701,8 @@ const commandWorkflows = {
   },
   '/tool-update': {
     tag: 'Low',
-    sub: { en: 'Sync and update engineer-shovel. Check component health for all 7 upstream tools.', zh: '同步更新 engineer-shovel。检查所有 7 个上游组件健康度。' },
-    tools: { en: 'Checks: RTK · Caveman · CRG · superpowers · OpenSpec · ECC · GSD', zh: '检查: RTK · Caveman · CRG · superpowers · OpenSpec · ECC · GSD' },
+    sub: { en: 'Sync and update engineer-shovel. Check component health for all 8 upstream tools.', zh: '同步更新 engineer-shovel。检查所有 8 个上游组件健康度。' },
+    tools: { en: 'Checks: RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD', zh: '检查: RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD' },
     modes: {
       '--check': {
         label: { en: 'Read-only', zh: '只读检查' },

@@ -12,6 +12,7 @@ ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 RTK_REPO="https://github.com/rtk-ai/rtk"
 CODE_REVIEW_GRAPH_REPO="https://github.com/tirth8205/code-review-graph"
 OPENSPEC_REPO="https://github.com/Fission-AI/OpenSpec"
+CLAUDE_MEM_REPO="https://github.com/thedotmack/claude-mem"
 
 ECC_SHA="841beea45cb25ba51f29fa45b7e272938d19b80a"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
@@ -824,6 +825,70 @@ install_openspec() {
   fi
 }
 
+_claude_mem_installed() {
+  local target="$1"
+  case "$target" in
+    opencode)
+      local config="$HOME/.config/opencode/opencode.json"
+      [[ -f "$config" ]] && grep -qi "claude-mem" "$config" 2>/dev/null && return 0
+      return 1
+      ;;
+    claude-code)
+      local out
+      out="$(claude plugin list 2>/dev/null)" || true
+      echo "$out" | grep -qi claude-mem && return 0
+      return 1
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+install_claude_mem_for_target() {
+  local target="$1"
+  local ide_flag=""
+
+  case "$target" in
+    opencode) ide_flag="--ide opencode" ;;
+    claude-code) ide_flag="--ide claude" ;;
+    *) record_failure "Unknown target for claude-mem: ${target}"; return 1 ;;
+  esac
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: npx -y claude-mem install ${ide_flag}"
+    return 0
+  fi
+
+  if _claude_mem_installed "$target"; then
+    ok "claude-mem already installed for ${target}"
+    return 0
+  fi
+
+  if ! command -v bun >/dev/null 2>&1; then
+    record_failure "claude-mem requires Bun. Install: curl -fsSL https://bun.sh/install | bash"
+    return 1
+  fi
+
+  info "Installing claude-mem for ${target}..."
+  local mem_output
+  if mem_output="$(npx -y claude-mem install ${ide_flag} 2>&1)"; then
+    printf '%s\n' "$mem_output"
+    ok "claude-mem installed for ${target}"
+  else
+    local mem_rc=$?
+    printf '%s\n' "$mem_output" >&2
+    record_failure "claude-mem install failed for ${target} (exit ${mem_rc}). Manual: npx claude-mem install ${ide_flag}"
+  fi
+}
+
+_install_claude_mem_for_targets() {
+  local target
+  for target in "${TARGETS[@]}"; do
+    install_claude_mem_for_target "$target"
+  done
+}
+
 configure_memory_hint() {
   local file=""
   if [[ "$ENV" == "opencode" ]]; then
@@ -905,6 +970,7 @@ main() {
       _install_caveman_for_targets
       install_rtk
       install_openspec
+      _install_claude_mem_for_targets
       ;;
     full)
       install_ecc
@@ -914,6 +980,7 @@ main() {
       _install_caveman_for_targets
       install_rtk
       install_openspec
+      _install_claude_mem_for_targets
       ;;
   esac
 

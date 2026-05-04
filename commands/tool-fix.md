@@ -28,32 +28,33 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 0. Code-review-graph (L2) is auto-refreshed by git hooks. Verify freshness inline.
 1. Reproduce or identify the failing assertion/log.
-2. Trace the error call chain through CRG:
+2. Search claude-mem for similar bug history: `npx claude-mem search "<error_keywords>"` for prior fixes and known patterns.
+3. Trace the error call chain through CRG:
    - `semantic_search_nodes(query="<failing_function>")` to locate the entry point
    - `get_affected_flows(entry_point="<node_id>")` to trace the full execution path
    - `query_graph(callers_of="<suspected_root>", depth=2)` to confirm upstream dependencies
    If CRG MCP tools are unavailable in the current harness, use `code-review-graph detect-changes/status` where possible or fall back to targeted Glob/Grep/Read.
-3. `get_impact_radius(target="<root_cause_node>")` to check blast radius before fixing.
-4. Apply a surgical fix.
-5. Run the failing test first, then related tests/build. Wrap large test output with `rtk gain`.
-6. `query_graph(tests_for="<fixed_node>")` to verify test coverage exists for the fix.
-7. **Verification Gate**: run project-native test/build → graph impact check clean → proceed to completion gate.
+4. `get_impact_radius(target="<root_cause_node>")` to check blast radius before fixing.
+5. Apply a surgical fix.
+6. Run the failing test first, then related tests/build. Wrap large test output with `rtk gain`.
+7. `query_graph(tests_for="<fixed_node>")` to verify test coverage exists for the fix.
+8. **Verification Gate**: run project-native test/build → graph impact check clean → proceed to completion gate.
 
 ## Completion Gate
 
 ### `--fast`
-8. Run project-native test/build. Report: what changed, what was verified. Done.
+9. Run project-native test/build. Report: what changed, what was verified. Done.
 
 ### `--standard`
-8. Re-run the failing test first, then related regression tests/build.
-9. `skill(name="caveman-review")` — compressed code quality check on the diff.
-10. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
+9. Re-run the failing test first, then related regression tests/build.
+10. `skill(name="caveman-review")` — compressed code quality check on the diff.
+11. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
 
 ### `--deep`
-8. `skill(name="gsd-verify-work")` — structured acceptance verification against bug report.
-9. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings.
-10. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge.
-11. Offer `/caveman-commit` suggestion.
+9. `skill(name="gsd-verify-work")` — structured acceptance verification against bug report.
+10. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings.
+11. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge.
+12. Offer `/caveman-commit` suggestion.
 
 ## Security Gate
 

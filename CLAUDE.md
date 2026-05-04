@@ -91,4 +91,13 @@ skill(name="engineer-shovel")
 - 不要把已移除或非当前文档中的组件写回这里。
 - 本文件应和 `AGENTS.md` 保持一致。
 
-最后更新：2026-05-03
+## 记忆系统
+
+跨会话记忆由 **claude-mem** 自动管理：
+- 决策、偏好、bug 历史自动捕获并跨会话持久化
+- 新会话启动时自动注入相关上下文 (渐进式披露: search → timeline → get_observations)
+- Web 界面: http://localhost:37777
+- 手动查询: `npx claude-mem search "查询内容"`
+- claude-mem 与 caveman 互补：caveman 压缩单会话通信，claude-mem 持久化跨会话知识
+
+最后更新：2026-05-04

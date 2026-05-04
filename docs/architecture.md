@@ -17,6 +17,12 @@ Layer 1: Code Intelligence (default when useful)
                       get_architecture_overview / refactor_tool
   /tool-graph reserved for manual diagnostics only
 
+Layer 1.5: Session Memory (auto-capture)
+  claude-mem → auto-captures tool outputs, decisions, preferences, bug history
+               progressive disclosure: search → timeline → get_observations (~10x token savings)
+               SQLite (FTS5 full-text) + Chroma (vector semantic)
+               Web UI at http://localhost:37777
+
 Layer 2: Development Methodology (on-demand)
   superpowers → brainstorming / writing-plans / tdd-workflow / systematic-debugging / verification
 
@@ -36,10 +42,11 @@ Layer 5: Project Orchestration (deep/milestone only)
 1. Escalate bottom-up — commands move up layers as complexity increases.
 2. Compression layer always on — caveman controls LLM verbosity, rtk controls tool output noise (large outputs only).
 3. Code intelligence auto-maintained — use CRG MCP tools when available, CRG CLI when not, and Glob/Grep/Read as fallback.
-4. OpenSpec creates durable agreement about what to build; it does not replace code graph context or project orchestration.
-5. ECC is a capability library, not a default workflow path.
-6. superpowers vs gsd — superpowers defines session-scoped methodology, gsd manages cross-session project phase state.
-7. GSD completion gates are deep-only by default; standard feature/fix work uses native verification plus light review.
+4. claude-mem auto-captures session context across work — decisions, preferences, bug history — and injects relevant memories at session start via progressive disclosure. Complements caveman: caveman compresses single-session communication, claude-mem persists cross-session knowledge.
+5. OpenSpec creates durable agreement about what to build; it does not replace code graph context or project orchestration.
+6. ECC is a capability library, not a default workflow path.
+7. superpowers vs gsd — superpowers defines session-scoped methodology, gsd manages cross-session project phase state.
+8. GSD completion gates are deep-only by default; standard feature/fix work uses native verification plus light review.
 
 ---
 
@@ -50,6 +57,7 @@ Layer 5: Project Orchestration (deep/milestone only)
 | **caveman** | LLM communication compression | Always on, tiered by mode | ~75% prompt reduction |
 | **rtk** | Tool output compression | `rtk gain` before test/build/git | Noisy output compression |
 | **code-review-graph** | Code knowledge graph | Git hooks auto-refresh, queried silently | Low (~100-500 tokens/query) |
+| **claude-mem** | Cross-session memory | Auto-capture via hooks, progressive disclosure | Very Low (~100 tokens/query) |
 | **superpowers** | Development methodology | When requirements unclear or discipline needed | Medium-High (multi-turn) |
 | **OpenSpec** | Durable spec artifacts | Requirements/spec/design/tasks need reviewable files | Medium |
 | **ecc** | Capability library | Language skills, security review, deep research, review orchestration, architecture decisions | Low-High |
@@ -59,11 +67,11 @@ Layer 5: Project Orchestration (deep/milestone only)
 
 ## Cost Mode Routing
 
-| Mode | Compression | Code Intelligence | Methodology | Domain Expertise | Project Mgmt |
-|------|-------------|-------------------|-------------|-----------------|--------------|
-| `--fast` | caveman lite + RTK (large outputs) | CRG only if target unclear | skip | skip | security only if sensitive | skip |
-| `--standard` | caveman full + RTK (large outputs) | CRG targeted | optional (brainstorm/tdd) | optional OpenSpec | patterns/security/research only if needed | skip by default |
-| `--deep` | caveman full/ultra + RTK (large outputs) | CRG architecture | plans/tdd/debug | OpenSpec when specs matter | L4 skills/review/research | gsd verify→review→ship |
+| Mode | Compression | Memory | Code Intelligence | Methodology | Domain Expertise | Project Mgmt |
+|------|-------------|--------|-------------------|-------------|-----------------|--------------|
+| `--fast` | caveman lite + RTK (large outputs) | auto-capture only | CRG only if target unclear | skip | skip | security only if sensitive | skip |
+| `--standard` | caveman full + RTK (large outputs) | search + auto-capture | CRG targeted | optional (brainstorm/tdd) | optional OpenSpec | patterns/security/research only if needed | skip by default |
+| `--deep` | caveman full/ultra + RTK (large outputs) | search + auto-capture | CRG architecture | plans/tdd/debug | OpenSpec when specs matter | L4 skills/review/research | gsd verify→review→ship |
 
 ---
 
@@ -86,18 +94,18 @@ When multiple tools could solve the same problem, choose ONE based on context:
 
 ## Command × Tool Matrix
 
-| Command | caveman | rtk | code-review-graph | superpowers | OpenSpec | gsd | ecc |
-|---------|---------|-----|-------------------|-------------|----------|-----|-----|
-| **quick** | yes lite/full | large outputs | only if target unclear | no | no | no | patterns/security only if needed |
-| **fix** | yes tiered | large outputs | trace/impact | sysdbg if needed | no | deep only | patterns/security/research if needed |
-| **feat** | yes tiered | large outputs | explore | brain/plans if unclear | optional standard/deep | deep only | patterns/council/security if needed |
-| **plan** | yes tiered | no | impact | brain/plans | optional standard/deep | milestone only | council/blueprint |
-| **refactor** | yes tiered | large outputs | impact/patterns | tdd if needed | deep plan if behavior boundaries need spec | milestone only | review-work deep |
-| **review** | yes tiered | large diffs/logs | pr-review | receiving-review | verify if spec exists | no | github-ops/review-work |
-| **research** | yes tiered | no | codebase context | no | no | no | deep-research/council |
-| **graph** | lite | build/update | all | no | no | no | no |
-| **branch** | lite | no | pr-review | no | no | no | no |
-| **update** | lite | no | install health | install health | install health | install health | install health |
+| Command | caveman | rtk | code-review-graph | claude-mem | superpowers | OpenSpec | gsd | ecc |
+|---------|---------|-----|-------------------|-----------|-------------|----------|-----|-----|
+| **quick** | yes lite/full | large outputs | only if target unclear | auto-cap | no | no | no | patterns/security only if needed |
+| **fix** | yes tiered | large outputs | trace/impact | search+cap | sysdbg if needed | no | deep only | patterns/security/research if needed |
+| **feat** | yes tiered | large outputs | explore | search+cap | brain/plans if unclear | optional standard/deep | deep only | patterns/council/security if needed |
+| **plan** | yes tiered | no | impact | search+cap | brain/plans | optional standard/deep | milestone only | council/blueprint |
+| **refactor** | yes tiered | large outputs | impact/patterns | search+cap | tdd if needed | deep plan if behavior boundaries need spec | milestone only | review-work deep |
+| **review** | yes tiered | large diffs/logs | pr-review | auto-cap | receiving-review | verify if spec exists | no | github-ops/review-work |
+| **research** | yes tiered | no | codebase context | search+cap | no | no | no | deep-research/council |
+| **graph** | lite | build/update | all | auto-cap | no | no | no | no |
+| **branch** | lite | no | pr-review | auto-cap | no | no | no | no |
+| **update** | lite | no | install health | install health | install health | install health | install health | install health |
 
 ---
 
@@ -131,5 +139,5 @@ When multiple tools could solve the same problem, choose ONE based on context:
 
 ---
 
-*Based on OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK integration*
-*Last updated: 2026-05-04 — v1.6.0*
+*Based on claude-mem + OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK integration*
+*Last updated: 2026-05-04 — v1.7.0*

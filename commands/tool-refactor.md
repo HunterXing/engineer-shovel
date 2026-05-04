@@ -27,14 +27,15 @@ Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman
 ## Flow
 
 1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites.
-2. Code-review-graph (L2, auto-refreshed):
+2. Search claude-mem for prior refactor rationale: `npx claude-mem search "<refactor_context>"` to capture known patterns and historical decisions.
+3. Code-review-graph (L2, auto-refreshed):
    - `get_impact_radius(target="<function_or_module>")` to understand affected callers before refactoring
    - `refactor_tool` to check for dead code or plan renames safely
    - `semantic_search_nodes(query="<similar_pattern>")` to identify existing codebase patterns for reference
-3. Refactor one logical unit at a time.
-4. Re-run the same verification after each step.
-5. Compare behavior, public APIs, and performance-sensitive paths.
-6. **Verification Gate**: confirm all tests pass → graph impact check clean → caveman review → report.
+4. Refactor one logical unit at a time.
+5. Re-run the same verification after each step.
+6. Compare behavior, public APIs, and performance-sensitive paths.
+7. **Verification Gate**: confirm all tests pass → graph impact check clean → caveman review → report.
 
 ## Security Gate
 

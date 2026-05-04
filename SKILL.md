@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.6.0"
+  version: "1.7.0"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -18,6 +18,7 @@ metadata:
     - Caveman plugin
     - rtk
     - code-review-graph
+    - claude-mem
 ---
 
 # 🪖 工兵铲 — Engineer Shovel
@@ -84,6 +85,15 @@ RTK compresses Bash/tool output (git, tests, builds, logs) before it enters LLM 
 | Skip RTK | Single-file tests, lint, short diffs, small directory listings |
 
 RTK + Caveman stack independently: Caveman compresses LLM communication, RTK compresses tool output. Neither replaces the other.
+
+## Memory Layer
+
+claude-mem provides auto-capture cross-session memory:
+- Decisions, preferences, bug history, and architectural context persist across sessions.
+- New sessions auto-inject relevant memories via progressive disclosure (search → timeline → get_observations).
+- Complements caveman: caveman compresses single-session communication, claude-mem persists cross-session knowledge.
+- Web UI: http://localhost:37777
+- Manual search: `npx claude-mem search "<query>"`
 
 ## Core Principles
 

@@ -28,6 +28,9 @@ If the goal description is vague or missing concrete targets, enter clarificatio
 - **Technical approach unclear** ("how to build") → `skill(name="brainstorming")`
 - **Multiple viable paths or architecture decision** → `skill(name="council")`
 
+Search claude-mem for prior architectural decisions that influence this plan:
+- `npx claude-mem search "<goal_keywords>"` for relevant cross-session context.
+
 ## Cost Modes
 
 - `--fast`: small task, clear scope → short inline plan → route to `/tool-quick` or `/tool-feat`.

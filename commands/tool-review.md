@@ -36,6 +36,7 @@ Compression: Caveman review mode for `--fast`, `/caveman full` by default, `/cav
 5. Fix critical/high findings surgically.
 6. Re-run the same or stronger review mode until clean.
 7. Post-review: use `skill(name="receiving-code-review")` to apply feedback when review results return.
+8. Review findings auto-captured to claude-mem for cross-session pattern detection.
 
 ## Security-Sensitive Code
 

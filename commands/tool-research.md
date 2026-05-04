@@ -27,13 +27,14 @@ Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (pe
 ## Flow
 
 1. Define the exact decision the research should inform.
-2. Query code-review-graph (L2) for relevant existing implementation and patterns:
+2. Search claude-mem for prior research conclusions: `npx claude-mem search "<topic_keywords>"` to avoid repeating known findings.
+3. Query code-review-graph (L2) for relevant existing implementation and patterns:
    - `semantic_search_nodes(query="<topic_keywords>")` to find related functions/classes
    - `query_graph(callees_of="<related_node>")` to understand dependency context
-3. Search the smallest source set likely to answer it.
-4. Cite or name sources when facts are current/external.
-5. Highlight conflicts and confidence.
-6. Route findings to `/tool-plan` (complex), `/tool-feat` (medium), `/tool-quick` (simple), or documentation. Append routing rationale.
+4. Search the smallest source set likely to answer it.
+5. Cite or name sources when facts are current/external.
+6. Highlight conflicts and confidence.
+7. Route findings to `/tool-plan` (complex), `/tool-feat` (medium), `/tool-quick` (simple), or documentation. Append routing rationale.
 
 ## Avoid
 

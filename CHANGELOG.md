@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.0 (2026-05-04)
+
+### Added
+- **Layer 1.5: Session Memory** — claude-mem for auto-capture cross-session memory (decisions, preferences, bug history, architectural context).
+- claude-mem install integration in `install.sh` for recommended and full modes.
+- `check_claude_mem()` and `repair_claude_mem()` health checks in `scripts/health.py`.
+- Memory routing added to 6 command files: `/tool-feat`, `/tool-fix`, `/tool-plan`, `/tool-research`, `/tool-review`, `/tool-refactor`.
+- Memory system documentation in `SKILL.md`, `CLAUDE.md`, and `AGENTS.md`.
+
+### Changed
+- `docs/architecture.md`: Layer Architecture diagram expanded with Layer 1.5, Cost Mode Routing table added Memory column, Command × Tool Matrix added claude-mem column.
+- Tool Overview table in architecture.md now includes claude-mem.
+
 ## 1.6.0 (2026-05-04)
 
 ### Changed
