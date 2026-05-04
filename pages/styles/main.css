@@ -357,20 +357,27 @@ body {
 /* ---- Commands Grid ---- */
 .commands-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 768px) {
   .commands-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
-  .cmd-card {
-    padding: 16px 18px;
-  }
-  .cmd-name {
-    font-size: 0.78rem;
-  }
+}
+
+.cmd-card.featured {
+  grid-column: span 2;
+}
+
+.cmd-card.featured .cmd-name {
+  font-size: 0.95rem;
+}
+
+.cmd-card.featured .cmd-usefor {
+  font-size: 0.85rem;
+  color: var(--text-primary);
 }
 
 .cmd-card {
@@ -1227,3 +1234,10 @@ body {
 
 /* ---- Upstream Row Hover ---- */
 .ut-row:hover { border-left: 2px solid var(--accent-blue); }
+
+/* ---- Responsive: featured cards reset on mobile ---- */
+@media (max-width: 767px) {
+  .cmd-card.featured {
+    grid-column: span 1;
+  }
+}

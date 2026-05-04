@@ -130,9 +130,9 @@ function initLanguageToggle() {
 
 // ---- Command Data ---- (10 active, no deprecated)
 const commands = [
+  { name: '/tool-feat',     color: '#4f8ef7', key: 'cmd.feat',     tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
   { name: '/tool-quick',    color: '#3dd590', key: 'cmd.quick',    tag: 'Low',        modes: ['--fast','--standard'] },
   { name: '/tool-fix',      color: '#f56f6f', key: 'cmd.fix',      tag: 'Low→High',   modes: ['--fast','--standard','--deep'] },
-  { name: '/tool-feat',     color: '#4f8ef7', key: 'cmd.feat',     tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
   { name: '/tool-branch',   color: '#9b6dff', key: 'cmd.branch',   tag: 'Low',        subcommands: ['create','status','review','merge','abort'] },
   { name: '/tool-plan',     color: '#f5a84f', key: 'cmd.plan',     tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
   { name: '/tool-refactor', color: '#3dd6f5', key: 'cmd.refactor', tag: 'Medium',     modes: ['--fast','--standard','--deep'] },
@@ -849,6 +849,9 @@ function renderCommands() {
     const label = labels[currentLang] || labels.en || {};
     const card = document.createElement('div');
     card.className = 'cmd-card';
+    if (cmd.name === '/tool-feat' || cmd.name === '/tool-fix') {
+      card.classList.add('featured');
+    }
     card.dataset.delay = (i % 3) * 100;
     card.style.setProperty('--cmd-color', cmd.color);
 
