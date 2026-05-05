@@ -104,6 +104,37 @@ def detect_project_rule_packs() -> list[str]:
     return detected
 
 
+def _has_crg_mcp_opencode() -> bool:
+    """Check if code-review-graph MCP is configured in OpenCode config."""
+    config = HOME / ".config/opencode/opencode.json"
+    if not config.exists():
+        return False
+    try:
+        data = json.loads(config.read_text(encoding="utf-8"))
+        mcp = data.get("mcpServers", data.get("mcp", {}))
+        return "code-review-graph" in mcp
+    except (json.JSONDecodeError, OSError):
+        return False
+
+
+def _has_crg_mcp_claude() -> bool:
+    """Check if code-review-graph MCP is configured in Claude Code settings."""
+    for path in [
+        HOME / ".claude" / "settings.json",
+        HOME / ".claude.json",
+    ]:
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            mcp = data.get("mcpServers", {})
+            if "code-review-graph" in mcp:
+                return True
+        except (json.JSONDecodeError, OSError):
+            continue
+    return False
+
+
 def check_code_review_graph(runner: CommandRunner) -> CheckResult:
     path = which("code-review-graph")
     if not path:
@@ -120,6 +151,8 @@ def check_code_review_graph(runner: CommandRunner) -> CheckResult:
         return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "status failed", "code-review-graph install", "component")
     if not graph_dir.exists():
         return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "graph not built", "code-review-graph build", "component")
+    if not _has_crg_mcp_opencode() and not _has_crg_mcp_claude():
+        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "MCP not configured", "code-review-graph install --platform opencode", "component")
     return CheckResult("code-review-graph", STATUS_OK, path, target="component")
 
 
@@ -246,12 +279,14 @@ def check_components(targets: list[str], runner: CommandRunner) -> list[CheckRes
 
 
 def repair_code_review_graph(runner: CommandRunner, targets: list[str]) -> None:
-    del targets
-    if which("pipx"):
-        runner.run(["pipx", "install", "code-review-graph"])
-    else:
-        runner.run(["python3", "-m", "pip", "install", "--user", "code-review-graph"])
-    runner.run(["code-review-graph", "install"])
+    if not which("code-review-graph"):
+        if which("pipx"):
+            runner.run(["pipx", "install", "code-review-graph"])
+        else:
+            runner.run(["python3", "-m", "pip", "install", "--user", "code-review-graph"])
+    for target in targets:
+        platform_flag = "opencode" if target == "opencode" else "claude-code"
+        runner.run(["code-review-graph", "install", "--platform", platform_flag])
     if (ROOT / ".git").exists():
         runner.run(["code-review-graph", "build"])
 

@@ -753,7 +753,13 @@ init_rtk() {
 install_code_review_graph() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
     info "DRY-RUN: pipx install code-review-graph || python3 -m pip install --user code-review-graph"
-    info "DRY-RUN: code-review-graph install"
+    local target
+    for target in "${TARGETS[@]}"; do
+      case "$target" in
+        opencode) info "DRY-RUN: code-review-graph install --platform opencode" ;;
+        claude-code) info "DRY-RUN: code-review-graph install --platform claude-code" ;;
+      esac
+    done
     if [[ "$WITH_GRAPH_BUILD" -eq 1 ]]; then
       info "DRY-RUN: code-review-graph build"
     else
@@ -774,7 +780,18 @@ install_code_review_graph() {
   fi
 
   if command -v code-review-graph >/dev/null 2>&1; then
-    code-review-graph install 2>&1 || record_failure "code-review-graph install failed; run manually: code-review-graph install"
+    local target platform_flag
+    for target in "${TARGETS[@]}"; do
+      case "$target" in
+        opencode) platform_flag="opencode" ;;
+        claude-code) platform_flag="claude-code" ;;
+        *) platform_flag="" ;;
+      esac
+      if [[ -n "$platform_flag" ]]; then
+        info "Configuring code-review-graph MCP for ${platform_flag}..."
+        code-review-graph install --platform "$platform_flag" 2>&1 || record_failure "code-review-graph install --platform ${platform_flag} failed; run manually"
+      fi
+    done
     if [[ "$WITH_GRAPH_BUILD" -ne 1 ]]; then
       info "Skipping code-review-graph build; pass --with-graph-build to run it."
       return 0

@@ -266,9 +266,20 @@ def test_health_repair_code_review_graph_uses_official_commands(monkeypatch):
 
     module.repair_code_review_graph(runner, ["opencode", "claude"])
 
-    assert ["pipx", "install", "code-review-graph"] in runner.commands
-    assert ["code-review-graph", "install"] in runner.commands
+    assert ["code-review-graph", "install", "--platform", "opencode"] in runner.commands
+    assert ["code-review-graph", "install", "--platform", "claude-code"] in runner.commands
     assert ["code-review-graph", "build"] in runner.commands
+
+
+def test_health_repair_code_review_graph_installs_when_missing(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/bin/" + name if name == "pipx" else None)
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_code_review_graph(runner, ["opencode"])
+
+    assert ["pipx", "install", "code-review-graph"] in runner.commands
+    assert ["code-review-graph", "install", "--platform", "opencode"] in runner.commands
 
 
 def test_health_repair_gsd_uses_all_for_both_targets():
