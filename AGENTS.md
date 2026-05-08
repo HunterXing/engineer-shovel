@@ -4,7 +4,7 @@ Engineer Shovel 是 OpenCode 和 Claude Code 的轻量级开发工作流路由�
 
 ## 工具链边界
 
-原生安装内容：轻量级 `engineer-shovel` 技能和 8 个活跃 `/tool-*` 命令（2 个已废弃）。
+原生安装内容：轻量级 `engineer-shovel` 技能和 10 个活跃 `/tool-*` 命令（2 个已废弃）。
 
 ## 快速入口
 
@@ -30,7 +30,7 @@ skill(name="engineer-shovel")
 | `/tool-fix` | Bug、失败测试、回归 |
 | `/tool-feat` | 新功能（需求模糊时自动脑暴） |
 | `/tool-branch` | 分支创建、状态、审查、合并、放弃（feat/fix 自动调用） |
-| `/tool-plan` | 需求与实现规划（--deep 自动升级为 blueprint/gsd） |
+| `/tool-plan` | 需求与实现规划（--deep 自动升级为持久规格/文件化计划/gsd） |
 | `/tool-refactor` | 行为保持不变的重构 |
 | `/tool-review` | 本地 diff、PR、实现后审查 |
 | `/tool-research` | 代码库感知的技术研究 |
@@ -100,7 +100,7 @@ skill(name="engineer-shovel")
 - 手动查询: `npx claude-mem search "查询内容"`
 - claude-mem 与 caveman 互补：caveman 压缩单会话通信，claude-mem 持久化跨会话知识
 
-最后更新：2026-05-04
+最后更新：2026-05-08
 
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph

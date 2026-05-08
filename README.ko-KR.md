@@ -96,7 +96,7 @@ skill(name="engineer-shovel")
 |---|---|---|
 | `--fast` | 저위험, 알려진 대상 | `/caveman lite`, 직접 편집, `/gsd-fast`, Caveman 리뷰 |
 | `--standard` | 일반 개발 | `/caveman full`, 대상 검색, 선택적 OpenSpec, 구현, 테스트/빌드, 경량 리뷰 |
-| `--deep` | 모호함, 고위험, 멀티시스템 | `/caveman full` 또는 `ultra`, OpenSpec/blueprint/GSD, 깊은 리서치, review-work |
+| `--deep` | 모호함, 고위험, 멀티시스템 | `/caveman full` 또는 `ultra`, OpenSpec/파일 계획/GSD, 깊은 리서치, `/tool-review --deep` |
 
 RTK는 설치될 때 보완적으로 작동합니다: git, 테스트, 빌드, 로그 등의 시끄러운 Bash/도구 출력이 모델 컨텍스트에 들어가기 전에 압축합니다.
 

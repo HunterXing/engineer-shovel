@@ -6,7 +6,7 @@ Engineer Shovel uses cost-aware escalation: start cheap, verify, escalate only w
 
 1. Large always-loaded skill files.
 2. Repeated workflow definitions in both skill and command files.
-3. Durable spec and multi-agent commands (OpenSpec artifacts, `/review-work`, GSD phase execution).
+3. Durable spec and deep review/orchestration paths (OpenSpec artifacts, `/tool-review --deep`, GSD phase execution).
 4. Multi-source research workflows.
 5. Loading broad skill sets for small tasks.
 
@@ -16,7 +16,7 @@ Engineer Shovel uses cost-aware escalation: start cheap, verify, escalate only w
 |------|----------------|----------|
 | Low | Known file, small diff | `/caveman lite`, `/tool-quick`, `/tool-review --fast` |
 | Medium | Normal feature/fix/refactor | `/caveman full`, `/tool-feat`, `/tool-fix`, optional OpenSpec, `/tool-plan` |
-| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-plan --deep`, GSD, `/tool-research --deep`, `/review-work` |
+| High | Ambiguous, cross-system, high-risk | `/caveman full` or `/caveman ultra`, `/tool-plan --deep`, GSD, `/tool-research --deep`, `/tool-review --deep` |
 
 ## Caveman Defaults
 

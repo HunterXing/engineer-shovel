@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Check and repair Engineer Shovel supporting components."""
+"""Check and repair Engineer Shovel supporting components.
+
+This script is intentionally limited to the component layer: external tools,
+plugins, MCP wiring, and runtime prerequisites. Router file sync belongs to
+`scripts/sync.py`. User-facing workflows should prefer `/tool-update`, which
+combines router sync with component health reporting and repair.
+"""
 
 import argparse
 import json
@@ -393,15 +399,28 @@ def print_report(title: str, checks: list[CheckResult]) -> None:
         print(f"- {label}: {check.status.upper()} {check.detail}".rstrip())
 
 
+def print_health_summary(command: str, target: str, checks: list[CheckResult]) -> None:
+    mode_label = "--check" if command == "check" else "--full"
+    repair_count = sum(1 for check in checks if check.needs_repair)
+    print("\nHEALTH SUMMARY")
+    print("==============")
+    print(f"Mode: {mode_label}")
+    print(f"Target: {target}")
+    print(f"Checks: {len(checks)}")
+    print(f"Needs repair: {repair_count}")
+
+
 def run_health(command: str, target: str, dry_run: bool = False) -> int:
     targets = expand_targets(target)
     runner = CommandRunner(dry_run=False)
     checks = check_base_dependencies(targets, runner) + check_components(targets, runner)
     print_report("HEALTH", checks)
+    print_health_summary(command, target, checks)
     if command == "repair":
         repair_components(checks, targets, CommandRunner(dry_run=dry_run))
         checks = check_base_dependencies(targets, runner) + check_components(targets, runner)
         print_report("VERIFY", checks)
+        print_health_summary(command, target, checks)
     return 1 if any(check.needs_repair for check in checks) else 0
 
 

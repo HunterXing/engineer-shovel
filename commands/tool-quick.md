@@ -14,7 +14,7 @@ when-to-use: Use for obvious low-risk work such as typos, tiny config edits, or 
 
 **Input**: $ARGUMENTS
 
-Use this for obvious, low-risk work. Do not run planning, deep research, or broad review for quick tasks.
+Use this for obvious, low-risk work. This is a primary workflow command, not a gateway into heavier process.
 
 Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/caveman full` for `--standard`. Wrap large test/build output with `rtk gain`; skip RTK for small diffs.
 
@@ -25,7 +25,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 ## Flow
 
-0. Get code-review-graph context (L2, auto-refreshed by git hooks):
+0. Get code-review-graph context only as needed (L2, auto-refreshed by git hooks):
    - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")`
    - For file-level context: `query_graph(imports_of="<file_path>")` to see dependencies
    - For structural overview: `get_architecture_overview` (only when target files are unclear)
@@ -38,10 +38,12 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 ## Security Gate
 
-If change touches auth, user input, file system, network, secrets, cookies, or SQL → escalate to `skill(name="security-review")`.
+If change touches auth, user input, file system, network, secrets, cookies, or SQL, stop treating it as a quick task; promote it to the matching deep route and add `/tool-review --deep` before completion.
 
 ## Avoid
 
-- No `/blueprint`.
+- No `/tool-plan --deep` unless the task is no longer quick.
 - No `/deep-research`.
-- No `/review-work` unless the change unexpectedly becomes high risk.
+- No OpenSpec.
+- No GSD.
+- No `/tool-review --deep` unless the change unexpectedly becomes high risk.

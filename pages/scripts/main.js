@@ -1,11 +1,11 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.7.0 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
+   v1.7.1 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.7.0 · MIT License',
+    'hero.badge': 'v1.7.1 · MIT License',
     'hero.subtitle': 'Token-aware AI development workflow router for OpenCode / Claude Code',
     'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.',
     'copy': 'Copy',
@@ -24,7 +24,7 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.7.0 · MIT License',
+    'hero.badge': 'v1.7.1 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器',
     'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、claude-mem 跨会话记忆、OpenSpec 持久规格、Caveman/RTK 压缩，GSD 仅用于深度编排。',
     'commands.title': '10 个命令',
@@ -42,7 +42,7 @@ const i18n = {
     'modes.deep.title': '高风险 · 跨系统 · 模糊',
     'modes.deep.1': '架构决策 / 跨模块',
     'modes.deep.2': '深度研究 / 复杂调试',
-    'modes.deep.3': 'OpenSpec / 蓝图 / GSD 阶段编排',
+    'modes.deep.3': 'OpenSpec / 文件化计划 / GSD 阶段编排',
     'start.title': '快速开始',
     'start.sub': '下载 → 检查 → 运行，三步完成安装。',
     'start.step1.title': '下载安装脚本',
@@ -59,7 +59,7 @@ const i18n = {
     'upstream.openspec': '规格驱动产物：proposal、specs、design、tasks、verify、archive。只安装 CLI，不自动初始化项目。',
     'upstream.ecc': '按需能力库：skills、rules、hooks、MCP、安全与 research-first 工作流 (L4)',
     'upstream.gsd': '深度项目编排：阶段执行、结构化验证闭环 (verify-work / code-review / ship) (L5)',
-    'upstream.sp': '强制技能工作流：brainstorming、TDD、planning、review、branch finishing (L3)',
+    'upstream.sp': '方法层：澄清、TDD、调试与验证纪律 (L3)',
     'upstream.crg': '本地代码知识图谱、MCP review context、影响面分析 (L2, auto-refreshed)',
     'upstream.cmem': '自动捕获跨会话记忆: 决策、偏好、bug 历史。渐进式披露。SQLite + Chroma 双存储 (L1.5)',
     'upstream.caveman': 'LLM 输出 token 压缩 (lite/full/ultra 三模式强制映射) (L1)',
@@ -162,16 +162,16 @@ const commandLabels = {
     zh: { usefor: '分支生命周期：创建、审查、合并、放弃', modes: ['create', 'status', 'review (含 CRG)', 'merge', 'abort'] }
   },
   'cmd.plan': {
-    en: { usefor: 'Requirements, specs, and planning — OpenSpec/blueprint/GSD when needed', modes: ['--fast (inline)', '--standard (OpenSpec or plan)', '--deep (blueprint/gsd)'] },
-    zh: { usefor: '需求、规格与实现规划 — 按需 OpenSpec/blueprint/GSD', modes: ['--fast (内联)', '--standard (OpenSpec 或计划)', '--deep (蓝图/gsd)'] }
+    en: { usefor: 'Requirements, specs, and planning — durable artifacts only when needed', modes: ['--fast (inline)', '--standard (file-backed plan)', '--deep (spec/milestone)'] },
+    zh: { usefor: '需求、规格与实现规划 — 仅在必要时升级为持久工件', modes: ['--fast (内联)', '--standard (文件化计划)', '--deep (规格/里程碑)'] }
   },
   'cmd.refactor': {
     en: { usefor: 'Behavior-preserving cleanup with before/after verification', modes: ['--fast (1-2 files)', '--standard (CRG impact)', '--deep (plan first)'] },
     zh: { usefor: '行为保持不变的重构，含前后验证', modes: ['--fast (1-2 文件)', '--standard (CRG 影响)', '--deep (先规划)'] }
   },
   'cmd.review': {
-    en: { usefor: 'Local diff, PR, or post-implementation review by risk', modes: ['--fast (caveman)', '--standard (CRG+standards)', '--deep (security+review-work)'] },
-    zh: { usefor: '按风险分级的本地 diff、PR 或实现后审查', modes: ['--fast (caveman)', '--standard (CRG+规范)', '--deep (安全+并行审查)'] }
+    en: { usefor: 'Local diff, PR, or post-implementation review by risk', modes: ['--fast (compressed sanity check)', '--standard (CRG+findings)', '--deep (security+deep review)'] },
+    zh: { usefor: '按风险分级的本地 diff、PR 或实现后审查', modes: ['--fast (压缩 sanity check)', '--standard (CRG+发现问题)', '--deep (安全+深度审查)'] }
   },
   'cmd.research': {
     en: { usefor: 'Codebase-aware evidence gathering and synthesis', modes: ['--quick (local+CRG)', '--web (docs/search)', '--deep (multi-source)'] },
@@ -224,7 +224,7 @@ const commandWorkflows = {
             desc: { en: 'Run tests/build. Wrap large output with rtk gain.', zh: '运行测试/构建。大输出用 rtk gain 压缩。' },
             tools: ['RTK'] },
           { phase: '04', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'skill(name="caveman-review") → report.', zh: 'skill(name="caveman-review") → 报告。' },
+            desc: { en: '/tool-review --fast or Caveman-compressed sanity check → report.', zh: '/tool-review --fast 或 Caveman 压缩 sanity check → 报告。' },
             tools: ['Caveman'] }
         ]
       }
@@ -271,7 +271,7 @@ const commandWorkflows = {
             desc: { en: 'Re-run failing test first, then related regression tests/build.', zh: '先重跑失败测试，再跑相关回归测试/构建。' },
             tools: [] },
           { phase: '07', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'skill(caveman-review) → offer /caveman-commit (no auto-commit).', zh: 'skill(caveman-review) → 提示 /caveman-commit (不自动提交)。' },
+            desc: { en: '/tool-review --fast or Caveman-compressed sanity check → offer /caveman-commit (no auto-commit).', zh: '/tool-review --fast 或 Caveman 压缩 sanity check → 提示 /caveman-commit (不自动提交)。' },
             tools: ['Caveman'] }
         ]
       },
@@ -291,7 +291,7 @@ const commandWorkflows = {
             desc: { en: 'skill(gsd-debug) — only if cross-session state needed.', zh: 'skill(gsd-debug) — 仅当需要跨 session 持久状态时。' },
             tools: ['GSD'] },
           { phase: '05', label: { en: 'Security', zh: '安全审查' },
-            desc: { en: 'skill(security-review) — always when touching auth/input/FS/network/SQL.', zh: 'skill(security-review) — 涉及 auth/input/FS/network/SQL 时必调。' },
+            desc: { en: 'Promote to security-sensitive route: add /tool-review --deep before sign-off.', zh: '提升为安全敏感路线：完成前补 /tool-review --deep。' },
             tools: ['ECC'] },
           { phase: '06', label: { en: 'GSD Verify', zh: 'GSD 验证' },
             desc: { en: 'skill(gsd-verify-work) — structured acceptance.', zh: 'skill(gsd-verify-work) — 结构化验收。' },
@@ -338,8 +338,8 @@ const commandWorkflows = {
             desc: { en: 'Targeted CRG context: semantic_search_nodes + query_graph(imports_of). Use architecture overview only if boundaries are unclear.', zh: '定向 CRG 上下文: semantic_search_nodes + query_graph(imports_of)。边界不清时才用架构概览。' },
             tools: ['CRG', 'ECC'] },
           { phase: '02', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if unclear) brainstorm; if acceptance needs durable agreement, create OpenSpec proposal/specs.', zh: '(需求不清时) 先澄清；验收需要持久共识时创建 OpenSpec proposal/specs。' },
-            tools: ['OpenSpec', 'Superpowers', 'ECC'] },
+            desc: { en: '(if unclear) clarify first; if acceptance needs durable agreement, create OpenSpec proposal/spec/task artifacts.', zh: '(需求不清时) 先澄清；验收需要持久共识时创建 OpenSpec proposal/spec/task 工件。' },
+            tools: ['OpenSpec', 'GSD', 'ECC'] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Search existing patterns first. Implement with project conventions.', zh: '先搜索现有模式。按项目规范实现。' },
             tools: [] },
@@ -347,7 +347,7 @@ const commandWorkflows = {
             desc: { en: 'Tests/build. rtk gain for large output. /caveman-stats report.', zh: '测试/构建。大输出用 rtk gain。/caveman-stats 报告。' },
             tools: ['RTK', 'Caveman'] },
           { phase: '05', label: { en: 'Light Review', zh: '轻量审查' },
-            desc: { en: '/tool-review --fast or skill(caveman-review). Offer /caveman-commit, no auto-commit.', zh: '/tool-review --fast 或 skill(caveman-review)。提示 /caveman-commit，不自动提交。' },
+            desc: { en: '/tool-review --fast or Caveman-compressed sanity check. Offer /caveman-commit, no auto-commit.', zh: '/tool-review --fast 或 Caveman 压缩 sanity check。提示 /caveman-commit，不自动提交。' },
             tools: ['Caveman'] }
         ]
       },
@@ -358,10 +358,10 @@ const commandWorkflows = {
             desc: { en: 'caveman-stats + branch check.', zh: 'caveman-stats + 分支检查。' },
             tools: ['Caveman'] },
           { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: 'Brainstorm mandatory. Clarify product/technical direction before planning.', zh: '必走需求澄清。先明确产品/技术方向，再规划。' },
-            tools: ['GSD', 'Superpowers', 'ECC'] },
+            desc: { en: 'Clarify product and technical direction before planning. Use research if multiple viable paths remain.', zh: '规划前先澄清产品与技术方向；如果路径不止一种，再补研究。' },
+            tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Spec + Plan', zh: '规格 + 规划' },
-            desc: { en: 'OpenSpec for durable requirements when needed; CRG architecture context → blueprint/GSD plan.', zh: '需要持久需求时用 OpenSpec；CRG 架构上下文 → blueprint/GSD 计划。' },
+            desc: { en: 'OpenSpec for durable requirements when needed; CRG architecture context → file-backed plan or milestone plan.', zh: '需要持久需求时用 OpenSpec；CRG 架构上下文 → 文件化计划或里程碑计划。' },
             tools: ['OpenSpec', 'CRG', 'ECC'] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Follow plan. Surgical changes per step.', zh: '按计划执行。每步手术改动。' },
@@ -440,15 +440,15 @@ const commandWorkflows = {
   },
   '/tool-plan': {
     tag: 'Medium',
-    sub: { en: 'Requirements, specs, and planning. Uses OpenSpec, blueprint, or GSD only when needed.', zh: '需求、规格与规划。仅按需使用 OpenSpec、blueprint 或 GSD。' },
-    tools: { en: 'Tools: OpenSpec · CRG detect_changes · writing-plans · blueprint · gsd-new-milestone', zh: '工具: OpenSpec · CRG detect_changes · writing-plans · blueprint · gsd-new-milestone' },
+    sub: { en: 'Requirements, specs, and planning. Uses durable artifacts only when they improve execution.', zh: '需求、规格与规划。只有确实提高执行质量时才升级为持久工件。' },
+    tools: { en: 'Tools: OpenSpec · CRG detect_changes · file-backed plans · gsd-new-milestone', zh: '工具: OpenSpec · CRG detect_changes · 文件化计划 · gsd-new-milestone' },
     modes: {
       '--fast': {
         label: { en: 'Inline plan', zh: '内联计划' },
         steps: [
           { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if vague) skill(gsd-explore) / skill(brainstorming) / skill(council).', zh: '(需求模糊时) skill(gsd-explore) / skill(brainstorming) / skill(council)。' },
-            tools: ['GSD', 'Superpowers', 'ECC'] },
+            desc: { en: '(if vague) use gsd-explore for product direction, /tool-research for technical ambiguity.', zh: '(需求模糊时) 产品方向用 gsd-explore，技术歧义用 /tool-research。' },
+            tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Plan', zh: '规划' },
             desc: { en: 'Short inline plan → route to /tool-quick or /tool-feat.', zh: '简短内联计划 → 路由到 /tool-quick 或 /tool-feat。' },
             tools: [] }
@@ -464,11 +464,11 @@ const commandWorkflows = {
             desc: { en: 'detect_changes + get_impact_radius(target="module").', zh: 'detect_changes + get_impact_radius(target="模块")。' },
             tools: ['CRG'] },
           { phase: '03', label: { en: 'Spec or Plan', zh: '规格或计划' },
-            desc: { en: 'Use OpenSpec for durable requirements OR writing-plans for implementation order. Do not use both by default.', zh: '持久需求用 OpenSpec；实现顺序用 writing-plans。默认不要两者都用。' },
-            tools: ['OpenSpec', 'Superpowers'] },
+            desc: { en: 'Use OpenSpec for durable requirements OR a file-backed plan for implementation order. Do not use both by default.', zh: '持久需求用 OpenSpec；实现顺序用文件化计划。默认不要两者都用。' },
+            tools: ['OpenSpec'] },
           { phase: '04', label: { en: 'Security', zh: '安全' },
-            desc: { en: 'Check: if touches auth/data/FS → skill(security-review).', zh: '检查: 涉及 auth/data/FS → skill(security-review)。' },
-            tools: ['ECC'] }
+            desc: { en: 'Check: if touches auth/data/FS/network/SQL, add /tool-review --deep as a checkpoint.', zh: '检查：如果涉及 auth/data/FS/network/SQL，把 /tool-review --deep 加进检查点。' },
+            tools: [] }
         ]
       },
       '--deep': {
@@ -478,7 +478,7 @@ const commandWorkflows = {
             desc: { en: '(if vague) clarify direction first.', zh: '(需求模糊时) 先澄清方向。' },
             tools: ['GSD', 'Superpowers'] },
           { phase: '02', label: { en: 'Classify', zh: '分级' },
-            desc: { en: 'Auto-classify: spec-first → OpenSpec, ≤3 PR → blueprint OR writing-plans, >3 PR → gsd-new-milestone, architecture → council→blueprint.', zh: '自动分级: 规格优先 → OpenSpec, ≤3 PR → blueprint 或 writing-plans, >3 PR → gsd-new-milestone, 架构变更 → council→blueprint。' },
+            desc: { en: 'Auto-classify: spec-first → OpenSpec, ≤3 PR → file-backed plan, >3 PR → gsd-new-milestone, architecture → deep research then milestone/file-backed plan.', zh: '自动分级：规格优先 → OpenSpec，≤3 PR → 文件化计划，>3 PR → gsd-new-milestone，架构变更 → 先深研究，再转里程碑或文件化计划。' },
             tools: ['OpenSpec', 'ECC', 'GSD'] },
           { phase: '03', label: { en: 'CRG Arch', zh: 'CRG 架构' },
             desc: { en: 'get_architecture_overview for module boundaries (deep mode).', zh: 'get_architecture_overview 了解模块边界 (deep 模式)。' },
@@ -539,11 +539,11 @@ const commandWorkflows = {
             desc: { en: 'Full baseline + CRG full analysis.', zh: '完整基线 + CRG 完整分析。' },
             tools: ['CRG', 'RTK'] },
           { phase: '02', label: { en: 'Deep Plan', zh: '深度规划' },
-            desc: { en: '/tool-plan --deep first. Use OpenSpec/blueprint/GSD only if the refactor needs durable boundaries or phase state.', zh: '先 /tool-plan --deep。仅当需要持久边界或阶段状态时使用 OpenSpec/blueprint/GSD。' },
+            desc: { en: '/tool-plan --deep first. Use OpenSpec/file-backed plan/GSD only if the refactor needs durable boundaries or phase state.', zh: '先 /tool-plan --deep。仅当需要持久边界或阶段状态时使用 OpenSpec/文件化计划/GSD。' },
             tools: ['OpenSpec', 'GSD', 'ECC'] },
           { phase: '03', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'skill(review-work) + E2E tests if applicable.', zh: 'skill(review-work) + E2E 测试 (如适用)。' },
-            tools: ['ECC'] }
+            desc: { en: 'Run /tool-review --deep and add E2E tests if applicable.', zh: '运行 /tool-review --deep，并在适用时补 E2E 测试。' },
+            tools: [] }
         ]
       }
     }
@@ -551,13 +551,13 @@ const commandWorkflows = {
   '/tool-review': {
     tag: 'Low→High',
     sub: { en: 'Local diff, PR, or post-implementation review by risk level.', zh: '按风险级别进行本地 diff、PR 或实现后审查。' },
-    tools: { en: 'Tools: CRG detect_changes · coding-standards · github-ops', zh: '工具: CRG detect_changes · coding-standards · github-ops' },
+    tools: { en: 'Tools: CRG detect_changes · review checklist · repository-native PR context', zh: '工具: CRG detect_changes · 审查清单 · 仓库原生 PR 上下文' },
     modes: {
       '--fast': {
         label: { en: 'Quick check', zh: '快速检查' },
         steps: [
           { phase: '01', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'skill(caveman-review) — compressed code quality sanity check.', zh: 'skill(caveman-review) — 压缩代码质量 sanity check。' },
+            desc: { en: 'Caveman-compressed code quality sanity check.', zh: 'Caveman 压缩代码质量 sanity check。' },
             tools: ['Caveman'] }
         ]
       },
@@ -571,14 +571,14 @@ const commandWorkflows = {
             desc: { en: 'get_impact_radius(target="changed") — blast-radius detection.', zh: 'get_impact_radius(target="变更") — 影响面检测。' },
             tools: ['CRG'] },
           { phase: '03', label: { en: 'PR Ops', zh: 'PR 操作' },
-            desc: { en: '(PR mode) skill(github-ops) — manage comments, CI status, merge readiness.', zh: '(PR 模式) skill(github-ops) — 管理审查评论、CI 状态、合并就绪。' },
-            tools: ['ECC'] },
+            desc: { en: '(PR mode) inspect repository-native comments, CI status, and merge blockers if available.', zh: '(PR 模式) 检查仓库原生评论、CI 状态和合并阻塞项。' },
+            tools: [] },
           { phase: '04', label: { en: 'Standards', zh: '规范' },
-            desc: { en: 'skill(coding-standards) by language → /code-review or /review-pr.', zh: 'skill(coding-standards) 按语言 → /code-review 或 /review-pr。' },
-            tools: ['ECC'] },
-          { phase: '05', label: { en: 'Fix + Recap', zh: '修复+复盘' },
-            desc: { en: 'Fix HIGH findings. Re-review until clean. skill(receiving-code-review).', zh: '修复 HIGH 发现。重新审查直到 clean。skill(receiving-code-review)。' },
-            tools: ['Superpowers'] }
+            desc: { en: 'Review for correctness, regressions, security, and maintainability.', zh: '围绕正确性、回归、安全和可维护性进行审查。' },
+            tools: [] },
+          { phase: '05', label: { en: 'Route Findings', zh: '路由问题' },
+            desc: { en: 'Report HIGH findings and route them to /tool-fix, /tool-refactor, or /tool-feat. Re-review after changes.', zh: '报告 HIGH 发现，并路由到 /tool-fix、/tool-refactor 或 /tool-feat。改完后再审。' },
+            tools: [] }
         ]
       },
       '--deep': {
@@ -588,14 +588,14 @@ const commandWorkflows = {
             desc: { en: 'Full CRG diff + impact analysis.', zh: '完整 CRG diff + 影响面分析。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Security', zh: '安全' },
-            desc: { en: 'skill(security-review) — if sensitive. skill(security-scan) for config audit.', zh: 'skill(security-review) — 安全敏感时。skill(security-scan) 配置审计。' },
-            tools: ['ECC'] },
+            desc: { en: 'Expand the checklist for auth, user input, filesystem, network, secrets, cookies, SQL, and serialization.', zh: '把检查范围扩展到 auth、用户输入、文件系统、网络、secrets、cookies、SQL 和序列化。' },
+            tools: [] },
           { phase: '03', label: { en: 'Parallel', zh: '并行审查' },
-            desc: { en: '/review-work — 5-agent parallel review. Fix HIGH. Re-review until clean.', zh: '/review-work — 5 agent 并行审查。修复 HIGH。重新审查直到 clean。' },
-            tools: ['ECC'] },
+            desc: { en: 'Run a deep review pass, route HIGH findings to the owning command, then re-review until clean.', zh: '执行一次深度审查，把 HIGH 发现交回对应命令修复，再复审直到 clean。' },
+            tools: [] },
           { phase: '04', label: { en: 'Post', zh: '收尾' },
-            desc: { en: 'skill(receiving-code-review) — apply feedback.', zh: 'skill(receiving-code-review) — 应用审查反馈。' },
-            tools: ['Superpowers'] }
+            desc: { en: 'Summarize residual risk, accepted debt, and next route.', zh: '总结残余风险、接受的技术债和下一步路由。' },
+            tools: [] }
         ]
       }
     }

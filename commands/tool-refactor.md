@@ -5,7 +5,7 @@ cost-profile: medium
 risk-level: medium
 recommended-mode: --standard
 allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
-escalates-to: [/review-work, /tool-fix, /tool-review]
+escalates-to: [/tool-plan, /tool-fix, /tool-review]
 depends-on: []
 when-to-use: Use for behavior-preserving cleanup where baseline and post-change verification can prove equivalence.
 ---
@@ -14,7 +14,7 @@ when-to-use: Use for behavior-preserving cleanup where baseline and post-change 
 
 **Input**: $ARGUMENTS
 
-Behavior must remain identical. Do not mix feature work into a refactor.
+Behavior must remain identical. Do not mix feature work into a refactor. This is an engineering support command, not the default path for ordinary feature work.
 
 Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman ultra` for broad diffs (per SKILL.md mapping). Wrap large test/build commands with `rtk gain`.
 
@@ -22,7 +22,7 @@ Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman
 
 - `--fast`: 1-2 file cleanup → baseline tests → refactor → verify → `/tool-review --fast`.
 - `--standard` or default: normal refactor → baseline tests → refactor (small steps) → tests/build → local review.
-- `--deep`: broad, risky, security-sensitive, or performance-critical → `/tool-plan --deep` first (OpenSpec/blueprint/GSD as appropriate) → execute in small verified steps → `skill(name="review-work")` + E2E if applicable.
+- `--deep`: broad, risky, security-sensitive, or performance-critical → `/tool-plan --deep` first, then add heavier layers deliberately.
 
 ## Flow
 
@@ -35,11 +35,11 @@ Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman
 4. Refactor one logical unit at a time.
 5. Re-run the same verification after each step.
 6. Compare behavior, public APIs, and performance-sensitive paths.
-7. **Verification Gate**: confirm all tests pass → graph impact check clean → caveman review → report.
+7. **Verification Gate**: confirm all tests pass → graph impact check clean → `/tool-review --fast` or Caveman-compressed sanity check → report.
 
 ## Security Gate
 
-If change touches auth, security-sensitive paths, or data handling → escalate to `skill(name="security-review")`.
+If change touches auth, security-sensitive paths, or data handling, stop treating it as a routine refactor and add a `/tool-review --deep` checkpoint before sign-off.
 
 ## Stop Conditions
 

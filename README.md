@@ -25,15 +25,37 @@
 
 ## What is this?
 
-Engineer Shovel is a lightweight skill + slash-command pack for OpenCode and Claude Code. It routes development work to the cheapest workflow that can still verify the outcome, then escalates to deeper agent workflows only when risk requires it.
+Engineer Shovel is a skill + slash-command router for OpenCode and Claude Code. It installs a broad engineering stack when requested, but routes daily programming work to the lightest path that can still verify the outcome.
 
 The runtime `SKILL.md` is intentionally small; long-form documentation lives in `docs/` so routine sessions do not pay for the full manual.
+
+## Default Shape
+
+- Install philosophy: full capability can be present by default.
+- Execution philosophy: lightweight by default, deeper layers only when justified.
+- Main workflow commands: `/tool-quick`, `/tool-fix`, `/tool-feat`, `/tool-plan`
+- Support commands: `/tool-review`, `/tool-refactor`, `/tool-research`
+- Platform commands: `/tool-branch`, `/tool-graph`, `/tool-update`
+
+Most teams should spend most of their time in `quick`, `fix`, and `feat`. `plan`, `review`, and `research` are support routes, while OpenSpec, ECC, and GSD are deliberate escalation layers rather than mandatory daily steps.
 
 ## Capability Boundary
 
 Native Engineer Shovel installs the lightweight router and `/tool-*` commands. Deeper capabilities come from optional external tools installed or configured by recommended/full modes: OpenSpec, ECC, GSD, superpowers, code-review-graph, Caveman, and RTK.
 
 Minimal installs are intentionally small. If a workflow mentions external commands such as GSD, ECC, Caveman, RTK, or code-review-graph behavior, those capabilities require the corresponding optional tool to be installed and healthy.
+
+Even in `--full`, those tools are treated as capability layers with distinct jobs:
+
+- `code-review-graph`: code understanding and impact analysis
+- `caveman`: communication compression
+- `rtk`: shell/tool output compression
+- `superpowers`: session-scoped clarification/debug/TDD discipline
+- `ECC`: specialized guidance for architecture, security, research, and integration tradeoffs
+- `OpenSpec`: durable specs/tasks
+- `GSD`: multi-phase orchestration
+
+Security-sensitive work should not stay on a routine path: promote it to the matching deep route and add `/tool-review --deep` before sign-off.
 
 ## Quick Start
 
@@ -85,35 +107,43 @@ or call a command directly:
 
 ```text
 /tool-quick --fast "fix typo in README"
-/tool-review --fast
-/tool-research --deep "compare options for X"
-/tool-graph update
+/tool-fix --standard "investigate failing login test"
+/tool-feat --standard "add smallest verifiable feature slice"
+/tool-plan --standard "plan rollout for X"
 ```
+
+## Practical Routing
+
+- 80% of work: `/tool-quick`, `/tool-fix`, `/tool-feat`
+- 15% of work: `/tool-plan`, `/tool-review`, `/tool-research`
+- 5% of work: explicit escalation to OpenSpec, ECC, or GSD
+
+This is the intended user experience even when `--full` is installed: full capability available, lightweight execution by default.
 
 ## Cost Modes
 
 | Mode | Use when | Typical path |
 |---|---|---|
-| `--fast` | low-risk, known target | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
-| `--standard` | normal development | `/caveman full`, targeted search, optional OpenSpec, implementation, tests/build, light review |
-| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, OpenSpec/blueprint/GSD, deep research, review-work |
+| `--fast` | low-risk, known target | `/caveman lite`, direct edit, targeted verification |
+| `--standard` | normal development | `/caveman full`, targeted graph context, implementation, tests/build, light review |
+| `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, deliberate use of OpenSpec/ECC/GSD |
 
 RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context.
 
 ## Commands
 
-| Command | Use for |
-|---|---|
-| `/tool-quick` | Obvious small edits |
-| `/tool-fix` | Bugs, failing tests, regressions |
-| `/tool-feat` | New functionality (auto-brainstorms) |
-| `/tool-branch` | Branch workflow: create, review, merge, abort |
-| `/tool-plan` | Requirements and planning (auto-escalates to blueprint/gsd) |
-| `/tool-refactor` | Behavior-preserving cleanup |
-| `/tool-review` | Local diff, PR, or deep review |
-| `/tool-research` | Evidence gathering and synthesis (codebase-aware) |
-| `/tool-graph` | code-review-graph diagnostics (auto-refreshed) |
-| `/tool-update` | Sync and update installation |
+| Group | Command | Use for |
+|---|---|---|
+| Main workflow | `/tool-quick` | Obvious small edits |
+| Main workflow | `/tool-fix` | Bugs, failing tests, regressions |
+| Main workflow | `/tool-feat` | New functionality (auto-clarifies) |
+| Main workflow | `/tool-plan` | Requirements and planning |
+| Engineering support | `/tool-review` | Local diff, PR, or deep review |
+| Engineering support | `/tool-refactor` | Behavior-preserving cleanup |
+| Engineering support | `/tool-research` | Evidence gathering and synthesis |
+| Platform support | `/tool-branch` | Branch workflow: create, review, merge, abort |
+| Platform support | `/tool-graph` | code-review-graph diagnostics |
+| Platform support | `/tool-update` | Router sync, component health, repair guidance |
 
 Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/tool-blueprint`.
 
@@ -121,7 +151,7 @@ Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/too
 
 ```text
 engineer-shovel/
-├── commands/          # 10 active slash commands + legacy redirects
+├── commands/          # 12 executable slash commands (10 active + 2 legacy redirects)
 ├── docs/              # long-form references kept out of runtime context
 ├── scripts/           # sync and validation utilities
 ├── SKILL.md           # lightweight router
@@ -134,8 +164,10 @@ engineer-shovel/
 ## Documentation
 
 - Toolchain architecture: [`docs/architecture.md`](docs/architecture.md)
+- Global mode routing: [`docs/mode-routing.md`](docs/mode-routing.md)
 - Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
 - Installation modes: [`docs/install.md`](docs/install.md)
+- Dependency policy: [`docs/dependency-policy.md`](docs/dependency-policy.md)
 - Language reference: [`docs/language-reference.md`](docs/language-reference.md)
 
 ## License
@@ -151,7 +183,7 @@ Engineer Shovel integrates and configures these upstream tools in `--full` mode.
 | OpenSpec | https://github.com/Fission-AI/OpenSpec | latest | Spec-driven artifacts: proposal, specs, design, tasks, verify, archive |
 | ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
 | GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Deep project orchestration, phase execution, verification, and context engineering |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | Mandatory skill workflows: brainstorming, TDD, planning, review, branch finishing |
+| superpowers | https://github.com/obra/superpowers | v5.0.7 | Method layer for clarification, TDD, debugging, and verification discipline |
 | code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
 | Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | Output-token compression, terse review/commit helpers, MCP shrink |
 | RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell and tool output compression proxy plus command rewrite hooks |

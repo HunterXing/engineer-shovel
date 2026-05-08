@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.1 (2026-05-08)
+
+### Changed
+- Unified command routing docs around executable routes only: removed direct references to unavailable skill names and replaced them with existing `/tool-*` routes plus capability-layer descriptions.
+- Clarified security handling across the router: security-sensitive work now promotes to the matching deep route and adds `/tool-review --deep` before sign-off.
+- Tightened command ownership: `/tool-review` now defaults to reporting findings rather than mutating code, `/tool-branch` is framed as explicit lifecycle control, and `/tool-update` defaults to `--check` as the recommended mode.
+- Updated `README.md`, `README_zh.md`, `docs/architecture.md`, `docs/install.md`, `docs/token-cost.md`, and `docs/mode-routing.md` to match the revised routing model.
+- Synced GitHub Pages content with the same route model, replacing outdated references such as `caveman-review`, `github-ops`, `writing-plans`, `blueprint`, `review-work`, and dedicated security-review skills.
+
 ## 1.7.0 (2026-05-04)
 
 ### Added
@@ -8,10 +17,18 @@
 - `check_claude_mem()` and `repair_claude_mem()` health checks in `scripts/health.py`.
 - Memory routing added to 6 command files: `/tool-feat`, `/tool-fix`, `/tool-plan`, `/tool-research`, `/tool-review`, `/tool-refactor`.
 - Memory system documentation in `SKILL.md`, `CLAUDE.md`, and `AGENTS.md`.
+- `docs/dependency-policy.md` to document router-vs-component update boundaries and dependency lock strategy.
 
 ### Changed
 - `docs/architecture.md`: Layer Architecture diagram expanded with Layer 1.5, Cost Mode Routing table added Memory column, Command × Tool Matrix added claude-mem column.
 - Tool Overview table in architecture.md now includes claude-mem.
+- Router docs now emphasize `full capability available, lightweight execution by default`.
+- `/tool-update` is documented as the single user-facing update entry point, with `scripts/sync.py` narrowed to router sync and `scripts/health.py` narrowed to component health.
+
+### Upstream Dependency Changes
+
+- Clarified dependency governance by separating router updates from component repair/upgrade flows.
+- Documented which tools are pinned, floating, or mixed-strategy in `docs/dependency-policy.md`.
 
 ## 1.6.0 (2026-05-04)
 

@@ -42,7 +42,7 @@ Skill + commands + Caveman + RTK + code-review-graph + superpowers + OpenSpec. B
 ```
 
 ### `--full` (default)
-Recommended components plus ECC and GSD. Use this when you want the full capability library and deep project orchestration.
+Recommended components plus ECC and GSD. Use this when you want the full capability library ready, while still keeping daily execution on lightweight routes.
 
 ```bash
 ./install.sh --target opencode --full
@@ -68,7 +68,7 @@ Engineer Shovel does not automatically run `openspec init` because that writes p
 
 ```bash
 openspec init
-/opsx:propose "add dark mode"
+openspec change create "add dark mode"
 ```
 
 ## Dry Run
@@ -81,18 +81,40 @@ Preview paths and pinned sources without making changes:
 
 ## Sync & Update
 
-Use `/tool-update` or `scripts/sync.py`:
+Use `/tool-update` as the user-facing entry point:
+
+```text
+/tool-update --check
+/tool-update --full
+```
+
+Internal scripts still exist, but they now have narrower roles:
 
 ```bash
-python3 scripts/sync.py check
-python3 scripts/sync.py sync
+python3 scripts/sync.py check   # router files only
+python3 scripts/sync.py sync    # router files only
+python3 scripts/health.py check --target both
+python3 scripts/health.py repair --target both
 ```
+
+Responsibility split:
+
+- `install.sh`: first install and explicit repair hooks
+- `scripts/sync.py`: Engineer Shovel router files and version sync
+- `scripts/health.py`: external component health and repair
+- `/tool-update`: user-facing orchestrator over sync + health
+
+Dry-run note:
+
+- `install.sh --dry-run` now prefers non-interactive defaults even in a TTY.
+- Defaults for dry-run preview are `--target auto --scope global` unless flags override them.
 
 ## Supply Chain
 
 - External helper repos pinned to explicit commit SHAs in `install.sh`.
 - `--full` invokes upstream installers after pinned checkout verification.
 - `--dry-run` preview recommended before bootstrapping unfamiliar machines.
+- Dependency lock strategy is documented in `docs/dependency-policy.md`.
 
 ## Non-interactive Default
 

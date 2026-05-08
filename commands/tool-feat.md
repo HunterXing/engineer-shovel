@@ -14,7 +14,7 @@ when-to-use: Use for adding new functionality. Includes built-in brainstorm phas
 
 **Input**: $ARGUMENTS
 
-Build the smallest feature slice that can be verified. Use deep workflows only for unclear or multi-component work.
+Build the smallest feature slice that can be verified. This is a main workflow command; standard mode should stay close to native implementation and verification.
 
 Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/caveman full` for `--standard`, `/caveman full` (escalate to `ultra` if subagent≥3) for `--deep`. Wrap large test/build output with `rtk gain`.
 
@@ -22,8 +22,8 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 If the feature description does not name specific files, classes, and expected behavior, enter clarification phase first:
 - **Product direction unclear** ("what to build") → `skill(name="gsd-explore")`
-- **Technical approach unclear** ("how to build") → `skill(name="brainstorming")`
-- **Multiple viable paths for architecture** → `skill(name="council")`
+- **Technical approach unclear** ("how to build") → `/tool-research --quick`
+- **Multiple viable paths for architecture** → `/tool-research --deep`, then `/tool-plan --deep` if the decision must drive implementation order
 
 Before implementing, search claude-mem for related prior decisions and patterns:
 - `npx claude-mem search "<feature_keywords>"` for cross-session context on similar work.
@@ -32,9 +32,9 @@ Route result to the appropriate cost mode below. Do not implement until directio
 
 ## Cost Modes
 
-- `--fast`: known area, small feature → `semantic_search_nodes` to confirm patterns → implement → tests → caveman review.
-- `--standard` or default: normal feature, 3-8 files → targeted CRG context + optional OpenSpec spec when acceptance criteria need durable agreement → implement → native tests/build → light review.
-- `--deep`: ambiguous, external deps, multi-system → Phase 0 brainstorm → OpenSpec/plan when needed → implement → gsd-verify-work → gsd-code-review → gsd-ship.
+- `--fast`: known area, small feature → confirm pattern → implement → tests → caveman review.
+- `--standard` or default: normal feature, 3-8 files → targeted CRG context → implement → native tests/build → light review. Use OpenSpec only when acceptance must persist as files.
+- `--deep`: ambiguous, external deps, multi-system, or milestone-scale → add OpenSpec/ECC/GSD deliberately.
 
 ## Flow
 
@@ -45,11 +45,11 @@ Route result to the appropriate cost mode below. Do not implement until directio
    - `semantic_search_nodes(query="<similar_feature_or_pattern>")` to find existing implementations
    - `query_graph(imports_of="<target_module>")` to understand dependencies
    If CRG MCP tools are unavailable in the current harness, use `code-review-graph` CLI or fall back to targeted Glob/Grep/Read.
-   Auto-load matching ECC pattern skill (e.g. `skill(name="golang-patterns")`, `skill(name="python-patterns")`). Use `docs/language-reference.md` for mapping.
+   Use existing project patterns plus `docs/language-reference.md` to choose project-native verification and implementation conventions.
 2. Search existing code for matching patterns before adding new structure.
 3. **Shortcut**: If the feature description already names specific files, classes, and expected behavior, skip Phase 0 and go directly to implement → verify.
 4. If requirements are unclear (less than specific files+classes+behavior), run **Phase 0: Brainstorm** above.
-5. If acceptance criteria need durable agreement, create an OpenSpec change (`/opsx:propose` or `openspec init` first if the project is not initialized). Do not run `openspec init` automatically from this command.
+5. If acceptance criteria need durable agreement, create or update OpenSpec proposal/spec/task artifacts through the repository's OpenSpec workflow. Do not run `openspec init` automatically from this command.
 6. Implement using project conventions.
 7. Run diagnostics, related tests, typecheck/build. Wrap large test/build output with `rtk gain`.
 8. Run `/caveman-stats` (L2) to report session token consumption and savings.
@@ -59,11 +59,11 @@ Route result to the appropriate cost mode below. Do not implement until directio
 ## Completion Gate
 
 ### `--fast`
-8. Run project-native test/build → `skill(name="caveman-review")` → report. Done.
+8. Run project-native test/build → `/tool-review --fast` or Caveman-compressed sanity check → report. Done.
 
 ### `--standard`
 9. Run project-native verification against the requirement or OpenSpec tasks/specs.
-10. `/tool-review --fast` or `skill(name="caveman-review")` — compressed code quality check on the diff.
+10. `/tool-review --fast` or a Caveman-compressed diff sanity check.
 11. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
 
 ### `--deep`
@@ -74,8 +74,9 @@ Route result to the appropriate cost mode below. Do not implement until directio
 
 ## Security Gate
 
-If change touches auth, user input, file system, network, secrets, cookies, or SQL → escalate to `skill(name="security-review")`.
+If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.
 
 ## Skill Routing
 
 Use project-native skills and commands from `docs/language-reference.md` instead of loading broad skill sets by default.
+Escalate to superpowers, ECC, OpenSpec, or GSD only when the feature cannot remain decision-light and still be implemented safely.

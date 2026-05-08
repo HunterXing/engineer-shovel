@@ -20,5 +20,5 @@ If your feature or plan direction is unclear, just use the target command direct
 
 The router auto-detects ambiguity and enters the appropriate clarification path:
 - Product direction unclear → `gsd-explore`
-- Technical approach unclear → `superpowers:brainstorming`
-- Multiple architecture options → `ecc:council`
+- Technical approach unclear → `/tool-research --quick`
+- Multiple architecture options → `/tool-research --deep`, then `/tool-plan --deep`

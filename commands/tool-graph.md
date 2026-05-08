@@ -14,7 +14,7 @@ when-to-use: Use ONLY for manual diagnostics. The code-review-graph is auto-refr
 
 **Input**: $ARGUMENTS
 
-Diagnostic commands for the code-review-graph index. **All other `/tool-*` commands use the graph automatically** — you do NOT need to call `/tool-graph update` manually during normal workflows. The graph is auto-refreshed by git post-commit/post-checkout hooks.
+Diagnostic commands for the code-review-graph index. This is a platform support command. **All other `/tool-*` commands use the graph automatically** — you do NOT need to call `/tool-graph update` manually during normal workflows. The graph is auto-refreshed by git post-commit/post-checkout hooks.
 
 ## Commands
 

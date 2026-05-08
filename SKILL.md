@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.7.0"
+  version: "1.7.1"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -23,45 +23,56 @@ metadata:
 
 # 🪖 工兵铲 — Engineer Shovel
 
-Engineer Shovel is a lightweight router for AI-assisted software engineering. It intentionally keeps this skill file short: use it to choose the right `/tool-*` command, then let the selected command carry the detailed workflow.
+Engineer Shovel is a workflow router for AI-assisted software engineering on OpenCode and Claude Code. It keeps the runtime small, installs broad capability when asked, and routes day-to-day work to the lightest path that still proves the result.
 
-## Commands
+## Product Shape
 
-| Command | Use for | Default cost |
-|---|---|---|
-| `/tool-quick` | Typos, config edits, 1-2 file surgical changes | Low |
-| `/tool-fix` | Bug reports, failing tests, regressions | Low → High by scope |
-| `/tool-feat` | New functionality (auto-brainstorms when unclear) | Medium |
-| `/tool-plan` | Requirements, specs, and implementation planning (OpenSpec/blueprint/GSD when needed) | Medium |
-| `/tool-refactor` | Behavior-preserving cleanup | Medium |
-| `/tool-review` | Local diff, PR, or post-implementation review | Low → High by mode |
-| `/tool-research` | Codebase-aware technical research | Low → High by mode |
-| `/tool-graph` | code-review-graph diagnostics only (auto-refreshed via git hooks) | Low |
-| `/tool-update` | Sync and update installation | Low |
-| `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` | — |
-| `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` | — |
-| `/tool-branch` | Branch create, status, review, merge, abort (auto-called by feat/fix) | Low |
+- Full install is allowed by default so advanced capability is available when needed.
+- Daily execution is lightweight by default: most work should stay in `quick`, `fix`, `feat`, or `plan`.
+- External tools are capability layers, not mandatory steps in every command.
+- This file is only the router. Detailed policy lives in `docs/`, including `docs/mode-routing.md` for the mode-first route map.
 
-## Router
+## Command Groups
 
-- If the change is obvious and touches at most 2 files, use `/tool-quick`.
-- If something is broken, use `/tool-fix`; only escalate to GSD debugging when the cause crosses files or is not reproducible locally.
-- If you need to build a feature, use `/tool-feat` — it auto-brainstorms when requirements are unclear. Standard work uses native verification plus light review; `--deep` runs GSD verification gates.
-- If starting any non-trivial task, `/tool-feat` and `/tool-fix` auto-create a feature branch.
-- If behavior must remain identical, use `/tool-refactor` and verify before/after.
-- If you need review, use `/tool-review --fast` for routine checks, default mode for local/PR review, and `--deep` only for high-risk work.
-- If planning is needed, use `/tool-plan` — `--fast` for inline plans, `--standard` for OpenSpec specs or `writing-plans` (choose one), `--deep` auto-escalates to blueprint or GSD project.
-- If you need external/current information, use `/tool-research` (codebase-aware via graph); start with `--quick` and escalate only when evidence is insufficient.
-- If you need to diagnose code-review-graph health, use `/tool-graph status` — graph is auto-refreshed by git hooks.
-- If you need manual branch operations, use `/tool-branch create|status|review|merge|abort`.
+| Group | Command | Use for | Default cost |
+|---|---|---|---|
+| Main workflow | `/tool-quick` | Typos, config edits, 1-2 file surgical changes | Low |
+| Main workflow | `/tool-fix` | Bug reports, failing tests, regressions | Low → High by scope |
+| Main workflow | `/tool-feat` | New functionality; clarifies when unclear | Medium |
+| Main workflow | `/tool-plan` | Requirements, sequencing, specs, implementation direction | Medium |
+| Engineering support | `/tool-review` | Local diff, PR, or pre-merge review | Low → High by mode |
+| Engineering support | `/tool-refactor` | Behavior-preserving cleanup | Medium |
+| Engineering support | `/tool-research` | Decision-focused research with codebase context | Low → High by mode |
+| Platform support | `/tool-branch` | Branch create, status, review, merge, abort | Low |
+| Platform support | `/tool-graph` | code-review-graph diagnostics only | Low |
+| Platform support | `/tool-update` | Router sync, component health, repair guidance | Low |
+| Compatibility | `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` | — |
+| Compatibility | `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` | — |
+
+## Default Routes
+
+- Use `/tool-quick` when the target is obvious and the change is small.
+- Use `/tool-fix` when behavior is broken or a failing test/log must be proven fixed.
+- Use `/tool-feat` for normal feature work; it may clarify first, but standard mode stays on native verification plus light review.
+- Use `/tool-plan` only when scope, order, or acceptance criteria are still unclear.
+- Use `/tool-review`, `/tool-refactor`, and `/tool-research` as support commands, not as default front doors for routine work.
+- Use `/tool-branch` only for explicit branch lifecycle operations; `feat` and `fix` may create branches automatically.
+- Use `/tool-graph` only for graph diagnostics; graph context should already be available to other commands.
+- Use `/tool-update` as the single user-facing update entry point.
+
+## Practical Split
+
+- 80% of work: `/tool-quick`, `/tool-fix`, `/tool-feat`
+- 15% of work: `/tool-plan`, `/tool-review`, `/tool-research`
+- 5% of work: deliberate escalation to OpenSpec, ECC, or GSD
 
 ## Cost Modes
 
 | Mode | Use when | Typical tools |
 |---|---|---|
-| `--fast` | Low-risk, known location, small diff | `/caveman lite`, direct edit, `/gsd-fast`, Caveman review |
-| `--standard` | Normal development work | `/caveman full`, targeted exploration, optional OpenSpec, tests, build, local review |
-| `--deep` | Ambiguous, high-risk, cross-system, security-sensitive | `/caveman full` or `/caveman ultra`, OpenSpec/blueprint/GSD, deep research, council, review-work |
+| `--fast` | Low-risk, known location, small diff | `/caveman lite`, direct edit, targeted verification |
+| `--standard` | Normal development work | `/caveman full`, targeted graph context, native tests/build, light review |
+| `--deep` | Ambiguous, high-risk, cross-system, security-sensitive | `/caveman full` or `/caveman ultra`, deliberate use of OpenSpec/ECC/GSD |
 
 Default to the cheapest mode that still verifies the outcome. Escalate only when evidence shows the lighter mode is insufficient.
 
@@ -86,6 +97,18 @@ RTK compresses Bash/tool output (git, tests, builds, logs) before it enters LLM 
 
 RTK + Caveman stack independently: Caveman compresses LLM communication, RTK compresses tool output. Neither replaces the other.
 
+## Capability Layers
+
+- `code-review-graph`: default code understanding and impact analysis layer
+- `caveman`: default communication compression layer
+- `rtk`: default noisy shell/tool output compression layer
+- `superpowers`: session-scoped methodology layer
+- `ECC`: specialized capability library layer
+- `OpenSpec`: durable spec and task artifact layer
+- `GSD`: multi-phase and cross-session orchestration layer
+
+These layers are available to the router, but they are not all activated on every task.
+
 ## Memory Layer
 
 claude-mem provides auto-capture cross-session memory:
@@ -95,20 +118,29 @@ claude-mem provides auto-capture cross-session memory:
 - Web UI: http://localhost:37777
 - Manual search: `npx claude-mem search "<query>"`
 
+## Escalation Rules
+
+- Escalate to `superpowers` when a single task needs clearer method, debugging, or planning discipline.
+- Escalate to `OpenSpec` only when requirements or acceptance must persist as reviewable artifacts.
+- Escalate to `ECC` for specialized research, architecture tradeoffs, security, or platform-specific skill packs.
+- Escalate to `GSD` only for milestone-scale, multi-phase, or cross-session work.
+- Full installation means these capabilities are ready; it does not mean the default route should become heavy.
+
 ## Core Principles
 
 1. Search before building when the approach is unknown.
 2. Prefer surgical changes and preserve existing style.
 3. Run the smallest meaningful verification first, then expand if risk demands it.
-4. Keep high-cost agents for high-risk decisions, not routine work.
+4. Keep heavy methodology and orchestration for high-risk work, not routine edits.
 5. Use Caveman or compact handoffs when context usage grows.
-6. Code-review-graph is auto-refreshed by git hooks — never manually refresh during workflow.
+6. Treat external tools as capability layers with distinct jobs; avoid overlapping routes by default.
+7. Code-review-graph is auto-refreshed by git hooks — never manually refresh during workflow.
 
 ## Cross-cutting Security Gate
 
 Enforced on ALL `/tool-*` commands regardless of cost mode. If any change touches:
 **auth, user input parsing, file system paths, network I/O, secrets, cookies, SQL, or serialization** —
-immediately escalate to `skill(name="security-review")`.
+immediately promote the task to the matching deep route and add a `/tool-review --deep` checkpoint before sign-off.
 
 Individual command files reference this gate with one line; do not repeat the full text.
 
@@ -118,7 +150,7 @@ For implementation work (`/tool-feat`, `/tool-fix`), default verification stays 
 
 ### `--standard` completion
 1. Run project-native targeted tests/build/typecheck.
-2. Use `/tool-review --fast` or `skill(name="caveman-review")` for compressed diff sanity check.
+2. Use `/tool-review --fast` or a Caveman-compressed diff sanity check.
 3. Offer `/caveman-commit` suggestion — **NEVER** auto-commit without explicit user request.
 
 ### `--deep` completion
@@ -132,9 +164,9 @@ For implementation work (`/tool-feat`, `/tool-fix`), default verification stays 
 ## Token Guidance
 
 - This file is a router, not the full manual. Detailed docs live in `docs/`.
-- Use `/tool-quick` or `/tool-review --fast` with `/caveman lite` for routine work.
+- Use `/tool-quick`, `/tool-fix`, or `/tool-feat` for most routine work.
 - RTK is only for noisy commands (large test suites, builds, long git logs); skip for small outputs.
-- Use OpenSpec, `/tool-research --deep`, `/review-work`, and GSD phase workflows deliberately; they can create durable artifacts or launch multiple agents.
+- Use OpenSpec, deep research, and GSD deliberately; they create durable artifacts or broader orchestration state.
 - If context exceeds 50%, switch to `/caveman ultra` before continuing long work.
 
 ## References

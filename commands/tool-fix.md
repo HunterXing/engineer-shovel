@@ -5,7 +5,7 @@ cost-profile: variable
 risk-level: variable
 recommended-mode: --standard
 allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
-escalates-to: [/gsd-debug, /security-review, /tool-review]
+escalates-to: [/tool-review, /tool-plan]
 depends-on: []
 when-to-use: Use when behavior is broken, tests fail, logs show regressions, or root cause must be proven before fixing.
 ---
@@ -14,15 +14,15 @@ when-to-use: Use when behavior is broken, tests fail, logs show regressions, or 
 
 **Input**: $ARGUMENTS
 
-Start with the cheapest path that can prove the bug is fixed. Escalate only when reproduction or root cause is unclear.
+Start with the cheapest path that can prove the bug is fixed. This is a main workflow command; escalate only when reproduction or root cause is unclear.
 
 Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/caveman full` for `--standard`, `/caveman full` (escalate to `ultra` if subagent≥3) for `--deep`. Wrap large test/log output with `rtk gain`.
 
 ## Cost Modes
 
-- `--fast`: known file/function, obvious cause → `semantic_search_nodes` to confirm location → direct fix + targeted test.
-- `--standard` or default: reproducible bug, local scope → full CRG trace pipeline (semantic_search → get_affected_flows → query_graph) → fix → failing test + regression verification → light review.
-- `--deep`: flaky, cross-module, security, or unknown root cause → CRG trace pipeline → `skill(name="deep-research")` if unfamiliar domain → `skill(name="systematic-debugging")` (superpowers, 4-phase) → `skill(name="gsd-debug")` if persistent state needed → `skill(name="security-review")`.
+- `--fast`: known file/function, obvious cause → confirm location → direct fix + targeted test.
+- `--standard` or default: reproducible bug, local scope → CRG trace + surgical fix + failing test + regression verification + light review.
+- `--deep`: flaky, cross-module, security, or unknown root cause → add method/spec/orchestration layers deliberately.
 
 ## Flow
 
@@ -47,7 +47,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 ### `--standard`
 9. Re-run the failing test first, then related regression tests/build.
-10. `skill(name="caveman-review")` — compressed code quality check on the diff.
+10. Run `/tool-review --fast` or a Caveman-compressed diff sanity check.
 11. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
 
 ### `--deep`
@@ -58,10 +58,11 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 ## Security Gate
 
-If change touches auth, user input, file system, network, secrets, cookies, or SQL → escalate to `skill(name="security-review")`.
+If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.
 
 ## Escalation Rules
 
 - Single-line typo: use `/tool-quick` instead.
-- Cross-file state or architecture issue: use `--deep`.
-- If systematic debugging fails 3+ times → question architecture, not hypothesis.
+- Cross-file state, external systems, or unclear ownership: use `--deep`.
+- Do not start with GSD or deep research unless evidence says the normal path is insufficient.
+- If systematic debugging fails 3+ times, stop iterating locally and move to `/tool-plan --deep` to reassess architecture or ownership.

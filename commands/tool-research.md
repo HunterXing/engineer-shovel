@@ -14,7 +14,7 @@ when-to-use: Use when a decision needs local, official, current, or multi-source
 
 **Input**: $ARGUMENTS
 
-Start narrow. Add sources only when the answer needs current or external evidence.
+Start narrow. Add sources only when the answer needs current or external evidence. This is a support command for decisions, not a default prelude to every feature or fix.
 
 Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (per SKILL.md mapping). Skip RTK (research is document-heavy, not shell-heavy).
 
@@ -22,7 +22,7 @@ Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (pe
 
 - `--quick` or default: local docs, known library, simple comparison → targeted docs/search. Supplement with code-review-graph: `semantic_search_nodes(query="<topic>")` for existing codebase context.
 - `--web`: current facts or official docs needed → web/docs search + concise synthesis. Include code-review-graph: `query_graph(imports_of="<related_module>")` for how the current codebase relates.
-- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem → code-review-graph: `get_architecture_overview` + `semantic_search_nodes` to map codebase → load matching ECC research skills → `skill(name="deep-research")` → tradeoff report.
+- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem, or architecture tradeoff → map the codebase first, then load deeper research capability.
 
 ## Flow
 
@@ -39,3 +39,4 @@ Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (pe
 ## Avoid
 
 Do not run deep multi-source research for questions answerable from local code or official docs.
+Do not make this a default prerequisite for normal `feat` or `fix` work.

@@ -5,7 +5,7 @@ cost-profile: variable
 risk-level: variable
 recommended-mode: --standard
 allowed-tools: [Read, Grep, Glob, Bash, Task]
-escalates-to: [/review-work, /security-review, /security-scan]
+escalates-to: [/tool-fix, /tool-refactor, /tool-feat]
 depends-on: []
 when-to-use: Use for local diffs, pull requests, or post-implementation review where risk determines review depth.
 ---
@@ -14,15 +14,15 @@ when-to-use: Use for local diffs, pull requests, or post-implementation review w
 
 **Input**: $ARGUMENTS
 
-Choose the cheapest review mode that can catch the relevant failure class.
+Choose the cheapest review mode that can catch the relevant failure class. This is an engineering support command, not the default front door for routine edits.
 
-Compression: Caveman review mode for `--fast`, `/caveman full` by default, `/caveman ultra` for deep summaries. Wrap large diff/log commands with `rtk gain`.
+Compression: use Caveman-compressed summaries for `--fast`, `/caveman full` by default, and `/caveman ultra` for deep summaries. Wrap large diff/log commands with `rtk gain`.
 
 ## Cost Modes
 
-- `--fast`: quick sanity check or small local diff → `skill(name="caveman-review")`.
-- `--standard` or default: local diff or normal PR → code-review-graph assisted analysis → `skill(name="coding-standards")` (by language) → `/code-review` or `/review-pr $ARGUMENTS`.
-- `--deep`: major implementation, security, broad refactor → `skill(name="security-review")` (if security-sensitive) → `/review-work`.
+- `--fast`: quick sanity check or small local diff → Caveman-compressed findings summary.
+- `--standard` or default: local diff or normal PR → graph-assisted analysis + normal review path.
+- `--deep`: major implementation, security, broad refactor, or pre-merge audit → heavier review stack.
 
 ## Flow
 
@@ -31,13 +31,21 @@ Compression: Caveman review mode for `--fast`, `/caveman full` by default, `/cav
    - `detect_changes` for risk-scored diff analysis
    - `get_review_context(changes="<diff>")` for token-efficient review snippets
    - `get_impact_radius(target="<changed_module>")` for blast-radius detection
-3. For PR review with `--standard` or `--deep`: use `skill(name="github-ops")` to manage PR lifecycle (review comments, merge status, CI checks).
+3. For PR review with `--standard` or `--deep`, inspect repository-native review comments, CI status, and merge blockers if available; keep this command focused on findings rather than platform automation.
 4. Review for correctness, regressions, security, and maintainability.
-5. Fix critical/high findings surgically.
-6. Re-run the same or stronger review mode until clean.
-7. Post-review: use `skill(name="receiving-code-review")` to apply feedback when review results return.
-8. Review findings auto-captured to claude-mem for cross-session pattern detection.
+5. Report critical/high findings with a recommended next route:
+   - `/tool-fix` for defects or regressions
+   - `/tool-refactor` for cleanup or structure issues
+   - `/tool-feat` for missing behavior or acceptance gaps
+6. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
+7. Review findings auto-captured to claude-mem for cross-session pattern detection.
+
+## Positioning
+
+- Use this command when review itself is the task.
+- Do not require it as a front door before every `quick`, `fix`, or `feat` execution.
+- Default behavior is to report findings, not to mutate code.
 
 ## Security-Sensitive Code
 
-Route to `skill(name="security-review")` or `skill(name="security-scan")` based on scope.
+Use `--deep` and expand the checklist for auth, user input, file system, network, secrets, cookies, SQL, and serialization paths.

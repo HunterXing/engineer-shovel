@@ -14,12 +14,12 @@ when-to-use: Use to update installed engineer-shovel files to latest version, ch
 
 **Input**: $ARGUMENTS
 
-Synchronize Engineer Shovel files and verify supporting component health.
+Single user-facing entry point for keeping Engineer Shovel current. It checks router files first, then component health, and only repairs what is actually needed.
 
 ## Modes
 
-- `--check` or default: Compare installed Engineer Shovel files and check base dependencies plus recommended/full components. Read-only.
-- `--full`: Update Engineer Shovel files, then install/configure missing low-risk components using official installers.
+- `--check` or default: Read-only. Compare installed Engineer Shovel router files, then inspect base dependencies and optional components.
+- `--full`: Sync Engineer Shovel router files first, then repair or upgrade missing/unconfigured components using supported installer paths.
 
 ## Target Scope
 
@@ -30,11 +30,18 @@ Synchronize Engineer Shovel files and verify supporting component health.
 ## Flow
 
 1. Detect installed locations based on target(s).
-2. Compare local installed files with latest repo versions.
-3. Report missing, outdated, or extra files.
+2. Compare local installed router files (`SKILL.md`, `/tool-*`) with latest repo versions.
+3. Report missing, outdated, or extra router files.
 4. Check component health for base tools and recommended/full integrations.
-5. If `--full`: overwrite installed files and repair missing/unconfigured components.
-6. Verify installation integrity after update.
+5. If `--full`: sync router files first, then repair missing or unconfigured components.
+6. Verify router integrity and component health after update.
+
+## Internal Split
+
+- `install.sh`: first install and explicit repair hooks
+- `scripts/sync.py`: router file sync and version comparison only
+- `scripts/health.py`: external component health and repair only
+- `/tool-update`: user-facing orchestrator over both layers
 
 ## Component Health
 
@@ -62,6 +69,13 @@ Safety:
 
 When a component is missing or broken, suggest the install command (e.g. `pipx install code-review-graph`, `npm install -g @fission-ai/openspec@latest`, `npx get-shit-done-cc@latest`) instead of silently skipping.
 
+## Positioning
+
+- Remember this command as the only update entry point.
+- Use `--check` for status, drift, and repair guidance.
+- Use `--full` when you want router sync plus component repair/upgrade in one pass.
+- The underlying scripts should present output in the same mental model: router layer first, component layer second.
+
 ## Compression
 
-Use L2: `/caveman-review` style for check mode output. RTK not needed for sync operations.
+Use concise Caveman-style summaries for check mode output. RTK is not needed for sync operations.

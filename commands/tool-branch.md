@@ -7,14 +7,14 @@ recommended-mode: --fast
 allowed-tools: [Bash, Read]
 escalates-to: []
 depends-on: []
-when-to-use: Use when starting any development or bug fix task to isolate changes in a feature branch with review before merge.
+when-to-use: Use for explicit branch lifecycle operations. `tool-feat` and `tool-fix` may create branches automatically; use this command when you want direct control.
 ---
 
 # /tool-branch — Branch Workflow Management
 
 **Input**: $ARGUMENTS
 
-Manage feature branch lifecycle with automatic type detection, diff review, and squash merge.
+Manage feature branch lifecycle with automatic type detection, diff review, and squash merge. This is a platform support command for explicit branch operations.
 
 ## Subcommands
 
@@ -28,7 +28,7 @@ Manage feature branch lifecycle with automatic type detection, diff review, and 
 
 ## Flow
 
-1. **Start task**: `/tool-branch create [description]` — auto-detects type (feat/fix/refactor/docs)
+1. **Start task or take control explicitly**: `/tool-branch create [description]` — auto-detects type (feat/fix/refactor/docs)
 2. **Work**: Make commits on the feature branch
 3. **Review**: `/tool-branch review` — shows diff vs source branch with CRG analysis: `detect_changes` + `get_impact_radius` for blast radius
 4. **Confirm**: `/tool-branch merge` — squash merge, prompts for commit message, deletes branch

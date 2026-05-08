@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Synchronize engineer-shovel installation with latest repository version."""
+"""Synchronize Engineer Shovel router files with the latest repository version.
+
+This script is intentionally limited to the router layer: `SKILL.md` and `/tool-*`
+files. External component health and repair live in `scripts/health.py`. User-facing
+workflows should prefer `/tool-update`, which orchestrates both layers.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +16,22 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+def print_section(title: str) -> None:
+    print(f"\n{title}")
+    print("=" * len(title))
+
+
+def print_update_summary(targets: list[str], scope: str, command: str) -> None:
+    mode_label = "--check" if command == "check" else "--full"
+    target_label = "both" if len(targets) > 1 else targets[0]
+    print_section("TOOL-UPDATE SUMMARY")
+    print(f"Mode: {mode_label}")
+    print(f"Target: {target_label}")
+    print(f"Scope: {scope}")
+    print("Router layer: scripts/sync.py")
+    print("Component layer: scripts/health.py")
+
 
 # Paths to track for sync
 TRACKED_FILES = {
@@ -120,6 +141,7 @@ def sync_files(comparisons: dict, target: str = "opencode", scope: str = "global
     for repo_path in comparisons["missing"]:
         if dry_run:
             print(f"  DRY-RUN: Would copy {repo_path.name}")
+            updated += 1
             continue
         if repo_path.parent.name == "commands":
             target_dir = command_dir
@@ -137,6 +159,7 @@ def sync_files(comparisons: dict, target: str = "opencode", scope: str = "global
         repo_path = entry["repo"]
         if dry_run:
             print(f"  DRY-RUN: Would update {installed_path.name}")
+            updated += 1
             continue
         installed_path.write_bytes(repo_path.read_bytes())
         print(f"  ~ Updated {installed_path.name}")
@@ -181,8 +204,7 @@ def print_check_report(check_result: dict, verbose: bool = False) -> None:
     scope = check_result["scope"]
     summary = check_result["summary"]
     
-    print(f"\n{target.upper()} ({scope})")
-    print("=" * 40)
+    print_section(f"{target.upper()} ({scope})")
     
     for file_type, info in check_result["files"].items():
         if info["status"] == "not_installed":
@@ -359,6 +381,7 @@ def main() -> int:
     args = parser.parse_args()
     
     targets = ["opencode", "claude"] if args.target == "both" else [args.target]
+    print_update_summary(targets, args.scope, args.command)
 
     remote_status = None
     if not args.skip_fetch:
@@ -395,7 +418,7 @@ def main() -> int:
             print("✔ All installations are up to date")
             return 0
         else:
-            print("✘ Some installations need updates. Run: /tool-update sync")
+            print("✘ Some installations need updates. Run: /tool-update --full")
             return 1
     
     elif args.command == "sync":

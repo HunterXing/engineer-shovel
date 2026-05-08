@@ -171,6 +171,20 @@ PROMPT
 }
 
 configure_interactive_choices() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$TARGET_SET" -eq 0 ]]; then
+      TARGET="auto"
+    fi
+    if [[ "$SCOPE_SET" -eq 0 ]]; then
+      SCOPE="global"
+    fi
+    if is_interactive && { [[ "$TARGET_SET" -eq 0 ]] || [[ "$SCOPE_SET" -eq 0 ]] || [[ "$MODE_SET" -eq 0 ]]; }; then
+      info "DRY-RUN: using non-interactive defaults (mode=${MODE}, target=${TARGET}, scope=${SCOPE})"
+      info "DRY-RUN: pass explicit flags if you want to preview another combination."
+    fi
+    return
+  fi
+
   if is_interactive; then
     if [[ "$TARGET_SET" -eq 0 ]]; then
       prompt_target
