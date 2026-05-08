@@ -215,8 +215,8 @@ const commandWorkflows = {
         label: { en: 'Tested edit', zh: '测试编辑' },
         steps: [
           { phase: '01', label: { en: 'CRG Context', zh: 'CRG 上下文' },
-            desc: { en: 'semantic_search_nodes / query_graph(imports_of="file") — with ECC pattern skill auto-load', zh: 'semantic_search_nodes / query_graph(imports_of="文件") — 自动加载 ECC 模式 skill' },
-            tools: ['CRG', 'ECC'] },
+            desc: { en: 'semantic_search_nodes / query_graph(imports_of="file") — use project patterns and language-reference only as needed.', zh: 'semantic_search_nodes / query_graph(imports_of="文件") — 仅在需要时参考项目模式和 language-reference。' },
+            tools: ['CRG'] },
           { phase: '02', label: { en: 'Edit', zh: '编辑' },
             desc: { en: 'Targeted surgical change. Preserve project style.', zh: '定向手术编辑。保持项目风格。' },
             tools: [] },
@@ -281,25 +281,19 @@ const commandWorkflows = {
           { phase: '01', label: { en: 'CRG Trace', zh: 'CRG 追踪' },
             desc: { en: 'Full CRG trace pipeline (same as standard).', zh: '完整 CRG 追踪管线 (同 standard)。' },
             tools: ['CRG'] },
-          { phase: '02', label: { en: 'Deep Research', zh: '深度研究' },
-            desc: { en: 'skill(deep-research) — when bug domain is unfamiliar.', zh: 'skill(deep-research) — 当 bug 领域陌生时。' },
-            tools: ['ECC'] },
-          { phase: '03', label: { en: 'Sys Debug', zh: '系统调试' },
-            desc: { en: 'skill(systematic-debugging) — superpowers 4-phase methodology.', zh: 'skill(systematic-debugging) — superpowers 4 阶段方法论。' },
-            tools: ['Superpowers'] },
-          { phase: '04', label: { en: 'Persist Debug', zh: '持久调试' },
-            desc: { en: 'skill(gsd-debug) — only if cross-session state needed.', zh: 'skill(gsd-debug) — 仅当需要跨 session 持久状态时。' },
-            tools: ['GSD'] },
-          { phase: '05', label: { en: 'Security', zh: '安全审查' },
-            desc: { en: 'Promote to security-sensitive route: add /tool-review --deep before sign-off.', zh: '提升为安全敏感路线：完成前补 /tool-review --deep。' },
-            tools: ['ECC'] },
-          { phase: '06', label: { en: 'GSD Verify', zh: 'GSD 验证' },
+          { phase: '02', label: { en: 'Add Method Layer', zh: '增加方法层' },
+            desc: { en: 'Only when reproduction or root cause remains unclear: add deeper research, systematic debugging, or cross-session debugging deliberately.', zh: '仅当复现或根因仍不清楚时，按需增加深研究、系统调试或跨会话调试。' },
+            tools: ['ECC', 'Superpowers', 'GSD'] },
+          { phase: '03', label: { en: 'Security Route', zh: '安全路线' },
+            desc: { en: 'If auth, input, filesystem, network, secrets, cookies, or SQL are involved, add /tool-review --deep before sign-off.', zh: '如果涉及 auth、输入、文件系统、网络、secrets、cookies 或 SQL，完成前补 /tool-review --deep。' },
+            tools: [] },
+          { phase: '04', label: { en: 'GSD Verify', zh: 'GSD 验证' },
             desc: { en: 'skill(gsd-verify-work) — structured acceptance.', zh: 'skill(gsd-verify-work) — 结构化验收。' },
             tools: ['GSD'] },
-          { phase: '07', label: { en: 'GSD Review', zh: 'GSD 审查' },
+          { phase: '05', label: { en: 'GSD Review', zh: 'GSD 审查' },
             desc: { en: 'skill(gsd-code-review) → severity-classified findings.', zh: 'skill(gsd-code-review) → 严重度分级审查。' },
             tools: ['GSD'] },
-          { phase: '08', label: { en: 'GSD Ship', zh: 'GSD 发布' },
+          { phase: '06', label: { en: 'GSD Ship', zh: 'GSD 发布' },
             desc: { en: 'skill(gsd-ship) → create PR, run gates, prepare merge.', zh: 'skill(gsd-ship) → 创建 PR，运行门控，准备合并。' },
             tools: ['GSD'] }
         ]
@@ -455,16 +449,16 @@ const commandWorkflows = {
         ]
       },
       '--standard': {
-        label: { en: 'File plan', zh: '文件化计划' },
+        label: { en: 'Normal plan', zh: '常规计划' },
         steps: [
           { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if vague) clarify direction first.', zh: '(需求模糊时) 先澄清方向。' },
-            tools: ['GSD', 'Superpowers'] },
+            desc: { en: '(if vague) clarify product direction first; use /tool-research for technical ambiguity.', zh: '(需求模糊时) 先澄清产品方向；技术歧义交给 /tool-research。' },
+            tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'CRG Impact', zh: 'CRG 影响' },
             desc: { en: 'detect_changes + get_impact_radius(target="module").', zh: 'detect_changes + get_impact_radius(target="模块")。' },
             tools: ['CRG'] },
           { phase: '03', label: { en: 'Spec or Plan', zh: '规格或计划' },
-            desc: { en: 'Use OpenSpec for durable requirements OR a file-backed plan for implementation order. Do not use both by default.', zh: '持久需求用 OpenSpec；实现顺序用文件化计划。默认不要两者都用。' },
+            desc: { en: 'Define scope, affected modules, execution order, verification, and exit criteria. Use OpenSpec or a file-backed plan only when it adds value.', zh: '定义范围、影响模块、执行顺序、验证与退出条件。只有确实增益时才升级到 OpenSpec 或文件化计划。' },
             tools: ['OpenSpec'] },
           { phase: '04', label: { en: 'Security', zh: '安全' },
             desc: { en: 'Check: if touches auth/data/FS/network/SQL, add /tool-review --deep as a checkpoint.', zh: '检查：如果涉及 auth/data/FS/network/SQL，把 /tool-review --deep 加进检查点。' },
@@ -472,11 +466,11 @@ const commandWorkflows = {
         ]
       },
       '--deep': {
-        label: { en: 'Blueprint / GSD', zh: '蓝图 / GSD' },
+        label: { en: 'Spec / Milestone', zh: '规格 / 里程碑' },
         steps: [
           { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
             desc: { en: '(if vague) clarify direction first.', zh: '(需求模糊时) 先澄清方向。' },
-            tools: ['GSD', 'Superpowers'] },
+            tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Classify', zh: '分级' },
             desc: { en: 'Auto-classify: spec-first → OpenSpec, ≤3 PR → file-backed plan, >3 PR → gsd-new-milestone, architecture → deep research then milestone/file-backed plan.', zh: '自动分级：规格优先 → OpenSpec，≤3 PR → 文件化计划，>3 PR → gsd-new-milestone，架构变更 → 先深研究，再转里程碑或文件化计划。' },
             tools: ['OpenSpec', 'ECC', 'GSD'] },
@@ -528,7 +522,7 @@ const commandWorkflows = {
             desc: { en: 'Compare behavior, public APIs, performance paths.', zh: '对比行为、公开 API、性能路径。' },
             tools: [] },
           { phase: '05', label: { en: 'Review', zh: '审查' },
-            desc: { en: 'caveman review → report. Graph impact check clean.', zh: 'caveman review → 报告。图影响检查为 clean。' },
+            desc: { en: '/tool-review --fast or Caveman-compressed sanity check → report. Graph impact check clean.', zh: '/tool-review --fast 或 Caveman 压缩 sanity check → 报告。图影响检查为 clean。' },
             tools: ['Caveman', 'CRG'] }
         ]
       },
@@ -603,7 +597,7 @@ const commandWorkflows = {
   '/tool-research': {
     tag: 'Low→High',
     sub: { en: 'Codebase-aware evidence gathering. Start narrow, escalate only when needed.', zh: '代码库感知的证据收集。从窄开始，按需升级。' },
-    tools: { en: 'Tools: CRG semantic_search · deep-research · tradeoff report', zh: '工具: CRG semantic_search · deep-research · 权衡报告' },
+    tools: { en: 'Tools: CRG semantic_search · multi-source synthesis · tradeoff report', zh: '工具: CRG semantic_search · 多源综合 · 权衡报告' },
     modes: {
       '--quick': {
         label: { en: 'Quick search', zh: '快速搜索' },
@@ -643,7 +637,7 @@ const commandWorkflows = {
             desc: { en: 'get_architecture_overview + semantic_search_nodes — map entire codebase context.', zh: 'get_architecture_overview + semantic_search_nodes — 映射完整代码库上下文。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Deep Search', zh: '深度搜索' },
-            desc: { en: 'skill(deep-research) — multi-source: web, code examples, official docs.', zh: 'skill(deep-research) — 多源: 网页、代码示例、官方文档。' },
+            desc: { en: 'Use deeper multi-source research only when the decision needs unfamiliar ecosystem knowledge, current facts, or conflicting evidence.', zh: '只有当决策需要陌生生态知识、最新事实或冲突证据时，才进入更深的多源研究。' },
             tools: ['ECC'] },
           { phase: '03', label: { en: 'Report', zh: '报告' },
             desc: { en: 'Tradeoff report with conflicts, confidence levels, and routing.', zh: '权衡报告: 冲突、置信度、路由建议。' },
@@ -1006,7 +1000,6 @@ function hexToRgba(hex, alpha) {
 }
 
 function initWorkflowModal() {
-  const modal = document.getElementById('wf-modal');
   const backdrop = document.getElementById('wf-modal-backdrop');
   const closeBtn = document.getElementById('wf-modal-close');
   if (backdrop) backdrop.addEventListener('click', closeWorkflowModal);
