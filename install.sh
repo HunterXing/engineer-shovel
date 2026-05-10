@@ -71,6 +71,10 @@ in order: target → mode → scope.
 Routine drift checks and post-install repair belong to /tool-update:
   /tool-update --check [--target ...] [--scope global|local]
   /tool-update --full  [--target ...] [--scope global|local]
+
+Model:
+  install.sh     = first install and explicit repair hooks
+  /tool-update   = router drift + component health + repair guidance
 USAGE
 }
 
@@ -1029,7 +1033,9 @@ main() {
     set_target_paths "$target"
     info "${ENV}: skill=${SKILL_DIR}/engineer-shovel/SKILL.md commands=${COMMAND_DIR}/tool-*.md"
   done
+  info "Component strategy remains mixed by design: some tools are pinned, some follow upstream latest, and some are effectively global."
   info "Next: restart your agent session, then use skill(name=\"engineer-shovel\") or run /tool-* commands."
+  info "Upgrade later with: /tool-update --check  (status) or /tool-update --full  (sync + repair)"
 }
 
 main "$@"

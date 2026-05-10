@@ -33,10 +33,14 @@ Single user-facing entry point for keeping Engineer Shovel current. It checks ro
 
 1. Detect installed locations based on target(s) and scope.
 2. Compare local installed router files (`SKILL.md`, `/tool-*`) with latest repo versions.
-3. Report missing, outdated, or extra router files.
+3. Report router drift explicitly as: current, missing, outdated, or extra.
 4. Check component health for base tools and recommended/full integrations.
-5. If `--full`: sync router files first, then repair missing or unconfigured components.
-6. Verify router integrity and component health after update.
+5. Classify component results as:
+   - repairable automatically
+   - blocked by scope/runtime/platform limits
+   - manual upgrade recommended
+6. If `--full`: sync router files first, then repair missing or unconfigured components.
+7. Verify router integrity and component health after update.
 
 ## Internal Split
 
@@ -77,6 +81,13 @@ Safety:
 ## Missing Component Guidance
 
 When a component is missing or broken, suggest the install command (e.g. `pipx install code-review-graph`, `npm install -g @fission-ai/openspec@latest`, `npx get-shit-done-cc@latest`) instead of silently skipping.
+
+When automatic repair is not supported, say that directly and report the manual path. Do not blur together:
+
+- router drift
+- component repair
+- blocked local-scope support
+- optional manual upgrades
 
 ## Positioning
 

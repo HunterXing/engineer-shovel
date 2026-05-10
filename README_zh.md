@@ -131,11 +131,20 @@ skill(name="engineer-shovel")
 
 这也是 `--full` 模式的目标体验：能力都在，但默认执行仍然应保持轻量。
 
+### 工具适配速查
+
+- `code-review-graph`：适合多文件理解、影响面分析、review context、重构；不适合每个微小改动都默认先查。
+- `superpowers`：适合方法升级、TDD、系统化调试；不要把它当成所有任务的默认能力包。
+- `ECC`：适合框架、安全、研究、外部集成深水区；不适合作为普通本地代码查找的默认入口。
+- `OpenSpec`：适合需要落成 proposal/spec/tasks 文件的持久协议。
+- `GSD`：适合阶段化、跨会话、多代理交付。
+- `caveman` 与 `rtk`：属于压缩层，不替代规划、实现或代码理解职责。
+
 ## 安装与更新分工
 
 - `install.sh`：首次安装、显式引导，以及 installer 自己负责的 repair hooks
-- `/tool-update --check`：比较路由文件、检查组件健康、报告漂移
-- `/tool-update --full`：先同步路由文件，再执行支持的 repair/upgrade
+- `/tool-update --check`：比较路由文件、检查组件健康，并区分漂移、可自动修复、受限阻塞、手动升级建议
+- `/tool-update --full`：先同步路由文件，再执行支持的 repair，并重新校验健康状态
 - `--scope global|local`：路由同步两者都支持；部分组件本质上仍是全局集成，会明确报告，不假装支持本地修复
 
 ## 成本模式
@@ -146,7 +155,7 @@ skill(name="engineer-shovel")
 | `--standard` | 普通开发任务；可选 OpenSpec 规格层；原生测试 + 轻量审查 |
 | `--deep` | 高风险、跨模块、复杂研究、架构决策或 GSD 阶段编排 |
 
-Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`deep` 用 full/ultra。RTK 如果已安装，则用于压缩 git、测试、构建、日志等 Bash/tool 输出；它不是模型回复压缩器，而是工具输出压缩层。
+Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`deep` 用 full/ultra。RTK 如果已安装，则用于压缩 git、测试、构建、日志等 Bash/tool 输出；它不是模型回复压缩器，也不能替代 `Read`、`Grep`、`Glob` 这类内建文件工具。
 
 ## 指令
 
@@ -167,18 +176,19 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 
 ## 能力升级层
 
-- `code-review-graph`：代码理解与影响面分析
+- `code-review-graph`：多文件代码理解与影响面分析
 - `caveman`：对话压缩
-- `rtk`：工具输出压缩
+- `rtk`：Bash/tool 输出压缩
 - `OpenSpec`：持久化规格与任务
-- `ECC`：架构、安全、研究与集成指导
-- `GSD`：里程碑或多阶段编排
+- `ECC`：架构、安全、框架、研究与集成指导
+- `GSD`：里程碑、多阶段或跨会话编排
 
 这些能力层各有职责。即使已经安装，也不意味着每个任务都要进入更重工作流。
 
 ## 文档
 
 - 工具链架构：[`docs/architecture.md`](docs/architecture.md)
+- 场景路由：[`docs/command-scenarios.md`](docs/command-scenarios.md)
 - 模式路由图：[`docs/mode-routing.md`](docs/mode-routing.md)
 - 安装与升级：[`docs/install.md`](docs/install.md)
 - 依赖治理：[`docs/dependency-policy.md`](docs/dependency-policy.md)

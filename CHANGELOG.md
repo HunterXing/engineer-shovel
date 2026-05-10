@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.3 (2026-05-10)
+
+### Changed
+- Synchronized version markers and product wording across `SKILL.md`, `docs/architecture.md`, GitHub Pages, and the public documentation surface so the router, docs, and site describe the same routing model.
+- Updated GitHub Pages route-picker copy and workflow descriptions to match the current command boundaries, especially around `/tool-quick`, `/tool-fix`, `/tool-feat`, `/tool-plan`, and `/tool-update`.
+- Refined the GitHub Pages `Choose Your Route` grid so six cards align cleanly in a balanced desktop layout instead of rendering as four cards on the first row and two on the second.
+
 ## 1.7.2 (2026-05-10)
 
 ### Changed

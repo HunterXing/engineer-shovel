@@ -25,11 +25,11 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 
 ## Flow
 
-0. Get code-review-graph context only as needed (L2, auto-refreshed by git hooks):
+0. Stay cheap by default. Only get code-review-graph context when the target file, symbol, or dependency edge is still unclear after a quick local read.
    - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")`
    - For file-level context: `query_graph(imports_of="<file_path>")` to see dependencies
-   - For structural overview: `get_architecture_overview` (only when target files are unclear)
-   If project language is known, load matching L4 ECC pattern reference from `docs/language-reference.md`.
+   - Skip graph queries entirely when the file and edit are already obvious
+   If project language is known, use matching ECC pattern reference from `docs/language-reference.md` only when a framework convention matters.
 1. Confirm the target file or symbol from context.
 2. Make the smallest safe change.
 3. Run the nearest useful verification: formatter/lint/test/build as applicable.
@@ -47,3 +47,4 @@ If change touches auth, user input, file system, network, secrets, cookies, or S
 - No OpenSpec.
 - No GSD.
 - No `/tool-review --deep` unless the change unexpectedly becomes high risk.
+- No hidden escalation for cross-file state, external systems, unknown root cause, or durable acceptance needs; promote those to the matching main route instead.

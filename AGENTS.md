@@ -100,7 +100,7 @@ skill(name="engineer-shovel")
 - 手动查询: `npx claude-mem search "查询内容"`
 - claude-mem 与 caveman 互补：caveman 压缩单会话通信，claude-mem 持久化跨会话知识
 
-最后更新：2026-05-08
+最后更新：2026-05-10
 
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph

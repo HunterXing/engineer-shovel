@@ -2,7 +2,7 @@
 
 Engineer Shovel is a router, not a bundle of mandatory workflows. The architecture is designed around **full capability available, lightweight execution by default**: routine programming work stays near the core, and deeper layers activate only when the task truly needs them.
 
-For a mode-first view of the same system, see [`docs/mode-routing.md`](mode-routing.md). That document answers a different question: not "which command exists", but "how the same commands diverge under `--fast`, `--standard`, and `--deep`."
+For a mode-first view of the same system, see [`docs/mode-routing.md`](mode-routing.md). That document answers a different question: not "which command exists", but "how the same commands diverge under `--fast`, `--standard`, and `--deep`." For scenario-first routing examples, see [`docs/command-scenarios.md`](command-scenarios.md).
 
 ---
 
@@ -18,6 +18,19 @@ The product promise is simple:
 1. Pick the lightest command that matches the job.
 2. Stay in the main workflow layer unless a clear trigger forces escalation.
 3. Treat external systems as narrow capability layers, not default ceremony.
+
+### Scenario-First Routing
+
+Pick the command from the engineering job first, then decide whether a capability layer is needed:
+
+| Engineering scenario | Default route | Upgrade only when needed |
+|---|---|---|
+| Tiny obvious edit | `quick` | `code-review-graph` only if target unclear; `rtk` only for noisy shell output |
+| Reproducible bug | `fix` | `code-review-graph` for trace/impact, `superpowers` for method, `ECC` for framework/security/external systems |
+| Clear feature slice | `feat` | `code-review-graph` for existing patterns, `ECC` for domain guidance, `OpenSpec` only if acceptance must persist |
+| Scope/order/acceptance unclear | `plan` | `superpowers` for clarification, `OpenSpec` for durable agreement, `GSD` only when work becomes phased |
+| Review or refactor | `review` / `refactor` | `code-review-graph` by default, `ECC` only for specialized platform risk |
+| Milestone or cross-session delivery | `plan --deep` | `GSD`, optional `OpenSpec` |
 
 This split matters more than installation mode. A repo may have the full stack installed and still spend almost all of its time in the main workflow commands.
 
@@ -80,6 +93,18 @@ Layer 5: Project Orchestration (deep/milestone only)
 7. Full install exposes capability; it does not imply full workflow on every task.
 8. Standard work should remain close to native implementation and verification.
 
+### Tool-Fit Rules
+
+| Tool | Best at | Avoid as default for |
+|------|---------|----------------------|
+| `code-review-graph` | multi-file reasoning, impact radius, callers/callees, review context, test coverage lookup | tiny single-file edits where direct file reads are cheaper |
+| `superpowers` | clarification, TDD, systematic debugging, disciplined execution | serving as a generic capability bundle on every task |
+| `ECC` | framework patterns, security, research, integration tradeoffs, language-specific expertise | acting as the first answer for ordinary CRUD or local code search |
+| `OpenSpec` | durable proposal/spec/design/tasks that must survive chat context | routine tasks whose agreement fits in normal planning |
+| `GSD` | multi-phase execution, parallel agents, cross-session continuity, verify/ship loops | standard `quick`/`fix`/`feat` work that fits in one session |
+| `caveman` | response compression and terse reviews/commits | replacing engineering method or architecture decisions |
+| `rtk` | Bash/tool output compression for noisy commands | replacing `Read`, `Grep`, `Glob`, or architectural analysis |
+
 ---
 
 ## Tool Overview
@@ -115,15 +140,16 @@ Escalate only when the command cannot stay lightweight and still be correct:
 |------|---------------|-------------|-----|
 | Find code, impact, callers, review context | code-review-graph | — | This is the default intelligence layer |
 | Clarify a single task's approach | command-local clarification | superpowers | Method upgrade for one task |
-| Compare architecture options or specialized domain paths | command-local clarification | ECC | Use the capability library only for hard tradeoffs |
+| Compare architecture options or specialized domain paths | command-local clarification | ECC | Use the capability library only for hard tradeoffs or domain gaps |
 | Persist agreement as specs/tasks | command-local plan | OpenSpec | Durable artifacts, not just chat alignment |
 | Run multi-phase or cross-session delivery | command-local execution | GSD | Orchestration state and gates |
 
 ### Routing Shortcuts
 
 - `quick` should not open durable specs or project orchestration.
+- `quick` should not default to CRG unless file/symbol targeting is unclear.
 - `fix` should not use deep research unless the domain is unfamiliar or the bug is cross-system.
-- `feat` should stay on native implementation plus targeted verification in `--standard`.
+- `feat` should stay on native implementation plus targeted verification in `--standard`; OpenSpec and GSD are opt-in by trigger, not ceremony.
 - `plan` is the first place to clarify scope; do not send ordinary planning straight into GSD.
 - `review` and `research` are support routes; they should not become the default front door for routine coding.
 
@@ -195,7 +221,12 @@ Scope rule:
 | review | Diff >100 lines or large log capture |
 | graph | Build/update output |
 
+RTK notes:
+
+- RTK only helps when shell commands are part of the workflow.
+- Built-in IDE tools such as `Read`, `Grep`, and `Glob` bypass RTK hooks, so do not describe RTK as a universal prompt compressor.
+
 ---
 
 *Based on claude-mem + OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK integration*
-*Last updated: 2026-05-08 — v1.7.1*
+*Last updated: 2026-05-10 — v1.7.3*

@@ -1,0 +1,74 @@
+{
+  "code-review-graph": {
+    "strategy": "latest",
+    "scope_model": "mixed",
+    "auto_repair": true,
+    "repair_hint": "pipx install code-review-graph && code-review-graph install && code-review-graph build",
+    "notes": "Default code intelligence layer for multi-file reasoning, review, and impact analysis."
+  },
+  "superpowers": {
+    "strategy": "plugin-reference",
+    "scope_model": "effectively-global",
+    "auto_repair": true,
+    "repair_hint": {
+      "opencode": "add plugin entry to opencode.json",
+      "claude": "claude plugin install superpowers@claude-plugins-official"
+    },
+    "notes": "Method layer for clarification, TDD, debugging, and execution discipline."
+  },
+  "caveman": {
+    "strategy": "latest-installer",
+    "scope_model": "effectively-global",
+    "auto_repair": true,
+    "repair_hint": {
+      "opencode": "npx skills add JuliusBrussee/caveman -a opencode",
+      "claude": "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman"
+    },
+    "notes": "Communication compression layer; keep separate from planning and code intelligence."
+  },
+  "rtk": {
+    "strategy": "mixed",
+    "scope_model": "effectively-global",
+    "auto_repair": true,
+    "repair_hint": "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh",
+    "notes": "Compresses Bash/tool output only; built-in Read/Grep/Glob do not pass through RTK hooks."
+  },
+  "openspec": {
+    "strategy": "latest",
+    "scope_model": "effectively-global",
+    "auto_repair": true,
+    "repair_hint": "npm install -g @fission-ai/openspec@latest",
+    "notes": "Installs the CLI only; project-local 'openspec init' stays explicit."
+  },
+  "gsd": {
+    "strategy": "latest-installer",
+    "scope_model": "global-and-local",
+    "auto_repair": true,
+    "repair_hint": {
+      "opencode": "npx -y get-shit-done-cc@latest --opencode --global",
+      "claude": "npx -y get-shit-done-cc@latest --claude --global",
+      "both": "npx -y get-shit-done-cc@latest --all --global"
+    },
+    "notes": "Use for phased, cross-session, or parallelized delivery instead of standard one-session work."
+  },
+  "ecc": {
+    "strategy": "pinned",
+    "scope_model": "global-only",
+    "auto_repair": false,
+    "repair_hint": {
+      "opencode": "run the ECC installer manually for OpenCode",
+      "claude": "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code"
+    },
+    "notes": "Use for framework, security, research, and integration depth; local scope is not supported."
+  },
+  "claude-mem": {
+    "strategy": "latest-installer",
+    "scope_model": "effectively-global",
+    "auto_repair": true,
+    "repair_hint": {
+      "opencode": "npx -y claude-mem install --ide opencode",
+      "claude": "npx -y claude-mem install --ide claude"
+    },
+    "notes": "Cross-session memory layer complementary to caveman."
+  }
+}

@@ -27,18 +27,19 @@ Shared policy: mode mapping and security gate come from `SKILL.md`; escalation r
 ## Flow
 
 1. Select local, PR, or post-implementation mode from the input.
-2. Code-review-graph (L2, auto-refreshed):
+2. Code-review-graph (L2, auto-refreshed) is the default intelligence layer for real review work:
    - `detect_changes` for risk-scored diff analysis
    - `get_review_context(changes="<diff>")` for token-efficient review snippets
    - `get_impact_radius(target="<changed_module>")` for blast-radius detection
-3. For PR review with `--standard` or `--deep`, inspect repository-native review comments, CI status, and merge blockers if available; keep this command focused on findings rather than platform automation.
-4. Review for correctness, regressions, security, and maintainability.
-5. Report critical/high findings with a recommended next route:
+3. For trivial one-file sanity checks, a fast local diff read may be enough; keep CRG for cases where graph context adds real value.
+4. For PR review with `--standard` or `--deep`, inspect repository-native review comments, CI status, and merge blockers if available; keep this command focused on findings rather than platform automation.
+5. Review for correctness, regressions, security, and maintainability.
+6. Report critical/high findings with a recommended next route:
    - `/tool-fix` for defects or regressions
    - `/tool-refactor` for cleanup or structure issues
    - `/tool-feat` for missing behavior or acceptance gaps
-6. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
-7. Review findings may be captured by claude-mem when cross-session pattern detection is useful.
+7. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
+8. Review findings may be captured by claude-mem when cross-session pattern detection is useful.
 
 ## Positioning
 

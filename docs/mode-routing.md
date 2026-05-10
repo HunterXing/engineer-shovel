@@ -300,34 +300,40 @@ flowchart TD
     C3 --> C4[结束]
 
     D --> D1[复现 bug 或锁定失败断言]
-    D1 --> D2[CRG trace callers/flows/impact]
-    D2 --> D3[手术式修复]
-    D3 --> D4[先跑 failing test]
-    D4 --> D5[再跑 regression/build]
-    D5 --> D6[light review]
-    D6 --> D7[结束]
+    D1 --> D2{是否跨文件/归属不清?}
+    D2 -- 是 --> D3[CRG trace callers/flows/impact]
+    D2 -- 否 --> D4[直接进入目标文件]
+    D3 --> D5[手术式修复]
+    D4 --> D5
+    D5 --> D6[先跑 failing test]
+    D6 --> D7[再跑 regression/build]
+    D7 --> D8[light review]
+    D8 --> D9[结束]
 
-    E --> E1[根因不清/跨模块/安全敏感]
-    E1 --> E2[方法层升级]
-    E2 --> E3[structured verify]
-    E3 --> E4[deep review]
-    E4 --> E5[ship-ready gate]
+    E --> E1[flaky/跨模块/安全/根因不清]
+    E1 --> E2[先升级方法层]
+    E2 --> E3[superpowers 系统化调试]
+    E3 --> E4{是否仍有知识缺口?}
+    E4 -- 是 --> E5[ECC 框架/安全/集成专项支持]
+    E4 -- 否 --> E6[定向修复 + 扩展验证]
+    E5 --> E6
+    E6 --> E7[必要时 tool-review --deep]
+    E7 --> E8[结束]
 ```
 
 路径说明：
 
 - `--fast`：适合“知道哪坏了”的修补
 - `--standard`：适合正常排查路径，默认应该停留在本地可证明范围
-- `--deep`：只在 flaky、跨模块、系统性问题、安全问题时启用
+- `--deep`：只在 flaky、跨模块、系统性问题、安全问题时启用，优先升级调试方法，而不是默认进入重编排
 
 ### `tool-feat`
 
 ```mermaid
 flowchart TD
     A[进入 tool-feat] --> B{需求是否清楚?}
-    B -- 否 --> P0[Phase 0: clarify/brainstorm]
+    B -- 否 --> P0[回到 tool-plan]
     B -- 是 --> C{模式}
-    P0 --> C
 
     C --> D[fast]
     C --> E[standard]
@@ -345,19 +351,26 @@ flowchart TD
     E3 --> E4[tool-review --fast]
     E4 --> E5[结束]
 
-    F --> F1[模糊/多系统/外部依赖/milestone]
-    F1 --> F2[OpenSpec/ECC/GSD 按需进入]
-    F2 --> F3[分阶段实现]
-    F3 --> F4[verify]
-    F4 --> F5[review]
-    F5 --> F6[ship]
+    F --> F1[外部依赖/多系统/milestone/高风险]
+    F1 --> F2{触发哪种升级?}
+    F2 --> F3[证据问题 -> tool-research]
+    F2 --> F4[持久化验收 -> OpenSpec]
+    F2 --> F5[框架/安全/集成 -> ECC]
+    F2 --> F6[多阶段/跨会话 -> GSD]
+    F3 --> F7[回到实现]
+    F4 --> F7
+    F5 --> F7
+    F6 --> F7
+    F7 --> F8[分阶段实现]
+    F8 --> F9[verify/review]
+    F9 --> F10[结束]
 ```
 
 路径说明：
 
-- `Phase 0` 不是额外负担，而是避免在需求模糊时直接编码
+- 需求不清时，应该先回到 `tool-plan`，而不是把 `tool-feat` 当成通用澄清入口
 - `--standard` 是最关键主路径：找模式、做最小切片、跑原生验证、轻审查
-- `--deep` 才引入更重的规格层和编排层
+- `--deep` 也不是默认重路径，而是由具体触发器决定进入 `tool-research`、OpenSpec、ECC 或 GSD
 
 ### `tool-plan`
 
@@ -415,26 +428,27 @@ flowchart TD
     C --> E[standard]
     C --> F[deep]
 
-    D --> D1[Caveman-compressed sanity check]
-    D1 --> D2[快速 sanity check]
+    D --> D1[小 diff / 单文件 sanity check]
+    D1 --> D2[直接本地 diff read 或 Caveman 压缩检查]
     D2 --> D3[结束]
 
     E --> E1[detect_changes]
     E1 --> E2[get_review_context]
     E2 --> E3[get_impact_radius]
     E3 --> E4[normal review]
-    E4 --> E5[修高优先级问题]
-    E5 --> E6[复审]
+    E4 --> E5[报告 critical/high findings]
+    E5 --> E6[路由到 fix/refactor/feat]
+    E6 --> E7[复审]
 
     F --> F1[大改动/安全/交付前]
-    F1 --> F2[更重 review stack]
-    F2 --> F3[必要时 github/security 流程]
-    F3 --> F4[直到 clean]
+    F1 --> F2[扩展 security/checklist]
+    F2 --> F3[更重 review stack]
+    F3 --> F4[问题回流后复审直到 clean]
 ```
 
 路径说明：
 
-- `--fast`：适合“小 diff 看一眼”的低成本审查
+- `--fast`：适合“小 diff 看一眼”的低成本审查，不要求每次都走完整图谱链路
 - `--standard`：默认 PR / diff 审查路径，图谱辅助是核心
 - `--deep`：适合大改动、发布前、安全敏感场景
 
@@ -580,19 +594,22 @@ flowchart TD
 
     C --> C1[检测安装位置]
     C1 --> C2[比较 router 文件]
-    C2 --> C3[检查组件健康]
-    C3 --> C4[输出 drift 和 repair guidance]
+    C2 --> C3[分类: current/missing/outdated/extra]
+    C3 --> C4[检查组件健康]
+    C4 --> C5[分类: repairable/blocked/manual]
+    C5 --> C6[输出 drift 和 repair guidance]
 
     D --> D1[检测安装位置]
     D1 --> D2[sync router files]
-    D2 --> D3[repair/upgrade components]
-    D3 --> D4[重新验证 router + health]
+    D2 --> D3[仅修复 missing/unconfigured]
+    D3 --> D4[blocked/manual 路径明确报告]
+    D4 --> D5[重新验证 router + health]
 ```
 
 路径说明：
 
 - `--check`：读状态，不改东西，给出 drift 和修复建议
-- `--full`：先处理 router 层，再处理 component 层
+- `--full`：先处理 router 层，再处理 component 层；自动修复只覆盖支持的路径
 - 这也是整个项目推荐记忆的唯一更新入口
 
 ---

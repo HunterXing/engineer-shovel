@@ -36,11 +36,13 @@ This command uses a special mode axis:
    - `semantic_search_nodes(query="<topic_keywords>")` to find related functions/classes
    - `query_graph(callees_of="<related_node>")` to understand dependency context
 4. Search the smallest source set likely to answer it.
-5. Cite or name sources when facts are current/external.
-6. Highlight conflicts and confidence.
-7. Route findings to `/tool-plan` (scope/order still unclear), `/tool-feat` (decision made), `/tool-quick` (small obvious change), or documentation. Append routing rationale.
+5. Use ECC only when the decision depends on specialized framework, language, security, or integration knowledge that local code and normal docs will not answer well.
+6. Cite or name sources when facts are current/external.
+7. Highlight conflicts and confidence.
+8. Route findings to `/tool-plan` (scope/order still unclear), `/tool-feat` (decision made), `/tool-quick` (small obvious change), or documentation. Append routing rationale so research does not become a dead-end artifact.
 
 ## Avoid
 
 Do not run deep multi-source research for questions answerable from local code or official docs.
 Do not make this a default prerequisite for normal `feat` or `fix` work.
+Do not treat ECC as the default answer source for ordinary codebase questions.

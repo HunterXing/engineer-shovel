@@ -37,17 +37,26 @@ Do not use this command as a generic clarification shell.
 
 0. Record baseline: run `/caveman-stats` (L2) to capture session starting token count.
    Before editing, verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
-1. Explore via code-review-graph (L2, auto-refreshed):
-   - `get_architecture_overview` for high-level structure and module boundaries
-   - `semantic_search_nodes(query="<similar_feature_or_pattern>")` to find existing implementations
-   - `query_graph(imports_of="<target_module>")` to understand dependencies
+1. Explore the smallest useful context first:
+   - search existing code for matching patterns before adding new structure
+   - use `semantic_search_nodes(query="<similar_feature_or_pattern>")` or `query_graph(imports_of="<target_module>")` when CRG will materially reduce search cost
+   - use `get_architecture_overview` only when module boundaries are still unclear
    If CRG MCP tools are unavailable in the current harness, use `code-review-graph` CLI or fall back to targeted Glob/Grep/Read.
-2. Search existing code for matching patterns before adding new structure; use `docs/language-reference.md` for project-native verification conventions.
-3. If requirements are still unclear after exploration, stop and route back to `/tool-plan` or `/tool-research`.
-4. If acceptance criteria need durable agreement, create or update OpenSpec artifacts. Do not run `openspec init` automatically from this command.
-5. Implement the smallest verifiable slice.
-6. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
-7. Run `/caveman-stats` (L2) to report session token consumption and savings.
+2. Default `--standard` path:
+   - find an existing pattern
+   - implement the smallest verifiable slice
+   - run project-native tests/build
+   - finish with a light review
+3. If requirements are still unclear after exploration, stop and route back to `/tool-plan`.
+4. Escalate only by trigger:
+   - decision needs evidence first -> `/tool-research`
+   - durable acceptance or reviewable agreement -> OpenSpec
+   - framework/security/integration guidance -> ECC
+   - multi-phase or cross-session delivery -> GSD
+5. Do not run `openspec init` automatically from this command.
+6. Implement the smallest verifiable slice.
+7. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
+8. Run `/caveman-stats` (L2) to report session token consumption and savings.
 
 ## Security Gate
 
@@ -57,3 +66,4 @@ If change touches auth, user input, file system, network, secrets, cookies, or S
 
 Use project-native skills and commands from `docs/language-reference.md` instead of loading broad skill sets by default.
 Escalate to superpowers, ECC, OpenSpec, or GSD only when the feature cannot remain decision-light and still be implemented safely.
+Standard feature work should stay close to native code search, implementation, tests/build, and lightweight review.

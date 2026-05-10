@@ -102,7 +102,13 @@ Responsibility split:
 - `install.sh`: first install and explicit repair hooks
 - `scripts/sync.py`: Engineer Shovel router files and version sync
 - `scripts/health.py`: external component health and repair
+- `scripts/dependency_manifest.json`: shared component strategy metadata for health/reporting/docs
 - `/tool-update`: user-facing orchestrator over sync + health
+
+`/tool-update --check` should be read in two passes:
+
+- Router drift: `current` / `missing` / `outdated` / `extra`
+- Component health: `ok` / `missing` / `unconfigured` / `blocked` / `manual-upgrade-recommended`
 
 Scope notes:
 
@@ -112,6 +118,15 @@ Scope notes:
   - GSD can be checked against the selected scope.
   - ECC local scope is not supported and is reported as blocked instead of auto-repaired.
 - `--dry-run` on health/update skips repair writes; read-only status probes may still run.
+
+Upgrade notes:
+
+- `install.sh` is for first install.
+- `/tool-update --full` is the normal post-install maintenance path.
+- Automatic repair is intentionally narrower than "upgrade everything":
+  - missing and unconfigured components may be repaired automatically
+  - blocked scope/platform cases are reported explicitly
+  - some components remain manual upgrade paths by design
 
 Dry-run note:
 
@@ -124,6 +139,7 @@ Dry-run note:
 - `--full` invokes upstream installers after pinned checkout verification.
 - `--dry-run` preview recommended before bootstrapping unfamiliar machines.
 - Dependency lock strategy is documented in `docs/dependency-policy.md`.
+- Component strategy metadata is also recorded in `scripts/dependency_manifest.json` to reduce drift between docs and health reporting.
 
 ## Non-interactive Default
 

@@ -133,11 +133,20 @@ or call a command directly:
 
 This remains the intended experience even in `--full`: capability is available, but the default path should still be light.
 
+### Tool Fit At A Glance
+
+- `code-review-graph`: use for multi-file reasoning, impact radius, review context, and refactors; skip it for tiny obvious edits.
+- `superpowers`: use when the task needs better method, TDD, or systematic debugging; do not treat it as a generic capability bundle.
+- `ECC`: use for framework, security, research, and integration depth; not for ordinary local code lookup.
+- `OpenSpec`: use when agreement must persist as specs/tasks in files.
+- `GSD`: use for phased, cross-session, or parallelized delivery.
+- `caveman` and `rtk`: compression layers only; they do not replace planning or code intelligence.
+
 ## Install Vs Update
 
 - `install.sh`: first install, explicit bootstrap, and installer-owned repair hooks
-- `/tool-update --check`: compare router files, inspect component health, report drift
-- `/tool-update --full`: sync router files first, then run supported repair or upgrade actions
+- `/tool-update --check`: compare router files, inspect component health, classify drift, repairable issues, blocked states, and manual upgrade paths
+- `/tool-update --full`: sync router files first, then run supported repair actions and re-verify health
 - `--scope global|local`: router sync supports both; some components remain effectively global and are reported that way instead of pretending local repair exists
 
 ## Cost Modes
@@ -148,7 +157,7 @@ This remains the intended experience even in `--full`: capability is available, 
 | `--standard` | normal development | `/caveman full`, targeted graph context, implementation, tests/build, light review |
 | `--deep` | ambiguous, high-risk, multi-system | `/caveman full` or `ultra`, deliberate use of OpenSpec/ECC/GSD |
 
-RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context.
+RTK is complementary when installed: it compresses noisy Bash/tool outputs such as git, tests, builds, and logs before they enter model context. It only helps on shell-command paths; built-in file tools such as `Read`, `Grep`, and `Glob` bypass RTK hooks.
 
 ## Commands
 
@@ -169,12 +178,12 @@ Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/too
 
 ## Escalation Layers
 
-- `code-review-graph`: code understanding and impact analysis
+- `code-review-graph`: code understanding and impact analysis for multi-file work
 - `caveman`: communication compression
-- `rtk`: tool output compression
+- `rtk`: Bash/tool output compression
 - `OpenSpec`: durable specs and tasks
-- `ECC`: specialized architecture, security, and research guidance
-- `GSD`: milestone or multi-phase orchestration
+- `ECC`: specialized architecture, security, framework, and research guidance
+- `GSD`: milestone, multi-phase, or cross-session orchestration
 
 These layers exist to solve specific problems. Installing them does not mean every task should use them.
 
@@ -197,6 +206,7 @@ engineer-shovel/
 ## Documentation
 
 - Toolchain architecture: [`docs/architecture.md`](docs/architecture.md)
+- Scenario routing: [`docs/command-scenarios.md`](docs/command-scenarios.md)
 - Global mode routing: [`docs/mode-routing.md`](docs/mode-routing.md)
 - Token cost model: [`docs/token-cost.md`](docs/token-cost.md)
 - Installation modes: [`docs/install.md`](docs/install.md)

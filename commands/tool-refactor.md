@@ -28,14 +28,15 @@ Shared policy: mode mapping, security gate, and completion behavior come from `S
 
 1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites.
 2. Search claude-mem for prior refactor rationale when historical decisions or naming context matter.
-3. Code-review-graph (L2, auto-refreshed):
+3. Code-review-graph (L2, auto-refreshed) is the default structural aid for refactor work:
    - `get_impact_radius(target="<function_or_module>")` to understand affected callers before refactoring
    - `refactor_tool` to check for dead code or plan renames safely
    - `semantic_search_nodes(query="<similar_pattern>")` to identify existing codebase patterns for reference
 4. Refactor one logical unit at a time.
 5. Re-run the same verification after each step.
 6. Compare behavior, public APIs, and performance-sensitive paths.
-7. **Verification Gate**: confirm all tests pass → graph impact check clean → `/tool-review --fast` or Caveman-compressed sanity check → report.
+7. If the work stops being behavior-preserving or grows into a broad multi-area redesign, switch to `/tool-plan --deep` before continuing.
+8. **Verification Gate**: confirm all tests pass → graph impact check clean → `/tool-review --fast` or Caveman-compressed sanity check → report.
 
 ## Security Gate
 

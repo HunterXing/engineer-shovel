@@ -31,6 +31,7 @@ def print_update_summary(targets: list[str], scope: str, command: str) -> None:
     print(f"Scope: {scope}")
     print("Router layer: scripts/sync.py")
     print("Component layer: scripts/health.py")
+    print("Router statuses: current / missing / outdated / extra")
 
 
 # Paths to track for sync
@@ -206,21 +207,24 @@ def print_check_report(check_result: dict, verbose: bool = False) -> None:
     
     for file_type, info in check_result["files"].items():
         if info["status"] == "not_installed":
-            print(f"  ✘ {file_type}: NOT INSTALLED")
+            print(f"  ✘ router/{file_type}: NOT INSTALLED")
         else:
             comp = info["comparison"]
             if comp["missing"]:
                 for f in comp["missing"]:
-                    print(f"  ✘ {file_type}/{f.name}: MISSING")
+                    print(f"  ✘ router/{file_type}/{f.name}: MISSING")
             if comp["outdated"]:
                 for entry in comp["outdated"]:
-                    print(f"  ~ {file_type}/{entry['installed'].name}: OUTDATED")
+                    print(f"  ~ router/{file_type}/{entry['installed'].name}: OUTDATED")
+            if comp["extra"]:
+                for f in comp["extra"]:
+                    print(f"  ! router/{file_type}/{f.name}: EXTRA")
             if comp["up_to_date"] and verbose:
                 for f in comp["up_to_date"]:
-                    print(f"  ✔ {file_type}/{f.name}: OK")
+                    print(f"  ✔ router/{file_type}/{f.name}: CURRENT")
     
-    status = "OK" if summary["issues"] == 0 else "NEEDS UPDATE"
-    print(f"\n  Status: {status} ({summary['up_to_date']}/{summary['total']} files current)")
+    status = "CURRENT" if summary["issues"] == 0 else "DRIFT DETECTED"
+    print(f"\n  Router status: {status} ({summary['up_to_date']}/{summary['total']} files current)")
 
 
 def extract_version(skill_md_path: Path) -> str | None:

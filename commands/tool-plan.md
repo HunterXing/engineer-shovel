@@ -16,7 +16,7 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 
 Unified planning entry point. Use this command when the work is not yet executable because scope, order, ownership, or acceptance is unclear.
 
-This command owns planning. It should not become a generic research prelude or a duplicate feature command.
+This command owns planning. It should not become a generic research prelude or a duplicate feature command. The outcome should be a plan an implementer can execute without needing fresh product decisions.
 
 Shared policy: mode mapping and completion behavior come from `SKILL.md`; escalation rules and capability-layer roles live in `docs/architecture.md`. Use RTK only for large shell outputs.
 
@@ -43,13 +43,23 @@ Search claude-mem only when prior architectural decisions are likely to change t
    - `get_impact_radius(target="<key_module>")` to understand blast radius
    - `get_architecture_overview` for module boundaries (deep mode only)
    If CRG MCP tools are unavailable, use the `code-review-graph` CLI where possible or fall back to targeted Glob/Grep/Read.
-3. Define the minimum plan contract: scope, affected modules, execution order, verification, exit criteria, and escalation triggers.
-4. Use OpenSpec only if the agreement must persist as reviewable artifacts. Do not auto-run `openspec init`.
-5. If the work touches auth, user data, or security-sensitive paths, add `/tool-review --deep` before sign-off.
-6. Execute only after the plan is specific enough that implementation no longer needs new product decisions.
+3. Define the minimum plan contract:
+   - scope and non-goals
+   - affected files/modules
+   - execution order
+   - verification method
+   - exit criteria
+   - escalation triggers
+4. Use this command as the engineering decision router:
+   - if a decision needs evidence -> `/tool-research`
+   - if requirements must persist as artifacts -> OpenSpec
+   - if work becomes phased, milestone-scale, or cross-session -> GSD
+5. Use OpenSpec only if the agreement must persist as reviewable artifacts. Do not auto-run `openspec init`.
+6. If the work touches auth, user data, or security-sensitive paths, add `/tool-review --deep` before sign-off.
+7. Execute only after the plan is specific enough that implementation no longer needs new product decisions.
 
 ## Escalation
 
 - Unknown technical approach: use `/tool-research` first.
-- Multi-PR or milestone work is handled by `--deep`; no separate `/tool-blueprint` is needed.
+- Multi-PR, milestone, or cross-session work is handled by `--deep`; no separate `/tool-blueprint` is needed.
 - Do not default to GSD or OpenSpec when a normal implementation plan is enough.

@@ -17,11 +17,39 @@ from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 HOME = Path.home()
+DEPENDENCY_MANIFEST_PATH = ROOT / "scripts" / "dependency_manifest.json"
 
 STATUS_OK = "ok"
 STATUS_MISSING = "missing"
 STATUS_UNCONFIGURED = "unconfigured"
 STATUS_BLOCKED = "blocked"
+STATUS_MANUAL_UPGRADE = "manual-upgrade-recommended"
+
+
+def load_dependency_manifest() -> dict[str, dict]:
+    try:
+        return json.loads(DEPENDENCY_MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+DEPENDENCY_MANIFEST = load_dependency_manifest()
+
+
+def manifest_entry(name: str) -> dict:
+    return DEPENDENCY_MANIFEST.get(name, {})
+
+
+def manifest_repair_hint(name: str, target: str | None, fallback: str) -> str:
+    repair_hint = manifest_entry(name).get("repair_hint")
+    if isinstance(repair_hint, str):
+        return repair_hint
+    if isinstance(repair_hint, dict):
+        if target and repair_hint.get(target):
+            return repair_hint[target]
+        if repair_hint.get("both"):
+            return repair_hint["both"]
+    return fallback
 
 
 def which(name: str) -> str | None:
@@ -38,7 +66,11 @@ class CheckResult:
 
     @property
     def needs_repair(self) -> bool:
-        return self.status in {STATUS_MISSING, STATUS_UNCONFIGURED, STATUS_BLOCKED}
+        return self.status in {STATUS_MISSING, STATUS_UNCONFIGURED, STATUS_BLOCKED, STATUS_MANUAL_UPGRADE}
+
+    @property
+    def can_auto_repair(self) -> bool:
+        return self.status in {STATUS_MISSING, STATUS_UNCONFIGURED}
 
 
 @dataclass
@@ -177,7 +209,7 @@ def check_code_review_graph(runner: CommandRunner) -> CheckResult:
             name="code-review-graph",
             status=STATUS_MISSING,
             detail="not found in PATH",
-            repair="pipx install code-review-graph && code-review-graph install && code-review-graph build",
+            repair=manifest_repair_hint("code-review-graph", None, "pipx install code-review-graph && code-review-graph install && code-review-graph build"),
             target="component",
         )
     status = runner.run(["code-review-graph", "status"])
@@ -187,7 +219,7 @@ def check_code_review_graph(runner: CommandRunner) -> CheckResult:
     if not graph_dir.exists():
         return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "graph not built", "code-review-graph build", "component")
     if not _has_crg_mcp_opencode() and not _has_crg_mcp_claude():
-        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "MCP not configured", "code-review-graph install --platform opencode", "component")
+        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "MCP not configured", manifest_repair_hint("code-review-graph", None, "code-review-graph install --platform opencode"), "component")
     return CheckResult("code-review-graph", STATUS_OK, path, target="component")
 
 
@@ -196,12 +228,12 @@ def check_superpowers(target: str, runner: CommandRunner) -> CheckResult:
         config = HOME / ".config/opencode/opencode.json"
         if config.exists() and "superpowers@git+https://github.com/obra/superpowers.git" in config.read_text(encoding="utf-8"):
             return CheckResult("superpowers", STATUS_OK, str(config), target=target)
-        return CheckResult("superpowers", STATUS_UNCONFIGURED, "OpenCode plugin missing", "add plugin entry to opencode.json", target)
+        return CheckResult("superpowers", STATUS_UNCONFIGURED, "OpenCode plugin missing", manifest_repair_hint("superpowers", target, "add plugin entry to opencode.json"), target)
 
     result = runner.run(["claude", "plugin", "list"])
     if result.returncode == 0 and "superpowers" in result.stdout.lower():
         return CheckResult("superpowers", STATUS_OK, "Claude plugin installed", target=target)
-    return CheckResult("superpowers", STATUS_MISSING, "Claude plugin missing", "claude plugin install superpowers@claude-plugins-official", target)
+    return CheckResult("superpowers", STATUS_MISSING, "Claude plugin missing", manifest_repair_hint("superpowers", target, "claude plugin install superpowers@claude-plugins-official"), target)
 
 
 def check_caveman(target: str, runner: CommandRunner) -> CheckResult:
@@ -213,20 +245,20 @@ def check_caveman(target: str, runner: CommandRunner) -> CheckResult:
         ]
         if any(path.exists() for path in markers):
             return CheckResult("caveman", STATUS_OK, "OpenCode marker found", target=target)
-        return CheckResult("caveman", STATUS_MISSING, "OpenCode marker missing", "npx skills add JuliusBrussee/caveman -a opencode", target)
+        return CheckResult("caveman", STATUS_MISSING, "OpenCode marker missing", manifest_repair_hint("caveman", target, "npx skills add JuliusBrussee/caveman -a opencode"), target)
 
     result = runner.run(["claude", "plugin", "list"])
     if result.returncode == 0 and "caveman" in result.stdout.lower():
         return CheckResult("caveman", STATUS_OK, "Claude plugin installed", target=target)
     if (HOME / ".claude/plugins/caveman").exists():
         return CheckResult("caveman", STATUS_OK, "Claude plugin directory found", target=target)
-    return CheckResult("caveman", STATUS_MISSING, "Claude plugin missing", "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman", target)
+    return CheckResult("caveman", STATUS_MISSING, "Claude plugin missing", manifest_repair_hint("caveman", target, "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman"), target)
 
 
 def check_rtk(runner: CommandRunner) -> CheckResult:
     path = which("rtk")
     if not path:
-        return CheckResult("rtk", STATUS_MISSING, "not found in PATH", "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh", "component")
+        return CheckResult("rtk", STATUS_MISSING, "not found in PATH", manifest_repair_hint("rtk", None, "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"), "component")
     runner.run(["rtk", "init", "--show"])
     return CheckResult("rtk", STATUS_OK, path, target="component")
 
@@ -244,13 +276,13 @@ def check_claude_mem(target: str, runner: CommandRunner) -> CheckResult:
                 return CheckResult("claude-mem", STATUS_UNCONFIGURED, "config unreadable", "npx claude-mem install --ide opencode", target)
         if not has_bun:
             return CheckResult("claude-mem", STATUS_BLOCKED, "Bun required", "curl -fsSL https://bun.sh/install | bash", target)
-        return CheckResult("claude-mem", STATUS_MISSING, "not installed for OpenCode", "npx claude-mem install --ide opencode", target)
+        return CheckResult("claude-mem", STATUS_MISSING, "not installed for OpenCode", manifest_repair_hint("claude-mem", target, "npx claude-mem install --ide opencode"), target)
     result = runner.run(["claude", "plugin", "list"])
     if result.returncode == 0 and "claude-mem" in result.stdout.lower():
         return CheckResult("claude-mem", STATUS_OK, "Claude plugin installed", target=target)
     if not has_bun:
         return CheckResult("claude-mem", STATUS_BLOCKED, "Bun required", "curl -fsSL https://bun.sh/install | bash", target)
-    return CheckResult("claude-mem", STATUS_MISSING, "not installed for Claude Code", "npx claude-mem install --ide claude", target)
+    return CheckResult("claude-mem", STATUS_MISSING, "not installed for Claude Code", manifest_repair_hint("claude-mem", target, "npx claude-mem install --ide claude"), target)
 
 
 def check_openspec() -> CheckResult:
@@ -261,7 +293,7 @@ def check_openspec() -> CheckResult:
         "openspec",
         STATUS_MISSING,
         "not found in PATH",
-        "npm install -g @fission-ai/openspec@latest && openspec init  # per project",
+        manifest_repair_hint("openspec", None, "npm install -g @fission-ai/openspec@latest"),
         "component",
     )
 
@@ -279,7 +311,7 @@ def check_gsd(target: str, scope: str) -> CheckResult:
         return CheckResult("gsd", STATUS_OK, f"GSD files found ({scope})", target=target)
     flag = "--opencode" if target == "opencode" else "--claude"
     scope_flag = "--local" if scope == "local" else "--global"
-    return CheckResult("gsd", STATUS_MISSING, f"GSD files missing ({scope})", f"npx -y get-shit-done-cc@latest {flag} {scope_flag}", target)
+    return CheckResult("gsd", STATUS_MISSING, f"GSD files missing ({scope})", manifest_repair_hint("gsd", target, f"npx -y get-shit-done-cc@latest {flag} {scope_flag}"), target)
 
 
 def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
@@ -289,7 +321,7 @@ def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
         markers = [HOME / ".config/opencode/ecc", HOME / ".config/opencode/commands/plan.md"]
         if any(path.exists() for path in markers):
             return CheckResult("ecc", STATUS_OK, "OpenCode ECC marker found", target=target)
-        return CheckResult("ecc", STATUS_BLOCKED, "OpenCode ECC automatic repair not implemented", "run ./install.sh --profile full --target opencode from ECC checkout", target)
+        return CheckResult("ecc", STATUS_MANUAL_UPGRADE, "OpenCode ECC automatic repair not implemented", manifest_repair_hint("ecc", target, "run the ECC installer manually for OpenCode"), target)
 
     plugin_list = runner.run(["claude", "plugin", "list"])
     rules = HOME / ".claude/rules/ecc/common"
@@ -298,7 +330,7 @@ def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
     if plugin_list.returncode == 0 and "everything-claude-code" in plugin_list.stdout:
         packs = ",".join(detect_project_rule_packs()) or "common"
         return CheckResult("ecc", STATUS_UNCONFIGURED, "ECC plugin installed but common rules missing", f"install ECC common rules and detected packs: {packs}", target)
-    return CheckResult("ecc", STATUS_MISSING, "Claude plugin missing", "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code", target)
+    return CheckResult("ecc", STATUS_MISSING, "Claude plugin missing", manifest_repair_hint("ecc", target, "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code"), target)
 
 
 def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
@@ -405,7 +437,7 @@ def repair_ecc(runner: CommandRunner, targets: list[str], scope: str) -> None:
 
 
 def repair_components(checks: list[CheckResult], targets: list[str], runner: CommandRunner, scope: str) -> None:
-    names = {check.name for check in checks if check.needs_repair}
+    names = {check.name for check in checks if check.can_auto_repair}
     if "code-review-graph" in names:
         repair_code_review_graph(runner, targets)
     if "rtk" in names:
@@ -436,6 +468,9 @@ def print_report(title: str, checks: list[CheckResult]) -> None:
 def print_health_summary(command: str, target: str, scope: str, checks: list[CheckResult]) -> None:
     mode_label = "--check" if command == "check" else "--full"
     repair_count = sum(1 for check in checks if check.needs_repair)
+    auto_repair_count = sum(1 for check in checks if check.can_auto_repair)
+    blocked_count = sum(1 for check in checks if check.status == STATUS_BLOCKED)
+    manual_count = sum(1 for check in checks if check.status == STATUS_MANUAL_UPGRADE)
     print("\nHEALTH SUMMARY")
     print("==============")
     print(f"Mode: {mode_label}")
@@ -443,6 +478,9 @@ def print_health_summary(command: str, target: str, scope: str, checks: list[Che
     print(f"Scope: {scope}")
     print(f"Checks: {len(checks)}")
     print(f"Needs repair: {repair_count}")
+    print(f"Auto-repairable: {auto_repair_count}")
+    print(f"Blocked: {blocked_count}")
+    print(f"Manual upgrade recommended: {manual_count}")
 
 
 def run_health(command: str, target: str, scope: str = "global", dry_run: bool = False) -> int:

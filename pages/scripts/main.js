@@ -1,16 +1,16 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.7.2 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
+   v1.7.3 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.7.2 · MIT License',
+    'hero.badge': 'v1.7.3 · MIT License',
     'hero.subtitle': 'Lightweight AI development workflow router for OpenCode / Claude Code',
     'hero.desc': 'Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.',
     'hero.note': 'Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.',
     'picker.title': 'Choose Your Route',
-    'picker.sub': 'Keep the README command table for quick reading. Use this visual picker on the site when you want a faster route into the right command.',
+    'picker.sub': 'Route by engineering scenario first. Use this visual picker when you want the fastest path into the right command.',
     'picker.quick.label': 'Small obvious edit',
     'picker.quick.desc': 'Typos, tiny config edits, 1-2 file surgical changes.',
     'picker.fix.label': 'Bug or regression',
@@ -42,12 +42,12 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.7.2 · MIT License',
+    'hero.badge': 'v1.7.3 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的轻量 AI 开发工作流路由器',
     'hero.desc': '先走主工作流命令。把 review、research 和外部工具保留为按需升级，而不是默认仪式。',
     'hero.note': '默认路线：quick / fix / feat / plan。辅助路线：review / refactor / research。平台路线：branch / graph / update。',
     'picker.title': '怎么选命令',
-    'picker.sub': 'README 里继续保留文本版命令选择表；页面这里额外提供一个可视化快速入口。',
+    'picker.sub': '先按工程场景选路线；页面这里提供一个比 README 更快的可视化入口。',
     'picker.quick.label': '明确的小改动',
     'picker.quick.desc': 'Typo、小配置修改、1-2 文件手术式改动。',
     'picker.fix.label': 'Bug 或回归',
@@ -236,14 +236,14 @@ const commandLabels = {
 const commandWorkflows = {
   '/tool-quick': {
     tag: 'Low',
-    sub: { en: 'Obvious, low-risk work. No planning, no deep research.', zh: '明显、低风险的工作。不规划、不深度研究。' },
+    sub: { en: 'Obvious, low-risk work. Stay cheap unless the target is still unclear.', zh: '明显、低风险的工作。除非目标仍不清楚，否则保持最低成本。' },
     tools: { en: 'Tools: CRG semantic_search_nodes / query_graph', zh: '工具: CRG semantic_search_nodes / query_graph' },
     modes: {
       '--fast': {
         label: { en: 'Direct edit', zh: '直接编辑' },
         steps: [
           { phase: '01', label: { en: 'CRG Locate', zh: 'CRG 定位' },
-            desc: { en: 'semantic_search_nodes(query="target") — confirm file/symbol', zh: 'semantic_search_nodes(query="目标") — 确认文件/符号' },
+            desc: { en: 'Read the obvious target first. Only use semantic_search_nodes when the file or symbol is still unclear.', zh: '先直接读取明显目标。只有文件或符号仍不清楚时，才用 semantic_search_nodes。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Edit', zh: '编辑' },
             desc: { en: 'Smallest safe change. No refactoring.', zh: '最小的安全改动。不重构。' },
@@ -260,7 +260,7 @@ const commandWorkflows = {
         label: { en: 'Tested edit', zh: '测试编辑' },
         steps: [
           { phase: '01', label: { en: 'CRG Context', zh: 'CRG 上下文' },
-            desc: { en: 'semantic_search_nodes / query_graph(imports_of="file") — use project patterns and language-reference only as needed.', zh: 'semantic_search_nodes / query_graph(imports_of="文件") — 仅在需要时参考项目模式和 language-reference。' },
+            desc: { en: 'Use semantic_search_nodes / query_graph(imports_of="file") only when graph context is genuinely helpful.', zh: '只有图谱上下文确实能降低搜索成本时，才使用 semantic_search_nodes / query_graph(imports_of="文件")。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Edit', zh: '编辑' },
             desc: { en: 'Targeted surgical change. Preserve project style.', zh: '定向手术编辑。保持项目风格。' },
@@ -278,13 +278,13 @@ const commandWorkflows = {
   '/tool-fix': {
     tag: 'Low→High',
     sub: { en: 'Broken behavior, failing tests, regressions. Find root cause, prove fix.', zh: '行为异常、测试失败、回归。找到根因，证明修复。' },
-    tools: { en: 'Tools: CRG trace pipeline · native regression verification · Caveman review', zh: '工具: CRG 追踪管线 · 原生回归验证 · Caveman 审查' },
+    tools: { en: 'Tools: CRG trace pipeline · systematic debugging when needed · native regression verification', zh: '工具: CRG 追踪管线 · 必要时的系统化调试 · 原生回归验证' },
     modes: {
       '--fast': {
         label: { en: 'Quick fix', zh: '快速修复' },
         steps: [
           { phase: '01', label: { en: 'Locate', zh: '定位' },
-            desc: { en: 'semantic_search_nodes(query="failing_fn") — confirm location', zh: 'semantic_search_nodes(query="失败函数") — 确认位置' },
+            desc: { en: 'If the location is obvious, go straight there. Otherwise use semantic_search_nodes(query="failing_fn").', zh: '如果位置已明显可见，直接进入文件；否则再用 semantic_search_nodes(query="失败函数")。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Fix', zh: '修复' },
             desc: { en: 'Apply surgical fix directly.', zh: '直接进行手术修复。' },
@@ -324,11 +324,11 @@ const commandWorkflows = {
         label: { en: 'Full pipeline', zh: '完整管线' },
         steps: [
           { phase: '01', label: { en: 'CRG Trace', zh: 'CRG 追踪' },
-            desc: { en: 'Full CRG trace pipeline (same as standard).', zh: '完整 CRG 追踪管线 (同 standard)。' },
+            desc: { en: 'Full CRG trace pipeline (same as standard) for cross-file or ownership-heavy bugs.', zh: '对跨文件或归属复杂的 bug 使用完整 CRG 追踪管线 (同 standard)。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Add Method Layer', zh: '增加方法层' },
-            desc: { en: 'Only when reproduction or root cause remains unclear: add deeper research, systematic debugging, or cross-session debugging deliberately.', zh: '仅当复现或根因仍不清楚时，按需增加深研究、系统调试或跨会话调试。' },
-            tools: ['ECC', 'Superpowers', 'GSD'] },
+            desc: { en: 'Only when reproduction or root cause remains unclear: add systematic debugging first, then specialized research if the domain is the blocker.', zh: '仅当复现或根因仍不清楚时，优先补系统化调试；只有领域知识才是阻塞点时再做专项研究。' },
+            tools: ['Superpowers', 'ECC', 'GSD'] },
           { phase: '03', label: { en: 'Security Route', zh: '安全路线' },
             desc: { en: 'If auth, input, filesystem, network, secrets, cookies, or SQL are involved, add /tool-review --deep before sign-off.', zh: '如果涉及 auth、输入、文件系统、网络、secrets、cookies 或 SQL，完成前补 /tool-review --deep。' },
             tools: [] },
@@ -348,7 +348,7 @@ const commandWorkflows = {
   '/tool-feat': {
     tag: 'Medium',
     sub: { en: 'Implement the smallest verifiable feature slice once the target behavior is already clear.', zh: '当目标行为已经清楚时，实现最小可验证功能切片。' },
-    tools: { en: 'Tools: CRG explore · optional OpenSpec · caveman-stats · light review', zh: '工具: CRG 探索 · 可选 OpenSpec · caveman-stats · 轻量审查' },
+    tools: { en: 'Tools: targeted CRG explore · optional OpenSpec · caveman-stats · light review', zh: '工具: 定向 CRG 探索 · 可选 OpenSpec · caveman-stats · 轻量审查' },
     modes: {
       '--fast': {
         label: { en: 'Small feature', zh: '小功能' },
@@ -357,7 +357,7 @@ const commandWorkflows = {
             desc: { en: '/caveman-stats — token baseline. Check not on main → /tool-branch create.', zh: '/caveman-stats — token 基线。检查不在 main → /tool-branch create。' },
             tools: ['Caveman'] },
           { phase: '01', label: { en: 'CRG Explore', zh: 'CRG 探索' },
-            desc: { en: 'semantic_search_nodes(query="pattern") — confirm existing patterns.', zh: 'semantic_search_nodes(query="模式") — 确认现有模式。' },
+            desc: { en: 'Confirm an existing pattern first. Use semantic_search_nodes when local structure is not already obvious.', zh: '先确认现有模式。只有本地结构不明显时再用 semantic_search_nodes。' },
             tools: ['CRG'] },
           { phase: '02', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Use project conventions. No new patterns unless necessary.', zh: '使用项目规范。非必要不引入新模式。' },
@@ -375,9 +375,9 @@ const commandWorkflows = {
             tools: ['Caveman'] },
           { phase: '01', label: { en: 'CRG Explore', zh: 'CRG 探索' },
             desc: { en: 'Targeted CRG context: semantic_search_nodes + query_graph(imports_of). Use architecture overview only if boundaries are unclear.', zh: '定向 CRG 上下文: semantic_search_nodes + query_graph(imports_of)。边界不清时才用架构概览。' },
-            tools: ['CRG', 'ECC'] },
+            tools: ['CRG'] },
           { phase: '02', label: { en: 'Route Back If Needed', zh: '必要时回退' },
-            desc: { en: 'If requirements remain unclear after exploration, stop and route to /tool-plan or /tool-research.', zh: '如果探索后需求仍不清楚，停止实现并回退到 /tool-plan 或 /tool-research。' },
+            desc: { en: 'If requirements remain unclear after exploration, stop and route to /tool-plan. Use /tool-research only when a decision needs evidence.', zh: '如果探索后需求仍不清楚，停止实现并回退到 /tool-plan。只有具体决策需要证据时才进入 /tool-research。' },
             tools: [] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Search existing patterns first. Implement with project conventions.', zh: '先搜索现有模式。按项目规范实现。' },
@@ -397,7 +397,7 @@ const commandWorkflows = {
             desc: { en: 'caveman-stats + branch check.', zh: 'caveman-stats + 分支检查。' },
             tools: ['Caveman'] },
           { phase: '01', label: { en: 'Plan First', zh: '先规划' },
-            desc: { en: 'If the feature is still decision-heavy, route through /tool-plan or /tool-research before implementation.', zh: '如果功能仍需要做高影响决策，先经过 /tool-plan 或 /tool-research 再实现。' },
+            desc: { en: 'If the feature is still decision-heavy, route through /tool-plan first. Use /tool-research only for unanswered evidence questions.', zh: '如果功能仍存在高影响决策，先走 /tool-plan。只有还缺证据时才进入 /tool-research。' },
             tools: ['ECC'] },
           { phase: '02', label: { en: 'Spec + Plan', zh: '规格 + 规划' },
             desc: { en: 'Use OpenSpec or a file-backed plan only when durable agreement improves execution.', zh: '只有在持久化共识确实能提高执行质量时，才使用 OpenSpec 或文件化计划。' },
@@ -480,13 +480,13 @@ const commandWorkflows = {
   '/tool-plan': {
     tag: 'Medium',
     sub: { en: 'Use this when the work is not yet executable because scope, order, ownership, or acceptance is unclear.', zh: '当工作因为范围、顺序、归属或验收不清楚而还不能直接执行时，使用这个命令。' },
-    tools: { en: 'Tools: OpenSpec · CRG detect_changes · file-backed plans · gsd-new-milestone', zh: '工具: OpenSpec · CRG detect_changes · 文件化计划 · gsd-new-milestone' },
+    tools: { en: 'Tools: OpenSpec · targeted CRG impact checks · file-backed plans · gsd-new-milestone', zh: '工具: OpenSpec · 定向 CRG 影响检查 · 文件化计划 · gsd-new-milestone' },
     modes: {
       '--fast': {
         label: { en: 'Inline plan', zh: '内联计划' },
         steps: [
           { phase: '01', label: { en: 'Clarify Inputs', zh: '澄清输入' },
-            desc: { en: 'If the work is not plan-ready, use gsd-explore for product direction or /tool-research for decision evidence first.', zh: '如果工作还不具备规划条件，先用 gsd-explore 处理产品方向，或用 /tool-research 收集决策证据。' },
+            desc: { en: 'Clarify only what blocks planning. Use /tool-research for evidence questions, not as a generic prelude.', zh: '只澄清阻塞规划的内容。/tool-research 只用于证据问题，不作为默认前奏。' },
             tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Plan', zh: '规划' },
             desc: { en: 'Short inline plan → route to /tool-quick or /tool-feat.', zh: '简短内联计划 → 路由到 /tool-quick 或 /tool-feat。' },
@@ -740,8 +740,8 @@ const commandWorkflows = {
   },
   '/tool-update': {
     tag: 'Low',
-    sub: { en: 'Sync and update engineer-shovel. Check component health for all 8 upstream tools.', zh: '同步更新 engineer-shovel。检查所有 8 个上游组件健康度。' },
-    tools: { en: 'Checks: RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD', zh: '检查: RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD' },
+    sub: { en: 'Sync and update engineer-shovel. Separate router drift from component health and repair guidance.', zh: '同步更新 engineer-shovel。把路由漂移、组件健康和修复建议清晰分开。' },
+    tools: { en: 'Checks: router current/missing/outdated/extra · RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD', zh: '检查: router current/missing/outdated/extra · RTK · Caveman · CRG · claude-mem · superpowers · OpenSpec · ECC · GSD' },
     modes: {
       '--check': {
         label: { en: 'Read-only', zh: '只读检查' },
@@ -750,10 +750,10 @@ const commandWorkflows = {
             desc: { en: 'Detect installed locations for target(s).', zh: '检测目标环境的安装位置。' },
             tools: [] },
           { phase: '02', label: { en: 'Compare', zh: '对比' },
-            desc: { en: 'Compare installed files with latest repo versions.', zh: '对比已安装文件与最新仓库版本。' },
+            desc: { en: 'Compare installed router files with latest repo versions and classify them as current, missing, outdated, or extra.', zh: '对比已安装路由文件与最新仓库版本，并分类为 current、missing、outdated、extra。' },
             tools: [] },
           { phase: '03', label: { en: 'Health', zh: '健康' },
-            desc: { en: 'Check component health. Report missing/outdated/extra files.', zh: '检查组件健康度。报告缺失/过时/多余文件。' },
+            desc: { en: 'Check component health. Separate auto-repairable issues from blocked states and manual-upgrade recommendations.', zh: '检查组件健康度，并区分可自动修复、受限阻塞和手动升级建议。' },
             tools: [] }
         ]
       },
@@ -761,13 +761,13 @@ const commandWorkflows = {
         label: { en: 'Sync + repair', zh: '同步 + 修复' },
         steps: [
           { phase: '01', label: { en: 'Check', zh: '检查' },
-            desc: { en: 'Same as --check: detect + compare + health audit.', zh: '同 --check: 检测 + 对比 + 健康审计。' },
+            desc: { en: 'Same as --check: detect + compare + router/component audit.', zh: '同 --check: 检测 + 对比 + 路由/组件审计。' },
             tools: [] },
           { phase: '02', label: { en: 'Update', zh: '更新' },
-            desc: { en: 'Overwrite installed files with latest versions.', zh: '用最新版本覆盖已安装文件。' },
+            desc: { en: 'Sync router files first so installed commands match the checked-out repository state.', zh: '先同步路由文件，让已安装命令与当前仓库状态保持一致。' },
             tools: [] },
           { phase: '03', label: { en: 'Repair', zh: '修复' },
-            desc: { en: 'Install/configure missing components via official installers.', zh: '通过官方安装器安装/配置缺失组件。' },
+            desc: { en: 'Repair missing or unconfigured components where automatic repair is supported; otherwise report the manual path clearly.', zh: '对支持自动修复的缺失/未配置组件执行修复；否则明确报告手动路径。' },
             tools: [] },
           { phase: '04', label: { en: 'Verify', zh: '验证' },
             desc: { en: 'Verify installation integrity post-update.', zh: '验证更新后安装完整性。' },
