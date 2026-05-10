@@ -1,6 +1,6 @@
 ---
 description: Update and synchronize engineer-shovel installation — sync skill, commands, and components
-argument-hint: [--check|--full] [--target opencode|claude|both]
+argument-hint: [--check|--full] [--target opencode|claude|both] [--scope global|local]
 cost-profile: low
 risk-level: low
 recommended-mode: --full
@@ -26,10 +26,12 @@ Single user-facing entry point for keeping Engineer Shovel current. It checks ro
 - `--target opencode`: Update OpenCode installation only
 - `--target claude`: Update Claude Code installation only  
 - `--target both`: Update both targets (default)
+- `--scope global`: Check or repair home-directory installations (default)
+- `--scope local`: Check or repair project-local router files and any components that actually support local scope
 
 ## Flow
 
-1. Detect installed locations based on target(s).
+1. Detect installed locations based on target(s) and scope.
 2. Compare local installed router files (`SKILL.md`, `/tool-*`) with latest repo versions.
 3. Report missing, outdated, or extra router files.
 4. Check component health for base tools and recommended/full integrations.
@@ -49,6 +51,12 @@ Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, plus selected runtim
 
 Checks recommended/full components: RTK, Caveman, code-review-graph, superpowers, OpenSpec, ECC, and GSD.
 
+Scope model:
+- Router files fully support `global` and `local`.
+- Some components remain effectively global even when the Engineer Shovel router is local, such as RTK, Caveman, superpowers, claude-mem, and OpenSpec.
+- GSD can be checked against the selected scope.
+- ECC local installs are not supported; report this explicitly instead of pretending repair is available.
+
 OpenSpec policy:
 - Install/check the global CLI only (`openspec`).
 - Do not run `openspec init` automatically because it writes project files.
@@ -64,6 +72,7 @@ Safety:
 - Does not enable telemetry explicitly.
 - Does not delete user config.
 - Backs up JSON config before editing.
+- `--dry-run` skips repair writes; read-only health probes may still run so status stays accurate.
 
 ## Missing Component Guidance
 
@@ -74,7 +83,7 @@ When a component is missing or broken, suggest the install command (e.g. `pipx i
 - Remember this command as the only update entry point.
 - Use `--check` for status, drift, and repair guidance.
 - Use `--full` when you want router sync plus component repair/upgrade in one pass.
-- The underlying scripts should present output in the same mental model: router layer first, component layer second.
+- The underlying scripts present one mental model: router layer first, component layer second, with scope called out explicitly.
 
 ## Compression
 

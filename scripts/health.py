@@ -73,6 +73,35 @@ def expand_targets(target: str) -> list[str]:
     return [target]
 
 
+def install_paths(target: str, scope: str) -> dict[str, Path | list[Path]]:
+    return {
+        "opencode": {
+            "global": {
+                "skill": HOME / ".agents/skills/engineer-shovel",
+                "commands": HOME / ".config/opencode/commands",
+                "gsd_skills": [HOME / ".agents/skills", HOME / ".config/opencode/skills"],
+            },
+            "local": {
+                "skill": ROOT / ".agents/skills/engineer-shovel",
+                "commands": ROOT / ".opencode/commands",
+                "gsd_skills": [ROOT / ".agents/skills", ROOT / ".opencode/skills"],
+            },
+        },
+        "claude": {
+            "global": {
+                "skill": HOME / ".claude/skills/engineer-shovel",
+                "commands": HOME / ".claude/commands",
+                "gsd_skills": [HOME / ".claude/skills"],
+            },
+            "local": {
+                "skill": ROOT / ".claude/skills/engineer-shovel",
+                "commands": ROOT / ".claude/commands",
+                "gsd_skills": [ROOT / ".claude/skills"],
+            },
+        },
+    }[target][scope]
+
+
 def check_base_dependencies(targets: list[str], runner: CommandRunner) -> list[CheckResult]:
     del runner
     names = ["git", "python3", "pipx", "node", "npx"]
@@ -202,7 +231,7 @@ def check_rtk(runner: CommandRunner) -> CheckResult:
     return CheckResult("rtk", STATUS_OK, path, target="component")
 
 
-def check_claude_mem(target: str) -> CheckResult:
+def check_claude_mem(target: str, runner: CommandRunner) -> CheckResult:
     has_bun = which("bun") is not None
     if target == "opencode":
         config = HOME / ".config/opencode/opencode.json"
@@ -216,7 +245,7 @@ def check_claude_mem(target: str) -> CheckResult:
         if not has_bun:
             return CheckResult("claude-mem", STATUS_BLOCKED, "Bun required", "curl -fsSL https://bun.sh/install | bash", target)
         return CheckResult("claude-mem", STATUS_MISSING, "not installed for OpenCode", "npx claude-mem install --ide opencode", target)
-    result = CommandRunner(dry_run=False).run(["claude", "plugin", "list"])
+    result = runner.run(["claude", "plugin", "list"])
     if result.returncode == 0 and "claude-mem" in result.stdout.lower():
         return CheckResult("claude-mem", STATUS_OK, "Claude plugin installed", target=target)
     if not has_bun:
@@ -237,24 +266,25 @@ def check_openspec() -> CheckResult:
     )
 
 
-def check_gsd(target: str) -> CheckResult:
-    command_dir = HOME / ".config/opencode/commands" if target == "opencode" else HOME / ".claude/commands"
-    if target == "opencode":
-        skill_dirs = [HOME / ".agents/skills", HOME / ".config/opencode/skills"]
-    else:
-        skill_dirs = [HOME / ".claude/skills"]
+def check_gsd(target: str, scope: str) -> CheckResult:
+    paths = install_paths(target, scope)
+    command_dir = paths["commands"]
+    skill_dirs = paths["gsd_skills"]
     has_gsd = any(command_dir.glob("gsd-*.md")) if command_dir.exists() else False
     has_gsd = has_gsd or any(
         skill_dir.exists() and any(skill_dir.glob("gsd-*/SKILL.md"))
         for skill_dir in skill_dirs
     )
     if has_gsd:
-        return CheckResult("gsd", STATUS_OK, "GSD files found", target=target)
+        return CheckResult("gsd", STATUS_OK, f"GSD files found ({scope})", target=target)
     flag = "--opencode" if target == "opencode" else "--claude"
-    return CheckResult("gsd", STATUS_MISSING, "GSD files missing", f"npx -y get-shit-done-cc@latest {flag} --global", target)
+    scope_flag = "--local" if scope == "local" else "--global"
+    return CheckResult("gsd", STATUS_MISSING, f"GSD files missing ({scope})", f"npx -y get-shit-done-cc@latest {flag} {scope_flag}", target)
 
 
-def check_ecc(target: str, runner: CommandRunner) -> CheckResult:
+def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
+    if scope == "local":
+        return CheckResult("ecc", STATUS_BLOCKED, "local scope not supported", "use --scope global or skip ECC for project-local installs", target)
     if target == "opencode":
         markers = [HOME / ".config/opencode/ecc", HOME / ".config/opencode/commands/plan.md"]
         if any(path.exists() for path in markers):
@@ -271,15 +301,15 @@ def check_ecc(target: str, runner: CommandRunner) -> CheckResult:
     return CheckResult("ecc", STATUS_MISSING, "Claude plugin missing", "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code", target)
 
 
-def check_components(targets: list[str], runner: CommandRunner) -> list[CheckResult]:
+def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
     checks = [check_code_review_graph(runner), check_rtk(runner), check_openspec()]
     for target in targets:
         checks.extend([
             check_superpowers(target, runner),
             check_caveman(target, runner),
-            check_claude_mem(target),
-            check_gsd(target),
-            check_ecc(target, runner),
+            check_claude_mem(target, runner),
+            check_gsd(target, scope),
+            check_ecc(target, runner, scope),
         ])
     return checks
 
@@ -328,7 +358,7 @@ def repair_superpowers(runner: CommandRunner, target: str) -> None:
 def repair_caveman(runner: CommandRunner, targets: list[str]) -> None:
     command = ["bash", "-lc", "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash"]
     if len(targets) == 1:
-        agent = "opencode" if targets[0] == "opencode" else "claude-code"
+        agent = "opencode" if targets[0] == "opencode" else "claude"
         command = ["bash", "-lc", f"curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash -s -- --only {agent}"]
     runner.run(command)
 
@@ -345,8 +375,8 @@ def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
 
 def repair_claude_mem(runner: CommandRunner, targets: list[str]) -> None:
     for target in targets:
-        ide = "--ide opencode" if target == "opencode" else "--ide claude"
-        runner.run(["npx", "-y", "claude-mem", "install", ide])
+        ide = "opencode" if target == "opencode" else "claude"
+        runner.run(["npx", "-y", "claude-mem", "install", "--ide", ide])
 
 
 def repair_openspec(runner: CommandRunner, targets: list[str]) -> None:
@@ -354,15 +384,19 @@ def repair_openspec(runner: CommandRunner, targets: list[str]) -> None:
     runner.run(["npm", "install", "-g", "@fission-ai/openspec@latest"])
 
 
-def repair_gsd(runner: CommandRunner, targets: list[str]) -> None:
+def repair_gsd(runner: CommandRunner, targets: list[str], scope: str) -> None:
+    scope_flag = "--local" if scope == "local" else "--global"
     if set(targets) == {"opencode", "claude"}:
-        runner.run(["npx", "-y", "get-shit-done-cc@latest", "--all", "--global"])
+        runner.run(["npx", "-y", "get-shit-done-cc@latest", "--all", scope_flag])
         return
     flag = "--opencode" if targets == ["opencode"] else "--claude"
-    runner.run(["npx", "-y", "get-shit-done-cc@latest", flag, "--global"])
+    runner.run(["npx", "-y", "get-shit-done-cc@latest", flag, scope_flag])
 
 
-def repair_ecc(runner: CommandRunner, targets: list[str]) -> None:
+def repair_ecc(runner: CommandRunner, targets: list[str], scope: str) -> None:
+    if scope == "local":
+        runner.commands.append(["blocked", "ecc-local", "use --scope global or skip ECC"])
+        return
     if "claude" in targets:
         runner.run(["claude", "plugin", "marketplace", "add", "https://github.com/affaan-m/everything-claude-code"])
         runner.run(["claude", "plugin", "install", "everything-claude-code@everything-claude-code"])
@@ -370,7 +404,7 @@ def repair_ecc(runner: CommandRunner, targets: list[str]) -> None:
         runner.commands.append(["blocked", "ecc-opencode", "manual install required"])
 
 
-def repair_components(checks: list[CheckResult], targets: list[str], runner: CommandRunner) -> None:
+def repair_components(checks: list[CheckResult], targets: list[str], runner: CommandRunner, scope: str) -> None:
     names = {check.name for check in checks if check.needs_repair}
     if "code-review-graph" in names:
         repair_code_review_graph(runner, targets)
@@ -379,7 +413,7 @@ def repair_components(checks: list[CheckResult], targets: list[str], runner: Com
     if "openspec" in names:
         repair_openspec(runner, targets)
     if "gsd" in names:
-        repair_gsd(runner, targets)
+        repair_gsd(runner, targets, scope)
     if "caveman" in names:
         repair_caveman(runner, targets)
     for target in targets:
@@ -388,7 +422,7 @@ def repair_components(checks: list[CheckResult], targets: list[str], runner: Com
     if "claude-mem" in names:
         repair_claude_mem(runner, targets)
     if "ecc" in names:
-        repair_ecc(runner, targets)
+        repair_ecc(runner, targets, scope)
 
 
 def print_report(title: str, checks: list[CheckResult]) -> None:
@@ -399,28 +433,30 @@ def print_report(title: str, checks: list[CheckResult]) -> None:
         print(f"- {label}: {check.status.upper()} {check.detail}".rstrip())
 
 
-def print_health_summary(command: str, target: str, checks: list[CheckResult]) -> None:
+def print_health_summary(command: str, target: str, scope: str, checks: list[CheckResult]) -> None:
     mode_label = "--check" if command == "check" else "--full"
     repair_count = sum(1 for check in checks if check.needs_repair)
     print("\nHEALTH SUMMARY")
     print("==============")
     print(f"Mode: {mode_label}")
     print(f"Target: {target}")
+    print(f"Scope: {scope}")
     print(f"Checks: {len(checks)}")
     print(f"Needs repair: {repair_count}")
 
 
-def run_health(command: str, target: str, dry_run: bool = False) -> int:
+def run_health(command: str, target: str, scope: str = "global", dry_run: bool = False) -> int:
     targets = expand_targets(target)
+    # Health probes are read-only; dry-run only skips the repair step below.
     runner = CommandRunner(dry_run=False)
-    checks = check_base_dependencies(targets, runner) + check_components(targets, runner)
+    checks = check_base_dependencies(targets, runner) + check_components(targets, runner, scope)
     print_report("HEALTH", checks)
-    print_health_summary(command, target, checks)
+    print_health_summary(command, target, scope, checks)
     if command == "repair":
-        repair_components(checks, targets, CommandRunner(dry_run=dry_run))
-        checks = check_base_dependencies(targets, runner) + check_components(targets, runner)
+        repair_components(checks, targets, CommandRunner(dry_run=dry_run), scope)
+        checks = check_base_dependencies(targets, runner) + check_components(targets, runner, scope)
         print_report("VERIFY", checks)
-        print_health_summary(command, target, checks)
+        print_health_summary(command, target, scope, checks)
     return 1 if any(check.needs_repair for check in checks) else 0
 
 
@@ -428,9 +464,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Check and repair Engineer Shovel supporting components")
     parser.add_argument("command", choices=["check", "repair"])
     parser.add_argument("--target", choices=["opencode", "claude", "both"], default="both")
+    parser.add_argument("--scope", choices=["global", "local"], default="global")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    return run_health(args.command, args.target, dry_run=args.dry_run)
+    return run_health(args.command, args.target, scope=args.scope, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

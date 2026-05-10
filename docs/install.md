@@ -84,8 +84,8 @@ Preview paths and pinned sources without making changes:
 Use `/tool-update` as the user-facing entry point:
 
 ```text
-/tool-update --check
-/tool-update --full
+/tool-update --check --target both --scope global
+/tool-update --full --target both --scope global
 ```
 
 Internal scripts still exist, but they now have narrower roles:
@@ -93,8 +93,8 @@ Internal scripts still exist, but they now have narrower roles:
 ```bash
 python3 scripts/sync.py check   # router files only
 python3 scripts/sync.py sync    # router files only
-python3 scripts/health.py check --target both
-python3 scripts/health.py repair --target both
+python3 scripts/health.py check --target both --scope global
+python3 scripts/health.py repair --target both --scope global
 ```
 
 Responsibility split:
@@ -103,6 +103,15 @@ Responsibility split:
 - `scripts/sync.py`: Engineer Shovel router files and version sync
 - `scripts/health.py`: external component health and repair
 - `/tool-update`: user-facing orchestrator over sync + health
+
+Scope notes:
+
+- Router sync supports both `--scope global` and `--scope local`.
+- Health checks now accept `--scope`, but component support is intentionally uneven:
+  - RTK, Caveman, superpowers, claude-mem, and OpenSpec are effectively global integrations.
+  - GSD can be checked against the selected scope.
+  - ECC local scope is not supported and is reported as blocked instead of auto-repaired.
+- `--dry-run` on health/update skips repair writes; read-only status probes may still run.
 
 Dry-run note:
 

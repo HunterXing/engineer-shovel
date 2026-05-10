@@ -67,6 +67,10 @@ Scope:
 
 When run in a terminal without explicit mode/target/scope, the installer prompts interactively
 in order: target → mode → scope.
+
+Routine drift checks and post-install repair belong to /tool-update:
+  /tool-update --check [--target ...] [--scope global|local]
+  /tool-update --full  [--target ...] [--scope global|local]
 USAGE
 }
 

@@ -16,19 +16,19 @@ when-to-use: Use when behavior is broken, tests fail, logs show regressions, or 
 
 Start with the cheapest path that can prove the bug is fixed. This is a main workflow command; escalate only when reproduction or root cause is unclear.
 
-Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/caveman full` for `--standard`, `/caveman full` (escalate to `ultra` if subagent≥3) for `--deep`. Wrap large test/log output with `rtk gain`.
+Shared policy: mode mapping, security gate, and completion pipeline come from `SKILL.md`; capability-layer roles and escalation rules live in `docs/architecture.md`. Wrap large test/log output with `rtk gain`.
 
 ## Cost Modes
 
 - `--fast`: known file/function, obvious cause → confirm location → direct fix + targeted test.
 - `--standard` or default: reproducible bug, local scope → CRG trace + surgical fix + failing test + regression verification + light review.
-- `--deep`: flaky, cross-module, security, or unknown root cause → add method/spec/orchestration layers deliberately.
+- `--deep`: flaky, cross-module, security, or unknown root cause → escalate deliberately per `docs/architecture.md`.
 
 ## Flow
 
 0. Code-review-graph (L2) is auto-refreshed by git hooks. Verify freshness inline.
 1. Reproduce or identify the failing assertion/log.
-2. Search claude-mem for similar bug history: `npx claude-mem search "<error_keywords>"` for prior fixes and known patterns.
+2. Search claude-mem for similar bug history when the failure looks familiar or cross-session context matters.
 3. Trace the error call chain through CRG:
    - `semantic_search_nodes(query="<failing_function>")` to locate the entry point
    - `get_affected_flows(entry_point="<node_id>")` to trace the full execution path
@@ -38,23 +38,7 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 5. Apply a surgical fix.
 6. Run the failing test first, then related tests/build. Wrap large test output with `rtk gain`.
 7. `query_graph(tests_for="<fixed_node>")` to verify test coverage exists for the fix.
-8. **Verification Gate**: run project-native test/build → graph impact check clean → proceed to completion gate.
-
-## Completion Gate
-
-### `--fast`
-9. Run project-native test/build. Report: what changed, what was verified. Done.
-
-### `--standard`
-9. Re-run the failing test first, then related regression tests/build.
-10. Run `/tool-review --fast` or a Caveman-compressed diff sanity check.
-11. Offer `/caveman-commit` suggestion (do NOT auto-commit without user request).
-
-### `--deep`
-9. `skill(name="gsd-verify-work")` — structured acceptance verification against bug report.
-10. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings.
-11. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge.
-12. Offer `/caveman-commit` suggestion.
+8. Re-run project-native test/build, then use `/tool-review --fast` for standard work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
 
 ## Security Gate
 

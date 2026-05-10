@@ -17,17 +17,17 @@ Engineer Shovel installs a router plus optional external capability layers. This
 
 ## Dependency Matrix
 
-| Component | Install path | Current strategy | Why |
-|---|---|---|---|
-| Engineer Shovel router | repo files / sync | repo version | Router files should match the checked-out repository state |
-| ECC | pinned checkout in `install.sh` | pinned SHA | High-surface dependency; pin for reproducibility |
-| RTK | official installer, fallback cargo pinned rev | mixed: installer + pinned fallback | Prefer upstream path, keep deterministic fallback |
-| code-review-graph | `pipx` or `pip` | latest package | Fast-moving tool with clear standalone install path |
-| Caveman | official installer | latest installer | Plugin-style tool with upstream-managed install flow |
-| superpowers | plugin reference | git/plugin reference | Managed as plugin capability rather than binary |
-| OpenSpec | `npm install -g @fission-ai/openspec@latest` | latest package | CLI intentionally kept separate from repo-local initialization |
-| GSD | `npx -y get-shit-done-cc@latest` | latest installer | Installer is upstream-owned orchestration entry point |
-| claude-mem | `npx -y claude-mem install` | latest installer | Session-memory layer is plugin/runtime integrated |
+| Component | Install path | Repair path | Scope model | Current strategy | Why |
+|---|---|---|---|---|---|
+| Engineer Shovel router | repo files / sync | `scripts/sync.py` via `/tool-update` | `global` + `local` | repo version | Router files should match the checked-out repository state |
+| ECC | pinned checkout in `install.sh` | limited checks in `scripts/health.py` | `global` only | pinned SHA | High-surface dependency; pin for reproducibility |
+| RTK | official installer, fallback cargo pinned rev | `scripts/health.py` | effectively global | mixed: installer + pinned fallback | Prefer upstream path, keep deterministic fallback |
+| code-review-graph | `pipx` or `pip` | `scripts/health.py` | mixed: global MCP + repo-local graph build | latest package | Fast-moving tool with clear standalone install path |
+| Caveman | official installer | `scripts/health.py` | effectively global | latest installer | Plugin-style tool with upstream-managed install flow |
+| superpowers | plugin reference | `scripts/health.py` | effectively global | git/plugin reference | Managed as plugin capability rather than binary |
+| OpenSpec | `npm install -g @fission-ai/openspec@latest` | `scripts/health.py` | effectively global CLI | latest package | CLI intentionally kept separate from repo-local initialization |
+| GSD | `npx -y get-shit-done-cc@latest` | `scripts/health.py` | `global` + `local` | latest installer | Installer is upstream-owned orchestration entry point |
+| claude-mem | `npx -y claude-mem install` | `scripts/health.py` | effectively global | latest installer | Session-memory layer is plugin/runtime integrated |
 
 ## Strategy Rules
 

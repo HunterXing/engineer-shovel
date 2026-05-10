@@ -16,7 +16,7 @@ when-to-use: Use for behavior-preserving cleanup where baseline and post-change 
 
 Behavior must remain identical. Do not mix feature work into a refactor. This is an engineering support command, not the default path for ordinary feature work.
 
-Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman ultra` for broad diffs (per SKILL.md mapping). Wrap large test/build commands with `rtk gain`.
+Shared policy: mode mapping, security gate, and completion behavior come from `SKILL.md`; escalation rules live in `docs/architecture.md`. Wrap large test/build commands with `rtk gain`.
 
 ## Cost Modes
 
@@ -27,7 +27,7 @@ Compression: `/caveman full` by default, `/caveman lite` for `--fast`, `/caveman
 ## Flow
 
 1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites.
-2. Search claude-mem for prior refactor rationale: `npx claude-mem search "<refactor_context>"` to capture known patterns and historical decisions.
+2. Search claude-mem for prior refactor rationale when historical decisions or naming context matter.
 3. Code-review-graph (L2, auto-refreshed):
    - `get_impact_radius(target="<function_or_module>")` to understand affected callers before refactoring
    - `refactor_tool` to check for dead code or plan renames safely
