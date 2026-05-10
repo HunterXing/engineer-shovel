@@ -232,7 +232,19 @@ def test_health_detects_opencode_gsd_agent_skill_marker(tmp_path, monkeypatch):
     marker.parent.mkdir(parents=True)
     marker.write_text("# GSD\n", encoding="utf-8")
 
-    result = module.check_gsd("opencode")
+    result = module.check_gsd("opencode", "global")
+
+    assert result.status == module.STATUS_OK
+
+
+def test_health_detects_local_gsd_command_marker(tmp_path, monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    marker = tmp_path / ".opencode" / "commands" / "gsd-test.md"
+    marker.parent.mkdir(parents=True)
+    marker.write_text("# GSD\n", encoding="utf-8")
+
+    result = module.check_gsd("opencode", "local")
 
     assert result.status == module.STATUS_OK
 
@@ -286,9 +298,56 @@ def test_health_repair_gsd_uses_all_for_both_targets():
     module = load_script("health.py")
     runner = module.CommandRunner(dry_run=True)
 
-    module.repair_gsd(runner, ["opencode", "claude"])
+    module.repair_gsd(runner, ["opencode", "claude"], "global")
 
     assert ["npx", "-y", "get-shit-done-cc@latest", "--all", "--global"] in runner.commands
+
+
+def test_health_repair_gsd_uses_local_scope_flag():
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_gsd(runner, ["opencode"], "local")
+
+    assert ["npx", "-y", "get-shit-done-cc@latest", "--opencode", "--local"] in runner.commands
+
+
+def test_health_repair_claude_mem_splits_argv():
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_claude_mem(runner, ["opencode", "claude"])
+
+    assert ["npx", "-y", "claude-mem", "install", "--ide", "opencode"] in runner.commands
+    assert ["npx", "-y", "claude-mem", "install", "--ide", "claude"] in runner.commands
+
+
+def test_health_repair_caveman_uses_claude_flag():
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_caveman(runner, ["claude"])
+
+    assert runner.commands == [[
+        "bash",
+        "-lc",
+        "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash -s -- --only claude",
+    ]]
+
+
+def test_health_check_claude_mem_uses_runner(monkeypatch):
+    module = load_script("health.py")
+    calls = []
+
+    def fake_exec(command):
+        calls.append(command)
+        return module.CommandResult(0, "claude-mem\n")
+
+    runner = module.CommandRunner(executor=fake_exec)
+    result = module.check_claude_mem("claude", runner)
+
+    assert calls == [["claude", "plugin", "list"]]
+    assert result.status == module.STATUS_OK
 
 
 def test_tool_update_mentions_component_health_checks():
@@ -298,6 +357,23 @@ def test_tool_update_mentions_component_health_checks():
     assert "code-review-graph" in text
     assert "superpowers" in text
     assert "MCP" in text
+    assert "--scope global|local" in text
+    assert "read-only health probes" in text
+
+
+def test_product_shape_docs_keep_command_boundaries_clear():
+    research = (ROOT / "commands" / "tool-research.md").read_text(encoding="utf-8")
+    mode_routing = (ROOT / "docs" / "mode-routing.md").read_text(encoding="utf-8")
+    tool_graph = (ROOT / "commands" / "tool-graph.md").read_text(encoding="utf-8").lower()
+    tool_update = (ROOT / "commands" / "tool-update.md").read_text(encoding="utf-8")
+
+    assert "special mode axis" in research
+    assert "--quick" in research
+    assert "--web" in research
+    assert "tool-research" in mode_routing
+    assert "--quick / --web / --deep" in mode_routing
+    assert "diagnostic" in tool_graph
+    assert "Single user-facing entry point" in tool_update
 
 
 def test_sync_script_invokes_health_script():
@@ -305,3 +381,84 @@ def test_sync_script_invokes_health_script():
 
     assert "health.py" in text
     assert "--skip-health" in text
+
+
+def test_sync_run_health_passes_scope(monkeypatch):
+    module = load_script("sync.py")
+    calls = []
+
+    class Proc:
+        returncode = 0
+
+    def fake_run(args, text, check=False):
+        calls.append(args)
+        return Proc()
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    assert module.run_health("check", "both", "local", dry_run=True) == 0
+    assert calls == [[
+        module.sys.executable,
+        str(module.ROOT / "scripts" / "health.py"),
+        "check",
+        "--target",
+        "both",
+        "--scope",
+        "local",
+        "--dry-run",
+    ]]
+
+
+def test_sync_main_sync_dry_run_compares_each_target_and_file_type(monkeypatch):
+    module = load_script("sync.py")
+    compare_calls = []
+    sync_calls = []
+
+    monkeypatch.setattr(
+        module.sys,
+        "argv",
+        ["sync.py", "sync", "--target", "both", "--scope", "local", "--dry-run", "--skip-fetch", "--skip-health"],
+    )
+    monkeypatch.setattr(module, "get_installed_files", lambda target, scope, file_type: [f"{target}:{scope}:{file_type}:installed"])
+    monkeypatch.setattr(module, "get_repo_files", lambda file_type: [f"{file_type}:repo"])
+
+    def fake_compare(installed, repo):
+        compare_calls.append((installed, repo))
+        return {"missing": [], "outdated": [], "extra": [], "up_to_date": installed}
+
+    def fake_sync(comparison, target, scope, dry_run):
+        sync_calls.append((comparison, target, scope, dry_run))
+        return 1
+
+    monkeypatch.setattr(module, "compare_files", fake_compare)
+    monkeypatch.setattr(module, "sync_files", fake_sync)
+
+    assert module.main() == 0
+    assert len(compare_calls) == 4
+    assert len(sync_calls) == 4
+    assert {call[1] for call in sync_calls} == {"opencode", "claude"}
+    assert {call[2] for call in sync_calls} == {"local"}
+    assert all(call[3] is True for call in sync_calls)
+
+
+def test_sync_main_sync_runs_health_when_not_skipped(monkeypatch):
+    module = load_script("sync.py")
+    health_calls = []
+
+    monkeypatch.setattr(
+        module.sys,
+        "argv",
+        ["sync.py", "sync", "--target", "opencode", "--scope", "global", "--dry-run", "--skip-fetch"],
+    )
+    monkeypatch.setattr(module, "get_installed_files", lambda target, scope, file_type: [])
+    monkeypatch.setattr(module, "get_repo_files", lambda file_type: [])
+    monkeypatch.setattr(module, "compare_files", lambda installed, repo: {"missing": [], "outdated": [], "extra": [], "up_to_date": []})
+    monkeypatch.setattr(module, "sync_files", lambda comparison, target, scope, dry_run: 0)
+    monkeypatch.setattr(
+        module,
+        "run_health",
+        lambda command, target, scope, dry_run=False: health_calls.append((command, target, scope, dry_run)) or 0,
+    )
+
+    assert module.main() == 0
+    assert health_calls == [("sync", "opencode", "global", True)]

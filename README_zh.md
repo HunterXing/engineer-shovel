@@ -23,17 +23,32 @@
 
 ---
 
-它提供 `/tool-*` 指令，覆盖快速任务、Bug 修复、新功能、分支工作流、规划、重构、审查、研究、代码图谱诊断和同步更新。新版将 `SKILL.md` 保持为轻量路由层，详细说明移动到 `docs/`，避免日常会话反复加载完整手册。
+Engineer Shovel 是一个面向 OpenCode / Claude Code 的轻量工作流路由器。
+
+它提供一组小而明确的 `/tool-*` 指令处理日常开发，同时把 OpenSpec、ECC、GSD、Caveman、RTK、code-review-graph 等保留为按需升级的能力层。即使安装了完整能力，默认执行也应该尽量停留在轻量主路径。
+
+运行时入口 `SKILL.md` 保持精简，长文档放在 `docs/`，避免日常会话反复加载完整手册。
+
+## 如何选命令
+
+| 如果任务是... | 使用 | 原因 |
+|---|---|---|
+| 明确的小改动 | `/tool-quick` | 1-2 文件低风险任务的最快路径 |
+| Bug、回归、失败测试 | `/tool-fix` | 先复现，再定位、修复和验证 |
+| 增加新行为 | `/tool-feat` | 做最小可验证功能切片 |
+| 范围、顺序、验收不清 | `/tool-plan` | 先澄清再执行 |
+| 审查本身就是任务 | `/tool-review` | 以 finding 为中心 |
+| 决策前需要证据 | `/tool-research` | 收集本地、网页或深度证据 |
+| 分支、图谱、更新维护 | `/tool-branch`、`/tool-graph`、`/tool-update` | 平台生命周期操作 |
 
 ## 默认形态
 
-- 安装形态：可以默认具备完整能力。
-- 执行形态：默认走轻量路径，只有在风险或复杂度上升时才升级。
 - 主工作流命令：`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-plan`
 - 工程辅助命令：`/tool-review`、`/tool-refactor`、`/tool-research`
 - 平台辅助命令：`/tool-branch`、`/tool-graph`、`/tool-update`
+- 核心原则：大多数任务应停留在主工作流层
 
-大多数日常编程任务应该停留在 `quick`、`fix`、`feat`。`plan`、`review`、`research` 是辅助入口；OpenSpec、ECC、GSD 是明确升级时才使用的能力层，不是每天都要经过的默认路径。
+`plan`、`review`、`research` 不是所有任务的必经前门；外部工具也不是默认仪式，而是遇到特定问题时才升级的能力层。
 
 ## 能力边界
 
@@ -114,7 +129,14 @@ skill(name="engineer-shovel")
 - 15% 任务：`/tool-plan`、`/tool-review`、`/tool-research`
 - 5% 任务：显式升级到 OpenSpec、ECC、GSD
 
-这也是 `--full` 模式的目标体验：能力都在，但默认执行不重。
+这也是 `--full` 模式的目标体验：能力都在，但默认执行仍然应保持轻量。
+
+## 安装与更新分工
+
+- `install.sh`：首次安装、显式引导，以及 installer 自己负责的 repair hooks
+- `/tool-update --check`：比较路由文件、检查组件健康、报告漂移
+- `/tool-update --full`：先同步路由文件，再执行支持的 repair/upgrade
+- `--scope global|local`：路由同步两者都支持；部分组件本质上仍是全局集成，会明确报告，不假装支持本地修复
 
 ## 成本模式
 
@@ -142,6 +164,17 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 | 平台辅助 | `/tool-update` | 路由同步、组件健康、升级修复 |
 
 > **v1.4.0**: `/tool-brainstorm` 已内化为 `/tool-feat` 和 `/tool-plan` 的 Phase 0；`/tool-blueprint` 已合并到 `/tool-plan --deep`。这两个命令文件保留重定向说明。
+
+## 能力升级层
+
+- `code-review-graph`：代码理解与影响面分析
+- `caveman`：对话压缩
+- `rtk`：工具输出压缩
+- `OpenSpec`：持久化规格与任务
+- `ECC`：架构、安全、研究与集成指导
+- `GSD`：里程碑或多阶段编排
+
+这些能力层各有职责。即使已经安装，也不意味着每个任务都要进入更重工作流。
 
 ## 文档
 

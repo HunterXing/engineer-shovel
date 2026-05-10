@@ -14,9 +14,9 @@ when-to-use: Use for local diffs, pull requests, or post-implementation review w
 
 **Input**: $ARGUMENTS
 
-Choose the cheapest review mode that can catch the relevant failure class. This is an engineering support command, not the default front door for routine edits.
+Choose the cheapest review mode that can catch the relevant failure class. Review is a support task, not the default front door for routine implementation.
 
-Compression: use Caveman-compressed summaries for `--fast`, `/caveman full` by default, and `/caveman ultra` for deep summaries. Wrap large diff/log commands with `rtk gain`.
+Shared policy: mode mapping and security gate come from `SKILL.md`; escalation rules live in `docs/architecture.md`. Wrap large diff/log commands with `rtk gain`.
 
 ## Cost Modes
 
@@ -38,7 +38,7 @@ Compression: use Caveman-compressed summaries for `--fast`, `/caveman full` by d
    - `/tool-refactor` for cleanup or structure issues
    - `/tool-feat` for missing behavior or acceptance gaps
 6. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
-7. Review findings auto-captured to claude-mem for cross-session pattern detection.
+7. Review findings may be captured by claude-mem when cross-session pattern detection is useful.
 
 ## Positioning
 

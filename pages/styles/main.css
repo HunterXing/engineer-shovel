@@ -239,6 +239,14 @@ body {
   animation: fadeInUp 0.6s ease-out 0.3s both;
 }
 
+.hero-note {
+  max-width: 720px;
+  margin-bottom: 28px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  animation: fadeInUp 0.6s ease-out 0.35s both;
+}
+
 .hero-actions {
   display: flex;
   gap: 12px;
@@ -352,6 +360,62 @@ body {
   color: var(--text-secondary);
   max-width: 480px;
   margin: 0 auto;
+}
+
+/* ---- Route Picker ---- */
+.route-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.route-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.route-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-bright);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow);
+}
+
+.route-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.route-command {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+.route-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.route-picker-note {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.84rem;
 }
 
 /* ---- Commands Grid ---- */
@@ -567,6 +631,14 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.mode-note {
+  max-width: 760px;
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .tool-tag {

@@ -23,21 +23,34 @@
 
 ---
 
-## What is this?
+## What Is This?
 
-Engineer Shovel is a skill + slash-command router for OpenCode and Claude Code. It installs a broad engineering stack when requested, but routes daily programming work to the lightest path that can still verify the outcome.
+Engineer Shovel is a lightweight workflow router for OpenCode and Claude Code.
 
-The runtime `SKILL.md` is intentionally small; long-form documentation lives in `docs/` so routine sessions do not pay for the full manual.
+It exposes a small set of `/tool-*` commands for everyday work, while keeping heavier systems such as OpenSpec, ECC, GSD, Caveman, RTK, and code-review-graph as optional capability layers. Full capability may be installed, but normal execution should still stay lightweight by default.
+
+The runtime `SKILL.md` stays intentionally small. Long-form policy lives in `docs/` so routine sessions do not keep paying for the full manual.
+
+## Command Selection
+
+| If the task is... | Use | Why |
+|---|---|---|
+| Small obvious edit | `/tool-quick` | Fastest path for 1-2 file low-risk work |
+| Bug, regression, failing test | `/tool-fix` | Reproduce, isolate, fix, verify |
+| New behavior to add | `/tool-feat` | Smallest verifiable feature slice |
+| Scope/order/acceptance unclear | `/tool-plan` | Clarifies what to do before execution |
+| Review itself is the task | `/tool-review` | Focus on findings, not implementation |
+| A decision needs evidence | `/tool-research` | Gather local, web, or deep evidence |
+| Branch/graph/update maintenance | `/tool-branch`, `/tool-graph`, `/tool-update` | Platform lifecycle operations |
 
 ## Default Shape
 
-- Install philosophy: full capability can be present by default.
-- Execution philosophy: lightweight by default, deeper layers only when justified.
-- Main workflow commands: `/tool-quick`, `/tool-fix`, `/tool-feat`, `/tool-plan`
-- Support commands: `/tool-review`, `/tool-refactor`, `/tool-research`
-- Platform commands: `/tool-branch`, `/tool-graph`, `/tool-update`
+- Main workflow: `/tool-quick`, `/tool-fix`, `/tool-feat`, `/tool-plan`
+- Support workflow: `/tool-review`, `/tool-refactor`, `/tool-research`
+- Platform workflow: `/tool-branch`, `/tool-graph`, `/tool-update`
+- Core principle: most work should stop at the main workflow layer
 
-Most teams should spend most of their time in `quick`, `fix`, and `feat`. `plan`, `review`, and `research` are support routes, while OpenSpec, ECC, and GSD are deliberate escalation layers rather than mandatory daily steps.
+`plan`, `review`, and `research` are not mandatory front doors. External tools are upgrade layers, not default ceremony.
 
 ## Capability Boundary
 
@@ -118,7 +131,14 @@ or call a command directly:
 - 15% of work: `/tool-plan`, `/tool-review`, `/tool-research`
 - 5% of work: explicit escalation to OpenSpec, ECC, or GSD
 
-This is the intended user experience even when `--full` is installed: full capability available, lightweight execution by default.
+This remains the intended experience even in `--full`: capability is available, but the default path should still be light.
+
+## Install Vs Update
+
+- `install.sh`: first install, explicit bootstrap, and installer-owned repair hooks
+- `/tool-update --check`: compare router files, inspect component health, report drift
+- `/tool-update --full`: sync router files first, then run supported repair or upgrade actions
+- `--scope global|local`: router sync supports both; some components remain effectively global and are reported that way instead of pretending local repair exists
 
 ## Cost Modes
 
@@ -147,12 +167,25 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 
 Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/tool-blueprint`.
 
+## Escalation Layers
+
+- `code-review-graph`: code understanding and impact analysis
+- `caveman`: communication compression
+- `rtk`: tool output compression
+- `OpenSpec`: durable specs and tasks
+- `ECC`: specialized architecture, security, and research guidance
+- `GSD`: milestone or multi-phase orchestration
+
+These layers exist to solve specific problems. Installing them does not mean every task should use them.
+
 ## Structure
 
 ```text
 engineer-shovel/
+├── .github/           # CI and Pages workflows
 ├── commands/          # 12 executable slash commands (10 active + 2 legacy redirects)
 ├── docs/              # long-form references kept out of runtime context
+├── pages/             # static project site assets
 ├── scripts/           # sync and validation utilities
 ├── SKILL.md           # lightweight router
 ├── install.sh         # minimal/recommended/full installer

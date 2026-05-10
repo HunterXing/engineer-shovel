@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.2 (2026-05-10)
+
+### Changed
+- Tightened the product message across `README.md`, `README_zh.md`, `SKILL.md`, and `docs/architecture.md` around the lightweight-router model: main workflow first, support routes second, capability layers only when needed.
+- Clarified command ownership across planning and execution docs: `/tool-plan` now owns planning, `/tool-feat` assumes the feature is ready to build, `/tool-review` is framed as a support task, and `/tool-research` is explicitly positioned as decision-focused evidence gathering.
+- Updated `docs/mode-routing.md` and GitHub Pages to explain that `/tool-research` uses a special `--quick / --web / --deep` evidence axis instead of the main `--fast / --standard / --deep` execution-cost axis.
+- Added a visual command-route picker to GitHub Pages while keeping the README command-selection table as the text-first reference.
+- Fixed `scripts/sync.py` so the `sync` path calls `compare_files()` with the correct arguments, restoring the router-sync path behind `/tool-update --full`.
+- Expanded validation coverage for product-shape rules and sync behavior in `scripts/validate-references.py` and `tests/test_validation_scripts.py`.
+
 ## 1.7.1 (2026-05-08)
 
 ### Changed

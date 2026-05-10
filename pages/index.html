@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Engineer Shovel — AI Dev Workflow Router</title>
-  <meta name="description" content="Token-aware AI development workflow router for OpenCode / Claude Code. 10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.">
+  <title>Engineer Shovel — Lightweight AI Dev Workflow Router</title>
+  <meta name="description" content="Lightweight workflow router for OpenCode / Claude Code. Start with quick, fix, feat, or plan. Use review and research as support routes, and upgrade to external capability layers only when needed.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
@@ -34,13 +34,14 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.7.1 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.7.2 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
     </h1>
-    <p class="hero-subtitle" data-i18n="hero.subtitle">Token-aware AI development workflow router for OpenCode / Claude Code</p>
-    <p class="hero-desc" data-i18n="hero.desc">10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.</p>
+    <p class="hero-subtitle" data-i18n="hero.subtitle">Lightweight AI development workflow router for OpenCode / Claude Code</p>
+    <p class="hero-desc" data-i18n="hero.desc">Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.</p>
+    <p class="hero-note" data-i18n="hero.note">Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.</p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
       <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
@@ -57,11 +58,52 @@
     </div>
   </section>
 
+  <!-- ===================== ROUTE PICKER ===================== -->
+  <section class="section" id="route-picker">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="picker.title">Choose Your Route</h2>
+      <p class="section-sub" data-i18n="picker.sub">Keep the README command table for quick reading. Use this visual picker on the site when you want a faster route into the right command.</p>
+    </div>
+    <div class="route-picker-grid">
+      <button class="route-card" data-command="/tool-quick">
+        <span class="route-label" data-i18n="picker.quick.label">Small obvious edit</span>
+        <span class="route-command">/tool-quick</span>
+        <span class="route-desc" data-i18n="picker.quick.desc">Typos, tiny config edits, 1-2 file surgical changes.</span>
+      </button>
+      <button class="route-card" data-command="/tool-fix">
+        <span class="route-label" data-i18n="picker.fix.label">Bug or regression</span>
+        <span class="route-command">/tool-fix</span>
+        <span class="route-desc" data-i18n="picker.fix.desc">Broken behavior, failing tests, logs, or regressions.</span>
+      </button>
+      <button class="route-card" data-command="/tool-feat">
+        <span class="route-label" data-i18n="picker.feat.label">New behavior to build</span>
+        <span class="route-command">/tool-feat</span>
+        <span class="route-desc" data-i18n="picker.feat.desc">Add the smallest verifiable feature slice once the goal is clear.</span>
+      </button>
+      <button class="route-card" data-command="/tool-plan">
+        <span class="route-label" data-i18n="picker.plan.label">Scope or order unclear</span>
+        <span class="route-command">/tool-plan</span>
+        <span class="route-desc" data-i18n="picker.plan.desc">Use when execution is blocked by unclear scope, ownership, order, or acceptance.</span>
+      </button>
+      <button class="route-card" data-command="/tool-review">
+        <span class="route-label" data-i18n="picker.review.label">Review is the task</span>
+        <span class="route-command">/tool-review</span>
+        <span class="route-desc" data-i18n="picker.review.desc">Use when you need findings on a diff, PR, or implementation.</span>
+      </button>
+      <button class="route-card" data-command="/tool-research">
+        <span class="route-label" data-i18n="picker.research.label">Decision needs evidence</span>
+        <span class="route-command">/tool-research</span>
+        <span class="route-desc" data-i18n="picker.research.desc">Gather local, web, or deep evidence before planning or implementation.</span>
+      </button>
+    </div>
+    <p class="route-picker-note" data-i18n="picker.note">Platform operations still live in `/tool-branch`, `/tool-graph`, and `/tool-update`.</p>
+  </section>
+
   <!-- ===================== COMMANDS ===================== -->
   <section class="section" id="commands">
     <div class="section-header">
       <h2 class="section-title" data-i18n="commands.title">10 Commands</h2>
-      <p class="section-sub" data-i18n="commands.sub">Each command maps to a specific development scenario. Pick the right tool, spend the fewest tokens.</p>
+      <p class="section-sub" data-i18n="commands.sub">Choose commands by task type first. Main workflow commands handle most work; support and platform commands appear only when needed.</p>
     </div>
     <div class="commands-grid" id="commands-grid"></div>
   </section>
@@ -129,6 +171,7 @@
         </div>
       </div>
     </div>
+    <p class="mode-note" data-i18n="modes.note">Special case: `/tool-research` uses `--quick / --web / --deep` because it routes by evidence source and research depth, not the main execution-cost axis.</p>
   </section>
 
   <!-- ===================== QUICK START ===================== -->
@@ -187,7 +230,7 @@ bash install.sh --target all">
         <div class="step-num">03</div>
         <div class="step-content">
           <h3 class="step-title" data-i18n="start.step3.title">Start Using</h3>
-          <p class="step-desc" data-i18n="start.step3.desc">Load the skill in session or call commands directly.</p>
+          <p class="step-desc" data-i18n="start.step3.desc">Load the skill in session or call commands directly. Start with the main workflow commands before reaching for support or platform routes.</p>
           <div class="code-block">
             <div class="code-lang">text</div>
             <pre><code># Load skill
@@ -195,15 +238,15 @@ skill(name="engineer-shovel")
 
 # Or call commands directly
 /tool-quick --fast "fix a README typo"
-/tool-review --fast
-/tool-research --deep "compare X options"
-/tool-graph update</code></pre>
+/tool-fix --standard "investigate failing login test"
+/tool-plan --standard "plan rollout for X"
+/tool-research --quick "compare local patterns for X"</code></pre>
             <button class="copy-btn" data-copy="skill(name=&quot;engineer-shovel&quot;)
 
 /tool-quick --fast &quot;fix a README typo&quot;
-/tool-review --fast
-/tool-research --deep &quot;compare X options&quot;
-/tool-graph update">
+/tool-fix --standard &quot;investigate failing login test&quot;
+/tool-plan --standard &quot;plan rollout for X&quot;
+/tool-research --quick &quot;compare local patterns for X&quot;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Copy
             </button>
@@ -308,13 +351,13 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.7.1 · MIT License</span>
+        <span class="footer-version">v1.7.2 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>
-        <a href="docs/architecture.md" target="_blank" data-i18n="footer.docs">Docs</a>
-        <a href="docs/install.md" target="_blank" data-i18n="footer.install">Install</a>
-        <a href="docs/token-cost.md" target="_blank" data-i18n="footer.cost">Cost Model</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/architecture.md" target="_blank" data-i18n="footer.docs">Docs</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/install.md" target="_blank" data-i18n="footer.install">Install</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/token-cost.md" target="_blank" data-i18n="footer.cost">Cost Model</a>
       </div>
     </div>
   </footer>

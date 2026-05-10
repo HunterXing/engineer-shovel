@@ -14,27 +14,31 @@ when-to-use: Use when a decision needs local, official, current, or multi-source
 
 **Input**: $ARGUMENTS
 
-Start narrow. Add sources only when the answer needs current or external evidence. This is a support command for decisions, not a default prelude to every feature or fix.
+Start narrow. Add sources only when the answer needs current or external evidence. This command exists to inform a decision, not to act as a generic prelude to every feature or fix.
 
-Compression: `/caveman full` by default, `/caveman ultra` for deep synthesis (per SKILL.md mapping). Skip RTK (research is document-heavy, not shell-heavy).
+Shared policy: mode mapping comes from `SKILL.md`; escalation rules and capability-layer roles live in `docs/architecture.md`. Skip RTK unless research unexpectedly turns into large shell output.
 
 ## Cost Modes
 
-- `--quick` or default: local docs, known library, simple comparison → targeted docs/search. Supplement with code-review-graph: `semantic_search_nodes(query="<topic>")` for existing codebase context.
-- `--web`: current facts or official docs needed → web/docs search + concise synthesis. Include code-review-graph: `query_graph(imports_of="<related_module>")` for how the current codebase relates.
-- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem, or architecture tradeoff → map the codebase first, then load deeper research capability.
+- `--quick` or default: local docs, known library, simple comparison → targeted docs/search plus minimal codebase context.
+- `--web`: current facts or official docs needed → web/docs search + concise synthesis.
+- `--deep`: strategic decision, conflicting evidence, unfamiliar ecosystem, or architecture tradeoff → escalate deliberately per `docs/architecture.md`.
+
+This command uses a special mode axis:
+- `quick / web / deep` describe evidence source and research depth
+- they do **not** replace the global `fast / standard / deep` execution model used by the main workflow commands
 
 ## Flow
 
 1. Define the exact decision the research should inform.
-2. Search claude-mem for prior research conclusions: `npx claude-mem search "<topic_keywords>"` to avoid repeating known findings.
+2. Search claude-mem for prior research conclusions when historical decisions are likely to matter.
 3. Query code-review-graph (L2) for relevant existing implementation and patterns:
    - `semantic_search_nodes(query="<topic_keywords>")` to find related functions/classes
    - `query_graph(callees_of="<related_node>")` to understand dependency context
 4. Search the smallest source set likely to answer it.
 5. Cite or name sources when facts are current/external.
 6. Highlight conflicts and confidence.
-7. Route findings to `/tool-plan` (complex), `/tool-feat` (medium), `/tool-quick` (simple), or documentation. Append routing rationale.
+7. Route findings to `/tool-plan` (scope/order still unclear), `/tool-feat` (decision made), `/tool-quick` (small obvious change), or documentation. Append routing rationale.
 
 ## Avoid
 

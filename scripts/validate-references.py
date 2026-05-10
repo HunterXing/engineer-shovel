@@ -35,6 +35,22 @@ def main() -> int:
     for command in sorted(commands):
         if f"/{command}" not in skill:
             errors.append(f"SKILL.md: missing command table reference /{command}")
+
+    research = (COMMAND_DIR / "tool-research.md").read_text(encoding="utf-8")
+    if "special mode axis" not in research or "--quick" not in research or "--web" not in research:
+        errors.append("commands/tool-research.md: must explain its special quick/web/deep mode axis")
+
+    mode_routing = (ROOT / "docs" / "mode-routing.md").read_text(encoding="utf-8")
+    if "tool-research" not in mode_routing or "--quick / --web / --deep" not in mode_routing:
+        errors.append("docs/mode-routing.md: must document tool-research as the special mode-axis exception")
+
+    tool_graph = (COMMAND_DIR / "tool-graph.md").read_text(encoding="utf-8").lower()
+    if "diagnostic" not in tool_graph:
+        errors.append("commands/tool-graph.md: must stay positioned as a diagnostic command")
+
+    tool_update = (COMMAND_DIR / "tool-update.md").read_text(encoding="utf-8")
+    if "Single user-facing entry point" not in tool_update:
+        errors.append("commands/tool-update.md: must keep single user-facing update entry positioning")
     if errors:
         print("Reference validation failed:", file=sys.stderr)
         print("\n".join(errors), file=sys.stderr)

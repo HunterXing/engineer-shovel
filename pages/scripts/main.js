@@ -1,13 +1,31 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.7.1 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
+   v1.7.2 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.7.1 · MIT License',
-    'hero.subtitle': 'Token-aware AI development workflow router for OpenCode / Claude Code',
-    'hero.desc': '10 active commands with 3-tier cost modes. CRG-powered code intelligence, claude-mem cross-session memory, OpenSpec durable specs, Caveman/RTK compression, and GSD only for deep orchestration.',
+    'hero.badge': 'v1.7.2 · MIT License',
+    'hero.subtitle': 'Lightweight AI development workflow router for OpenCode / Claude Code',
+    'hero.desc': 'Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.',
+    'hero.note': 'Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.',
+    'picker.title': 'Choose Your Route',
+    'picker.sub': 'Keep the README command table for quick reading. Use this visual picker on the site when you want a faster route into the right command.',
+    'picker.quick.label': 'Small obvious edit',
+    'picker.quick.desc': 'Typos, tiny config edits, 1-2 file surgical changes.',
+    'picker.fix.label': 'Bug or regression',
+    'picker.fix.desc': 'Broken behavior, failing tests, logs, or regressions.',
+    'picker.feat.label': 'New behavior to build',
+    'picker.feat.desc': 'Add the smallest verifiable feature slice once the goal is clear.',
+    'picker.plan.label': 'Scope or order unclear',
+    'picker.plan.desc': 'Use when execution is blocked by unclear scope, ownership, order, or acceptance.',
+    'picker.review.label': 'Review is the task',
+    'picker.review.desc': 'Use when you need findings on a diff, PR, or implementation.',
+    'picker.research.label': 'Decision needs evidence',
+    'picker.research.desc': 'Gather local, web, or deep evidence before planning or implementation.',
+    'picker.note': 'Platform operations still live in `/tool-branch`, `/tool-graph`, and `/tool-update`.',
+    'commands.sub': 'Choose commands by task type first. Main workflow commands handle most work; support and platform commands appear only when needed.',
+    'modes.note': 'Special case: `/tool-research` uses `--quick / --web / --deep` because it routes by evidence source and research depth, not the main execution-cost axis.',
     'copy': 'Copy',
     'copied': 'copied',
     'wf.close': 'Close'
@@ -24,13 +42,30 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.7.1 · MIT License',
-    'hero.subtitle': '面向 OpenCode / Claude Code 的 token-aware AI 开发工作流路由器',
-    'hero.desc': '10 个活跃命令，3 级成本模式。CRG 代码智能、claude-mem 跨会话记忆、OpenSpec 持久规格、Caveman/RTK 压缩，GSD 仅用于深度编排。',
+    'hero.badge': 'v1.7.2 · MIT License',
+    'hero.subtitle': '面向 OpenCode / Claude Code 的轻量 AI 开发工作流路由器',
+    'hero.desc': '先走主工作流命令。把 review、research 和外部工具保留为按需升级，而不是默认仪式。',
+    'hero.note': '默认路线：quick / fix / feat / plan。辅助路线：review / refactor / research。平台路线：branch / graph / update。',
+    'picker.title': '怎么选命令',
+    'picker.sub': 'README 里继续保留文本版命令选择表；页面这里额外提供一个可视化快速入口。',
+    'picker.quick.label': '明确的小改动',
+    'picker.quick.desc': 'Typo、小配置修改、1-2 文件手术式改动。',
+    'picker.fix.label': 'Bug 或回归',
+    'picker.fix.desc': '行为异常、失败测试、日志报错或回归问题。',
+    'picker.feat.label': '要新增行为',
+    'picker.feat.desc': '当目标已经清楚时，做最小可验证功能切片。',
+    'picker.plan.label': '范围或顺序不清',
+    'picker.plan.desc': '当执行被范围、归属、顺序或验收不清阻塞时使用。',
+    'picker.review.label': '审查本身是任务',
+    'picker.review.desc': '当你需要针对 diff、PR 或实现结果产出问题列表时使用。',
+    'picker.research.label': '决策前需要证据',
+    'picker.research.desc': '在规划或实现前，收集本地、网页或深度证据。',
+    'picker.note': '平台类操作仍然在 `/tool-branch`、`/tool-graph`、`/tool-update`。',
     'commands.title': '10 个命令',
-    'commands.sub': '点击命令卡片查看每个模式的完整工作流。选对工具+模式，用最少的 token 完成验证。',
+    'commands.sub': '先按任务类型选命令。大多数工作停留在主工作流层；辅助命令和平台命令只在需要时出现。',
     'modes.title': '成本模式',
     'modes.sub': '根据任务复杂度选择对应模式，默认选择能验证结果的最低成本路径。',
+    'modes.note': '特例：`/tool-research` 使用 `--quick / --web / --deep`，表达的是证据来源与研究深度，而不是主工作流的执行成本轴。',
     'modes.fast.title': '低风险 · 明确目标',
     'modes.fast.1': 'Typo 修复 / 配置修改',
     'modes.fast.2': '1-2 文件手术编辑',
@@ -50,7 +85,7 @@ const i18n = {
     'start.step2.title': '选择安装模式',
     'start.step2.desc': '支持 OpenCode / Claude Code。recommended 安装核心栈；full 额外安装 ECC 和 GSD。',
     'start.step3.title': '开始使用',
-    'start.step3.desc': '在会话中加载技能或直接调用命令。',
+    'start.step3.desc': '在会话中加载技能或直接调用命令。优先使用主工作流命令，再按需进入辅助或平台路线。',
     'upstream.title': '上游工具',
     'upstream.sub': 'recommended 安装核心栈；full 额外加入 ECC 和 GSD 做深度编排。',
     'upstream.col.tool': '工具',
@@ -130,6 +165,16 @@ function initLanguageToggle() {
   });
 }
 
+function initRoutePicker() {
+  document.querySelectorAll('.route-card[data-command]').forEach(card => {
+    card.addEventListener('click', () => {
+      const name = card.dataset.command;
+      const cmd = commands.find(item => item.name === name);
+      if (cmd) openWorkflowModal(cmd);
+    });
+  });
+}
+
 // ---- Command Data ---- (10 active, no deprecated)
 const commands = [
   { name: '/tool-feat',     color: '#4f8ef7', key: 'cmd.feat',     tag: 'Medium',   modes: ['--fast','--standard','--deep'], defaultMode: '--standard' },
@@ -154,28 +199,28 @@ const commandLabels = {
     zh: { usefor: 'Bug 修复、失败测试、回归 — 证明根因', modes: ['--fast (已知位置)', '--standard (CRG 追踪)', '--deep (调试管线)'] }
   },
   'cmd.feat': {
-    en: { usefor: 'New features with built-in brainstorm Phase 0', modes: ['--fast (small, known)', '--standard (optional OpenSpec + light review)', '--deep (spec/verify→review→ship)'] },
-    zh: { usefor: '新功能实现，内置需求澄清 Phase 0', modes: ['--fast (小型/已知)', '--standard (可选 OpenSpec + 轻审查)', '--deep (规格/验证→审查→发布)'] }
+    en: { usefor: 'New behavior that is already clear enough to implement', modes: ['--fast (small, known)', '--standard (native build + light review)', '--deep (spec/verify→review→ship)'] },
+    zh: { usefor: '已经清楚要做什么时的新功能实现', modes: ['--fast (小型/已知)', '--standard (原生验证 + 轻审查)', '--deep (规格/验证→审查→发布)'] }
   },
   'cmd.branch': {
     en: { usefor: 'Branch lifecycle: create, review, merge, abort', modes: ['create', 'status', 'review (CRG)', 'merge', 'abort'] },
     zh: { usefor: '分支生命周期：创建、审查、合并、放弃', modes: ['create', 'status', 'review (含 CRG)', 'merge', 'abort'] }
   },
   'cmd.plan': {
-    en: { usefor: 'Requirements, specs, and planning — durable artifacts only when needed', modes: ['--fast (inline)', '--standard (file-backed plan)', '--deep (spec/milestone)'] },
-    zh: { usefor: '需求、规格与实现规划 — 仅在必要时升级为持久工件', modes: ['--fast (内联)', '--standard (文件化计划)', '--deep (规格/里程碑)'] }
+    en: { usefor: 'Use when scope, order, ownership, or acceptance is still unclear', modes: ['--fast (inline)', '--standard (execution plan)', '--deep (spec/milestone)'] },
+    zh: { usefor: '范围、顺序、归属或验收仍不清楚时使用', modes: ['--fast (内联)', '--standard (执行计划)', '--deep (规格/里程碑)'] }
   },
   'cmd.refactor': {
     en: { usefor: 'Behavior-preserving cleanup with before/after verification', modes: ['--fast (1-2 files)', '--standard (CRG impact)', '--deep (plan first)'] },
     zh: { usefor: '行为保持不变的重构，含前后验证', modes: ['--fast (1-2 文件)', '--standard (CRG 影响)', '--deep (先规划)'] }
   },
   'cmd.review': {
-    en: { usefor: 'Local diff, PR, or post-implementation review by risk', modes: ['--fast (compressed sanity check)', '--standard (CRG+findings)', '--deep (security+deep review)'] },
-    zh: { usefor: '按风险分级的本地 diff、PR 或实现后审查', modes: ['--fast (压缩 sanity check)', '--standard (CRG+发现问题)', '--deep (安全+深度审查)'] }
+    en: { usefor: 'Use when review itself is the task', modes: ['--fast (compressed sanity check)', '--standard (CRG+findings)', '--deep (security+deep review)'] },
+    zh: { usefor: '当审查本身就是任务时使用', modes: ['--fast (压缩 sanity check)', '--standard (CRG+发现问题)', '--deep (安全+深度审查)'] }
   },
   'cmd.research': {
-    en: { usefor: 'Codebase-aware evidence gathering and synthesis', modes: ['--quick (local+CRG)', '--web (docs/search)', '--deep (multi-source)'] },
-    zh: { usefor: '代码库感知的证据收集与综合', modes: ['--quick (本地+CRG)', '--web (文档/搜索)', '--deep (多源)'] }
+    en: { usefor: 'Gather evidence for a specific decision before planning or implementation', modes: ['--quick (local+CRG)', '--web (docs/search)', '--deep (multi-source)'] },
+    zh: { usefor: '在规划或实现前，为具体决策收集证据', modes: ['--quick (本地+CRG)', '--web (文档/搜索)', '--deep (多源)'] }
   },
   'cmd.graph': {
     en: { usefor: 'code-review-graph diagnostics (auto-refreshed via git hooks)', modes: ['status', 'build', 'update', 'rebuild', 'watch'] },
@@ -302,7 +347,7 @@ const commandWorkflows = {
   },
   '/tool-feat': {
     tag: 'Medium',
-    sub: { en: 'New functionality. Built-in brainstorm Phase 0. Smallest verifiable slice.', zh: '新功能开发。内置需求澄清 Phase 0。最小可验证切片。' },
+    sub: { en: 'Implement the smallest verifiable feature slice once the target behavior is already clear.', zh: '当目标行为已经清楚时，实现最小可验证功能切片。' },
     tools: { en: 'Tools: CRG explore · optional OpenSpec · caveman-stats · light review', zh: '工具: CRG 探索 · 可选 OpenSpec · caveman-stats · 轻量审查' },
     modes: {
       '--fast': {
@@ -331,9 +376,9 @@ const commandWorkflows = {
           { phase: '01', label: { en: 'CRG Explore', zh: 'CRG 探索' },
             desc: { en: 'Targeted CRG context: semantic_search_nodes + query_graph(imports_of). Use architecture overview only if boundaries are unclear.', zh: '定向 CRG 上下文: semantic_search_nodes + query_graph(imports_of)。边界不清时才用架构概览。' },
             tools: ['CRG', 'ECC'] },
-          { phase: '02', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if unclear) clarify first; if acceptance needs durable agreement, create OpenSpec proposal/spec/task artifacts.', zh: '(需求不清时) 先澄清；验收需要持久共识时创建 OpenSpec proposal/spec/task 工件。' },
-            tools: ['OpenSpec', 'GSD', 'ECC'] },
+          { phase: '02', label: { en: 'Route Back If Needed', zh: '必要时回退' },
+            desc: { en: 'If requirements remain unclear after exploration, stop and route to /tool-plan or /tool-research.', zh: '如果探索后需求仍不清楚，停止实现并回退到 /tool-plan 或 /tool-research。' },
+            tools: [] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Search existing patterns first. Implement with project conventions.', zh: '先搜索现有模式。按项目规范实现。' },
             tools: [] },
@@ -351,12 +396,12 @@ const commandWorkflows = {
           { phase: '00', label: { en: 'Baseline', zh: '基线' },
             desc: { en: 'caveman-stats + branch check.', zh: 'caveman-stats + 分支检查。' },
             tools: ['Caveman'] },
-          { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: 'Clarify product and technical direction before planning. Use research if multiple viable paths remain.', zh: '规划前先澄清产品与技术方向；如果路径不止一种，再补研究。' },
-            tools: ['GSD', 'ECC'] },
+          { phase: '01', label: { en: 'Plan First', zh: '先规划' },
+            desc: { en: 'If the feature is still decision-heavy, route through /tool-plan or /tool-research before implementation.', zh: '如果功能仍需要做高影响决策，先经过 /tool-plan 或 /tool-research 再实现。' },
+            tools: ['ECC'] },
           { phase: '02', label: { en: 'Spec + Plan', zh: '规格 + 规划' },
-            desc: { en: 'OpenSpec for durable requirements when needed; CRG architecture context → file-backed plan or milestone plan.', zh: '需要持久需求时用 OpenSpec；CRG 架构上下文 → 文件化计划或里程碑计划。' },
-            tools: ['OpenSpec', 'CRG', 'ECC'] },
+            desc: { en: 'Use OpenSpec or a file-backed plan only when durable agreement improves execution.', zh: '只有在持久化共识确实能提高执行质量时，才使用 OpenSpec 或文件化计划。' },
+            tools: ['OpenSpec', 'CRG'] },
           { phase: '03', label: { en: 'Implement', zh: '实现' },
             desc: { en: 'Follow plan. Surgical changes per step.', zh: '按计划执行。每步手术改动。' },
             tools: [] },
@@ -434,14 +479,14 @@ const commandWorkflows = {
   },
   '/tool-plan': {
     tag: 'Medium',
-    sub: { en: 'Requirements, specs, and planning. Uses durable artifacts only when they improve execution.', zh: '需求、规格与规划。只有确实提高执行质量时才升级为持久工件。' },
+    sub: { en: 'Use this when the work is not yet executable because scope, order, ownership, or acceptance is unclear.', zh: '当工作因为范围、顺序、归属或验收不清楚而还不能直接执行时，使用这个命令。' },
     tools: { en: 'Tools: OpenSpec · CRG detect_changes · file-backed plans · gsd-new-milestone', zh: '工具: OpenSpec · CRG detect_changes · 文件化计划 · gsd-new-milestone' },
     modes: {
       '--fast': {
         label: { en: 'Inline plan', zh: '内联计划' },
         steps: [
-          { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if vague) use gsd-explore for product direction, /tool-research for technical ambiguity.', zh: '(需求模糊时) 产品方向用 gsd-explore，技术歧义用 /tool-research。' },
+          { phase: '01', label: { en: 'Clarify Inputs', zh: '澄清输入' },
+            desc: { en: 'If the work is not plan-ready, use gsd-explore for product direction or /tool-research for decision evidence first.', zh: '如果工作还不具备规划条件，先用 gsd-explore 处理产品方向，或用 /tool-research 收集决策证据。' },
             tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Plan', zh: '规划' },
             desc: { en: 'Short inline plan → route to /tool-quick or /tool-feat.', zh: '简短内联计划 → 路由到 /tool-quick 或 /tool-feat。' },
@@ -451,8 +496,8 @@ const commandWorkflows = {
       '--standard': {
         label: { en: 'Normal plan', zh: '常规计划' },
         steps: [
-          { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if vague) clarify product direction first; use /tool-research for technical ambiguity.', zh: '(需求模糊时) 先澄清产品方向；技术歧义交给 /tool-research。' },
+          { phase: '01', label: { en: 'Clarify Inputs', zh: '澄清输入' },
+            desc: { en: 'Use gsd-explore or /tool-research only if the work is still not ready for planning.', zh: '只有在工作还不具备规划条件时，才进入 gsd-explore 或 /tool-research。' },
             tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'CRG Impact', zh: 'CRG 影响' },
             desc: { en: 'detect_changes + get_impact_radius(target="module").', zh: 'detect_changes + get_impact_radius(target="模块")。' },
@@ -468,8 +513,8 @@ const commandWorkflows = {
       '--deep': {
         label: { en: 'Spec / Milestone', zh: '规格 / 里程碑' },
         steps: [
-          { phase: '01', label: { en: 'Phase 0', zh: 'Phase 0' },
-            desc: { en: '(if vague) clarify direction first.', zh: '(需求模糊时) 先澄清方向。' },
+          { phase: '01', label: { en: 'Clarify Inputs', zh: '澄清输入' },
+            desc: { en: 'If direction is still vague, clarify first. Planning should own execution order, not generic exploration.', zh: '如果方向仍然模糊，先做澄清。规划负责执行顺序，不负责兜底所有探索。' },
             tools: ['GSD', 'ECC'] },
           { phase: '02', label: { en: 'Classify', zh: '分级' },
             desc: { en: 'Auto-classify: spec-first → OpenSpec, ≤3 PR → file-backed plan, >3 PR → gsd-new-milestone, architecture → deep research then milestone/file-backed plan.', zh: '自动分级：规格优先 → OpenSpec，≤3 PR → 文件化计划，>3 PR → gsd-new-milestone，架构变更 → 先深研究，再转里程碑或文件化计划。' },
@@ -544,7 +589,7 @@ const commandWorkflows = {
   },
   '/tool-review': {
     tag: 'Low→High',
-    sub: { en: 'Local diff, PR, or post-implementation review by risk level.', zh: '按风险级别进行本地 diff、PR 或实现后审查。' },
+    sub: { en: 'Review is a support task. Use it when review itself is the job.', zh: '审查是辅助任务。当审查本身就是工作内容时使用。' },
     tools: { en: 'Tools: CRG detect_changes · review checklist · repository-native PR context', zh: '工具: CRG detect_changes · 审查清单 · 仓库原生 PR 上下文' },
     modes: {
       '--fast': {
@@ -596,8 +641,8 @@ const commandWorkflows = {
   },
   '/tool-research': {
     tag: 'Low→High',
-    sub: { en: 'Codebase-aware evidence gathering. Start narrow, escalate only when needed.', zh: '代码库感知的证据收集。从窄开始，按需升级。' },
-    tools: { en: 'Tools: CRG semantic_search · multi-source synthesis · tradeoff report', zh: '工具: CRG semantic_search · 多源综合 · 权衡报告' },
+    sub: { en: 'Codebase-aware evidence gathering for a specific decision. Start narrow, escalate only when needed.', zh: '面向具体决策的代码库感知证据收集。从窄开始，按需升级。' },
+    tools: { en: 'Special mode axis: quick / web / deep. Tools: CRG semantic_search · multi-source synthesis · tradeoff report', zh: '特殊模式轴: quick / web / deep。工具: CRG semantic_search · 多源综合 · 权衡报告' },
     modes: {
       '--quick': {
         label: { en: 'Quick search', zh: '快速搜索' },
@@ -1108,6 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollHint();
   initScrollAnimations();
   initLanguageToggle();
+  initRoutePicker();
   renderCommands();
   initStepExecution();
   initCopyButtons();

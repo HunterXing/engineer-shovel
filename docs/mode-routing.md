@@ -11,7 +11,13 @@ Engineer Shovel 的真实路由不是只有“先选命令”，而是两层判�
 任务类型 -> 命令入口 -> 成本模式 -> 具体工作流 -> 是否升级到外部能力层
 ```
 
-这份文档从 `--fast / --standard / --deep` 的统一视角，梳理 10 个活跃命令到底会走什么路径。
+这份文档回答两个问题：
+
+1. 先该选哪个命令
+2. 进入命令后该用多重的模式
+
+主工作流命令遵循统一的 `--fast / --standard / --deep` 成本轴。
+唯一显式特例是 `tool-research`，它使用 `--quick / --web / --deep`，表达的是证据来源与研究深度，而不是主工作流的执行成本轴。
 
 ---
 
@@ -614,10 +620,10 @@ flowchart TD
 
 - 小改动：`tool-quick`
 - Bug/回归：`tool-fix`
-- 新功能：`tool-feat`
+- 新功能且已清楚要做什么：`tool-feat`
 - 范围、顺序、验收不清：`tool-plan`
 - 审查本身是任务：`tool-review`
-- 研究本身是任务：`tool-research`
+- 决策前需要证据：`tool-research`
 - 平台动作：`tool-branch`、`tool-graph`、`tool-update`
 
 ### 再选模式
@@ -625,6 +631,7 @@ flowchart TD
 - 能在最小上下文下做对：`--fast`
 - 正常工程开发：`--standard`
 - 明显跨系统、高风险、需要规格或编排：`--deep`
+- 对 `tool-research` 而言，改用 `--quick / --web / --deep`，因为它按证据来源分流
 
 ### 再决定是否升级能力层
 

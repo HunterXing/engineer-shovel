@@ -9,11 +9,30 @@ For a mode-first view of the same system, see [`docs/mode-routing.md`](mode-rout
 ## Product Model
 
 - Main workflow commands: `quick`, `fix`, `feat`, `plan`
-- Engineering support commands: `review`, `refactor`, `research`
-- Platform support commands: `branch`, `graph`, `update`
+- Support commands: `review`, `refactor`, `research`
+- Platform commands: `branch`, `graph`, `update`
 - Escalation layers: `superpowers`, `ECC`, `OpenSpec`, `GSD`
 
-This split matters more than installation mode. A repository may have the full stack installed, but the default route should still stay inside the main workflow commands unless there is a clear trigger to escalate.
+The product promise is simple:
+
+1. Pick the lightest command that matches the job.
+2. Stay in the main workflow layer unless a clear trigger forces escalation.
+3. Treat external systems as narrow capability layers, not default ceremony.
+
+This split matters more than installation mode. A repo may have the full stack installed and still spend almost all of its time in the main workflow commands.
+
+---
+
+## Shared Policy Surface
+
+Keep shared rules in the narrowest stable place:
+
+- `SKILL.md`: router defaults, command groups, cost-mode mapping, security gate, completion pipeline
+- `docs/architecture.md`: capability-layer roles, escalation rules, update model, command/tool matrix
+- `commands/tool-*.md`: command-local entry guidance only; do not restate the full Caveman/GSD/OpenSpec decision tree
+- `docs/install.md` and `docs/dependency-policy.md`: install, repair, scope, and upgrade governance
+
+This keeps command files readable and reduces drift when a shared rule changes.
 
 ---
 
@@ -52,15 +71,14 @@ Layer 5: Project Orchestration (deep/milestone only)
 
 ### Layer Principles
 
-1. Escalate bottom-up — commands move up layers only when a clear trigger is present.
-2. Compression layer always on — caveman controls LLM verbosity, rtk controls tool output noise (large outputs only).
-3. Code intelligence auto-maintained — use CRG MCP tools when available, CRG CLI when not, and Glob/Grep/Read as fallback.
-4. claude-mem auto-captures session context across work — decisions, preferences, bug history — and injects relevant memories at session start via progressive disclosure. Complements caveman: caveman compresses single-session communication, claude-mem persists cross-session knowledge.
-5. OpenSpec creates durable agreement about what to build; it does not replace code graph context or project orchestration.
-6. ECC is a capability library, not a default workflow path.
-7. superpowers handles session-scoped method; GSD handles multi-phase and cross-session state.
-8. Full install exposes capability; it does not imply full workflow on every task.
-9. GSD completion gates are deep-only by default; standard feature/fix work uses native verification plus light review.
+1. Escalate bottom-up — move up layers only when a clear trigger is present.
+2. Command first, layer second — choose `quick`/`fix`/`feat`/`plan` before thinking about OpenSpec, ECC, or GSD.
+3. Compression is always on — caveman manages LLM verbosity, rtk manages noisy tool output.
+4. Code intelligence is background support — use CRG when available, but keep `/tool-graph` as a diagnostic command.
+5. claude-mem persists cross-session context; it complements, not replaces, the router.
+6. OpenSpec stores durable agreement; ECC supplies specialized guidance; GSD handles multi-phase orchestration.
+7. Full install exposes capability; it does not imply full workflow on every task.
+8. Standard work should remain close to native implementation and verification.
 
 ---
 
@@ -132,8 +150,8 @@ Escalate only when the command cannot stay lightweight and still be correct:
 
 User-facing update should be remembered as one command:
 
-- `/tool-update --check`: compare router files, inspect component health, report repair actions
-- `/tool-update --full`: sync router files, then run health-driven repair/upgrade steps
+- `/tool-update --check [--target ...] [--scope global|local]`: compare router files, inspect component health, report repair actions
+- `/tool-update --full [--target ...] [--scope global|local]`: sync router files, then run health-driven repair/upgrade steps
 
 Internal responsibility split:
 
@@ -141,6 +159,11 @@ Internal responsibility split:
 - `scripts/sync.py`: Engineer Shovel router files and version sync
 - `scripts/health.py`: external component health and repair
 - `/tool-update`: user-facing orchestrator over sync + health
+
+Scope rule:
+
+- Router sync supports both global and project-local installs.
+- Component health is scope-aware where the underlying component supports it; otherwise `/tool-update` should report the limitation explicitly instead of pretending local repair exists.
 
 ---
 

@@ -91,14 +91,12 @@ def get_repo_files(file_type: str) -> list[Path]:
     """Get list of source files from repository."""
     if file_type == "skill":
         return [ROOT / f for f in TRACKED_FILES["skill"]]
-    elif file_type == "commands":
+    if file_type == "commands":
         return sorted((ROOT / "commands").glob("tool-*.md"))
-    elif file_type == "hooks":
-        return [ROOT / f for f in TRACKED_FILES["hooks"]]
     return []
 
 
-def compare_files(installed: list[Path], repo: list[Path], repo_root: Path) -> dict:
+def compare_files(installed: list[Path], repo: list[Path]) -> dict:
     """Compare installed files with repo versions."""
     result = {
         "missing": [],
@@ -185,7 +183,7 @@ def check_installation(target: str, scope: str) -> dict:
             result["files"][file_type] = {"status": "not_installed", "files": []}
             result["summary"]["issues"] += len(repo)
         else:
-            comparison = compare_files(installed, repo, ROOT)
+            comparison = compare_files(installed, repo)
             result["files"][file_type] = {
                 "status": "installed",
                 "comparison": comparison
@@ -327,9 +325,17 @@ def pull_repo() -> bool:
         return False
 
 
-def run_health(command: str, target: str, dry_run: bool = False) -> int:
+def run_health(command: str, target: str, scope: str, dry_run: bool = False) -> int:
     health_command = "check" if command == "check" else "repair"
-    args = [sys.executable, str(ROOT / "scripts" / "health.py"), health_command, "--target", target]
+    args = [
+        sys.executable,
+        str(ROOT / "scripts" / "health.py"),
+        health_command,
+        "--target",
+        target,
+        "--scope",
+        scope,
+    ]
     if dry_run:
         args.append("--dry-run")
     proc = subprocess.run(args, text=True, check=False)
@@ -409,7 +415,7 @@ def main() -> int:
             if result["summary"]["issues"] > 0:
                 all_ok = False
         
-        health_rc = 0 if args.skip_health else run_health("check", args.target, dry_run=True)
+        health_rc = 0 if args.skip_health else run_health("check", args.target, args.scope, dry_run=True)
         if health_rc != 0:
             all_ok = False
         
@@ -441,7 +447,7 @@ def main() -> int:
             for file_type in ["skill", "commands"]:
                 installed = get_installed_files(target, args.scope, file_type)
                 repo = get_repo_files(file_type)
-                comparison = compare_files(installed, repo, ROOT)
+                comparison = compare_files(installed, repo)
                 
                 updated = sync_files(comparison, target=target, scope=args.scope, dry_run=args.dry_run)
                 total_updated += updated
@@ -460,7 +466,7 @@ def main() -> int:
                         print(f"  {target.upper()} now at v{new_ver}")
         
         if not args.skip_health:
-            health_rc = run_health("sync", args.target, dry_run=args.dry_run)
+            health_rc = run_health("sync", args.target, args.scope, dry_run=args.dry_run)
             if health_rc != 0:
                 return health_rc
         

@@ -14,49 +14,42 @@ when-to-use: Use when execution order, affected files, risks, or verification cr
 
 **Input**: $ARGUMENTS
 
-Unified planning entry point. This is the first place to clarify scope, order, and acceptance before reaching for heavier systems. Auto-detects complexity and escalates:
-- **Durable requirement/spec needed**: OpenSpec artifacts via the repository's OpenSpec workflow
-- **≤3 PR implementation work**: inline plan or file-backed implementation plan
-- **Milestone-scale**: `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
+Unified planning entry point. Use this command when the work is not yet executable because scope, order, ownership, or acceptance is unclear.
 
-Compression: `/caveman lite` for short plans, `/caveman full` for file-backed plans (per SKILL.md enforced mapping). Use RTK only for large shell outputs.
+This command owns planning. It should not become a generic research prelude or a duplicate feature command.
 
-## Phase 0: Brainstorm (auto-triggered when direction unclear)
+Shared policy: mode mapping and completion behavior come from `SKILL.md`; escalation rules and capability-layer roles live in `docs/architecture.md`. Use RTK only for large shell outputs.
 
-If the goal description is vague or missing concrete targets, enter clarification first:
-- **Product direction unclear** ("what to build") → `skill(name="gsd-explore")`
-- **Technical approach unclear** ("how to build") → `/tool-research --quick`
-- **Multiple viable paths or architecture decision** → `/tool-research --deep`
+## Before Planning
 
-Search claude-mem for prior architectural decisions that influence this plan:
-- `npx claude-mem search "<goal_keywords>"` for relevant cross-session context.
+If the work is not ready for a plan yet:
+- **What to build is unclear** → `skill(name="gsd-explore")`
+- **A decision needs evidence first** → `/tool-research`
+- **A small task is already clear** → skip planning and use `/tool-quick` or `/tool-feat`
+
+Search claude-mem only when prior architectural decisions are likely to change the plan.
 
 ## Cost Modes
 
-- `--fast`: small task, clear scope → short inline plan → route to `/tool-quick` or `/tool-feat`.
-- `--standard` or default: medium work → Phase 0 if needed → implementation order and acceptance. Use OpenSpec only when durable specs are actually needed.
-- `--deep`: auto-classify complexity:
-- **Spec-first code work** → OpenSpec artifacts first, then plan from accepted specs
-- **≤3 PR code work** → file-backed implementation plan with explicit order, risks, and verification
-- **>3 PR or milestone-scale** → `skill(name="gsd-new-milestone")` (discuss → plan → execute phases)
-- **Architecture change** → `/tool-research --deep`, then convert conclusions into a file-backed plan or milestone plan
+- `--fast`: small task, clear scope → short execution plan → route to `/tool-quick` or `/tool-feat`
+- `--standard` or default: medium work → define order, risks, verification, exit criteria
+- `--deep`: spec-first, multi-PR, milestone, or architecture-heavy work → escalate deliberately per `docs/architecture.md`
 
 ## Flow
 
-1. Restate the goal and non-goals.
-2. Identify files/modules likely affected via code-review-graph (L2, auto-refreshed):
+1. Restate goal, non-goals, and what must be true before execution can start.
+2. Identify likely affected files/modules via code-review-graph (L2, auto-refreshed):
    - `detect_changes` to assess impact scope from the diff baseline
    - `get_impact_radius(target="<key_module>")` to understand blast radius
    - `get_architecture_overview` for module boundaries (deep mode only)
    If CRG MCP tools are unavailable, use the `code-review-graph` CLI where possible or fall back to targeted Glob/Grep/Read.
-3. Define the minimum plan contract: scope/non-goals, affected modules, execution order, verification commands, exit criteria, and escalation triggers.
-4. If the work needs agreed requirements, create or update an OpenSpec change. Do not auto-run `openspec init`; ask the user to initialize the project or run it only with explicit approval.
-5. If the work touches auth, user data, or security-sensitive paths, add a `/tool-review --deep` checkpoint to the plan before implementation sign-off.
-6. For file-backed plans/specs, request review before execution.
-7. Execute only after the plan is clear enough to verify.
+3. Define the minimum plan contract: scope, affected modules, execution order, verification, exit criteria, and escalation triggers.
+4. Use OpenSpec only if the agreement must persist as reviewable artifacts. Do not auto-run `openspec init`.
+5. If the work touches auth, user data, or security-sensitive paths, add `/tool-review --deep` before sign-off.
+6. Execute only after the plan is specific enough that implementation no longer needs new product decisions.
 
 ## Escalation
 
-- Unknown technical approach: use `/tool-research --quick` first.
-- Multi-PR or milestone work is handled by `--deep` mode; no separate `/tool-blueprint` needed.
+- Unknown technical approach: use `/tool-research` first.
+- Multi-PR or milestone work is handled by `--deep`; no separate `/tool-blueprint` is needed.
 - Do not default to GSD or OpenSpec when a normal implementation plan is enough.

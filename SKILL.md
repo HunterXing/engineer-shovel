@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.7.1"
+  version: "1.7.2"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -27,10 +27,12 @@ Engineer Shovel is a workflow router for AI-assisted software engineering on Ope
 
 ## Product Shape
 
-- Full install is allowed by default so advanced capability is available when needed.
-- Daily execution is lightweight by default: most work should stay in `quick`, `fix`, `feat`, or `plan`.
-- External tools are capability layers, not mandatory steps in every command.
-- This file is only the router. Detailed policy lives in `docs/`, including `docs/mode-routing.md` for the mode-first route map.
+- Engineer Shovel is a lightweight workflow router, not a heavy mandatory framework.
+- Most work should stay in `quick`, `fix`, `feat`, or `plan`.
+- `review`, `refactor`, and `research` are support routes, not default front doors.
+- `branch`, `graph`, and `update` are platform lifecycle commands.
+- External tools are upgrade layers with narrow jobs, not ceremony every task must pass through.
+- This file is the router; detailed policy lives in `docs/`.
 
 ## Command Groups
 
@@ -51,20 +53,20 @@ Engineer Shovel is a workflow router for AI-assisted software engineering on Ope
 
 ## Default Routes
 
-- Use `/tool-quick` when the target is obvious and the change is small.
-- Use `/tool-fix` when behavior is broken or a failing test/log must be proven fixed.
-- Use `/tool-feat` for normal feature work; it may clarify first, but standard mode stays on native verification plus light review.
-- Use `/tool-plan` only when scope, order, or acceptance criteria are still unclear.
-- Use `/tool-review`, `/tool-refactor`, and `/tool-research` as support commands, not as default front doors for routine work.
-- Use `/tool-branch` only for explicit branch lifecycle operations; `feat` and `fix` may create branches automatically.
-- Use `/tool-graph` only for graph diagnostics; graph context should already be available to other commands.
-- Use `/tool-update` as the single user-facing update entry point.
+- `/tool-quick`: obvious low-risk 1-2 file work
+- `/tool-fix`: broken behavior, regression, failing test
+- `/tool-feat`: new behavior that is already clear enough to implement
+- `/tool-plan`: scope, order, ownership, or acceptance is unclear
+- `/tool-review`: review itself is the task
+- `/tool-research`: a decision needs evidence before planning or implementation
+- `/tool-branch`, `/tool-graph`, `/tool-update`: platform maintenance only
 
 ## Practical Split
 
 - 80% of work: `/tool-quick`, `/tool-fix`, `/tool-feat`
 - 15% of work: `/tool-plan`, `/tool-review`, `/tool-research`
 - 5% of work: deliberate escalation to OpenSpec, ECC, or GSD
+- Full install means these paths are available; it does not change the default route.
 
 ## Cost Modes
 
@@ -99,15 +101,15 @@ RTK + Caveman stack independently: Caveman compresses LLM communication, RTK com
 
 ## Capability Layers
 
-- `code-review-graph`: default code understanding and impact analysis layer
-- `caveman`: default communication compression layer
-- `rtk`: default noisy shell/tool output compression layer
-- `superpowers`: session-scoped methodology layer
-- `ECC`: specialized capability library layer
-- `OpenSpec`: durable spec and task artifact layer
-- `GSD`: multi-phase and cross-session orchestration layer
+- `code-review-graph`: code understanding and impact analysis
+- `caveman`: communication compression
+- `rtk`: noisy tool output compression
+- `superpowers`: session-scoped method upgrade
+- `ECC`: specialized architecture, security, and research guidance
+- `OpenSpec`: durable specs and tasks
+- `GSD`: multi-phase or cross-session orchestration
 
-These layers are available to the router, but they are not all activated on every task.
+These layers solve specific problems. Availability does not imply automatic use.
 
 ## Memory Layer
 
