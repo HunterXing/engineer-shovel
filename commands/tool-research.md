@@ -57,6 +57,13 @@ When using external tools, announce them with maximum visibility:
 - Highlight conflicting evidence explicitly.
 - Provide actionable recommendations, not just raw data.
 
+## Error Handling
+
+- If sources conflict, present both sides with confidence assessment.
+- If external docs are unavailable, note this and rely on local code analysis.
+- If research scope is too broad, narrow down to the specific decision needed.
+- If research reveals deeper issues, recommend `/tool-plan` for proper planning.
+
 ## Avoid
 
 Do not run deep multi-source research for questions answerable from local code or official docs.

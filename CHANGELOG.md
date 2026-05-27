@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.7.5 (2026-05-27)
+
+### Added
+- **Toolchain Awareness**: All 10 commands now announce external tool usage with `🚀 **Tool Name** → action` format, making it impossible to miss which tools are powering the workflow.
+- **Error Handling**: Added comprehensive error handling sections to all command files with clear recovery paths.
+- **Quality Checklists**: Added verification checklists to `tool-plan`, `tool-review`, and `tool-refactor` commands.
+
+### Fixed
+- **install.ps1**: Fixed PowerShell syntax error (`/* */` → `#`) and removed references to non-existent commands (brainstorm, blueprint).
+- **paths.py**: Fixed target key inconsistency by adding `claude-code` alias for `claude`.
+- **tests**: Fixed typo in test assertions (`write_mcp_confg` → `write_mcp_config`).
+
+### Changed
+- **install.sh**: Added version display, improved success summary with next steps, and better error reporting.
+- **SKILL.md**: Added Error Recovery section and Toolchain Awareness specification.
+- **scripts/health.py**: Added timeouts (300s) and better exception handling for subprocess calls.
+- **scripts/sync.py**: Added permission error handling for file operations.
+- **commands**: Enhanced all 10 commands with toolchain announcements and boundary condition checks.
+
 ## 1.7.4 (2026-05-26)
 
 ### Added

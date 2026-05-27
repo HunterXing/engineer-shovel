@@ -115,6 +115,13 @@ When automatic repair is not supported, say that directly and report the manual 
 - blocked local-scope support
 - optional manual upgrades
 
+## Error Handling
+
+- If a component repair fails, report the specific error and suggest manual fix.
+- If network is unavailable, skip remote checks and report local status only.
+- If permission denied, suggest running with appropriate privileges.
+- If component version conflicts exist, recommend clean reinstall.
+
 ## Positioning
 
 - Remember this command as the only update entry point.

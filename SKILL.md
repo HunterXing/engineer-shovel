@@ -242,3 +242,30 @@ For implementation work (`/tool-feat`, `/tool-fix`), default verification stays 
 - Token cost model: `docs/token-cost.md`
 - Installation modes: `docs/install.md`
 - Language command reference: `docs/language-reference.md`
+
+## Quick Start
+
+If you're new to Engineer Shovel, start here:
+
+1. **Install**: `bash install.sh --target opencode` (or `--target all` for both)
+2. **Load skill**: `skill(name="engineer-shovel")`
+3. **Try a command**: `/tool-quick --fast "fix typo in README"`
+4. **Check health**: `/tool-update --check`
+
+### Most Common Commands
+
+| Task | Command | Example |
+|------|---------|---------|
+| Fix a bug | `/tool-fix` | `/tool-fix --standard "login button not working"` |
+| Add feature | `/tool-feat` | `/tool-feat --standard "add dark mode toggle"` |
+| Quick edit | `/tool-quick` | `/tool-quick --fast "fix typo in docs"` |
+| Plan work | `/tool-plan` | `/tool-plan --standard "refactor auth module"` |
+| Review code | `/tool-review` | `/tool-review --fast` |
+
+### Cost Mode Quick Reference
+
+| Mode | When to use | Token cost |
+|------|-------------|------------|
+| `--fast` | Small, obvious changes | Lowest |
+| `--standard` | Normal development | Medium |
+| `--deep` | Complex, risky, or security-sensitive | Higher |

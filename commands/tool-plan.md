@@ -77,6 +77,13 @@ When using external tools, announce them with maximum visibility:
 - [ ] Exit criteria are clear
 - [ ] Escalation triggers are documented
 
+## Error Handling
+
+- If the goal is too vague, ask clarifying questions before planning.
+- If scope is too large for a single plan, break into phases and recommend GSD.
+- If technical approach is unknown, escalate to `/tool-research` first.
+- If planning reveals security concerns, add `/tool-review --deep` checkpoint.
+
 ## Escalation
 
 - Unknown technical approach: use `/tool-research` first.

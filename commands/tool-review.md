@@ -50,6 +50,13 @@ Shared policy: mode mapping and security gate come from `SKILL.md`; escalation r
 - [ ] Performance: Are there obvious performance issues?
 - [ ] Testing: Is there adequate test coverage?
 
+## Error Handling
+
+- If the diff is too large to review, suggest splitting into smaller PRs.
+- If CI status is unavailable, note this limitation in the review.
+- If critical findings are found, clearly communicate the severity and required action.
+- If review reveals architectural concerns, recommend `/tool-plan --deep`.
+
 ## Positioning
 
 - Use this command when review itself is the task.

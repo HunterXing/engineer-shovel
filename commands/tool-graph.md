@@ -47,6 +47,13 @@ When running diagnostic commands, announce them with maximum visibility:
 - **Missing**: No graph directory found
 - **Broken**: Graph exists but status checks fail
 
+## Error Handling
+
+- If code-review-graph is not installed, provide clear install instructions.
+- If graph build fails, suggest checking git repository status.
+- If graph is stale, recommend rebuild or check git hooks.
+- If MCP config is missing, guide user through configuration.
+
 ## Auto-Refresh Integration
 
 The graph is automatically kept fresh by git hooks configured at install time:
