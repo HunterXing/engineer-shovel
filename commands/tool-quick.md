@@ -26,15 +26,23 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
 ## Flow
 
 0. Stay cheap by default. Only get code-review-graph context when the target file, symbol, or dependency edge is still unclear after a quick local read.
-   - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")`
-   - For file-level context: `query_graph(imports_of="<file_path>")` to see dependencies
+   - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")` → announce: `🔧 code-review-graph: searching for <symbol>`
+   - For file-level context: `query_graph(imports_of="<file_path>")` → announce: `🔧 code-review-graph: analyzing dependencies for <file>`
    - Skip graph queries entirely when the file and edit are already obvious
    If project language is known, use matching ECC pattern reference from `docs/language-reference.md` only when a framework convention matters.
 1. Confirm the target file or symbol from context.
 2. Make the smallest safe change.
 3. Run the nearest useful verification: formatter/lint/test/build as applicable.
-   Call `rtk gain` before noisy commands (test runs, builds, diff/log inspection).
+   Call `rtk gain` before noisy commands (test runs, builds, diff/log inspection) → announce: `🔧 rtk: wrapping output for compression`
 4. **Verification Gate**: Run the project-native test/build command. On pass, report what changed and what was verified.
+
+### Toolchain Announcements
+
+When using external tools, announce them clearly:
+- `🔧 code-review-graph: <action>` — when querying the code graph
+- `🔧 caveman: <mode>` — when applying communication compression
+- `🔧 rtk: wrapping <command> output` — when compressing shell output
+- `🔧 claude-mem: searching for similar history` — when querying cross-session memory
 
 ## Error Handling
 

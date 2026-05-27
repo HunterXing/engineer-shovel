@@ -30,8 +30,11 @@ Manage feature branch lifecycle with automatic type detection, diff review, and 
 
 1. **Start task or take control explicitly**: `/tool-branch create [description]` — auto-detects type (feat/fix/refactor/docs)
 2. **Work**: Make commits on the feature branch
-3. **Review**: `/tool-branch review` — shows diff vs source branch with CRG analysis: `detect_changes` + `get_impact_radius` for blast radius
+3. **Review**: `/tool-branch review` — shows diff vs source branch with CRG analysis:
+   - `detect_changes` → announce: `🔧 code-review-graph: analyzing branch changes`
+   - `get_impact_radius` for blast radius → announce: `🔧 code-review-graph: checking blast radius`
 4. **Confirm**: `/tool-branch merge` — squash merge, prompts for commit message, deletes branch
+   - Use `/caveman-commit` for commit message → announce: `🔧 caveman: generating commit message`
 5. **Or discard**: `/tool-branch abort` — abandon branch, return to source
 
 ## Auto-Detection Rules

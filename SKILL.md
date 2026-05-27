@@ -171,6 +171,45 @@ When a workflow encounters errors:
 4. **Scope creep**: Split work into smaller slices and defer additional scope
 5. **Repeated failures**: Escalate to `/tool-plan --deep` for architectural review
 
+## Toolchain Awareness
+
+**IMPORTANT**: When using any external tool or capability layer, you MUST explicitly announce it to the user. This helps developers understand what tools are powering their workflow and builds trust in the AI harness.
+
+### Announcement Format
+
+Use this format when activating a tool:
+
+```
+🔧 [Tool Name]: <what it's doing>
+```
+
+Examples:
+```
+🔧 code-review-graph: analyzing impact radius for auth module
+🔧 caveman: compressing output (full mode)
+🔧 rtk: wrapping large test suite output
+🔧 superpowers: loading systematic-debugging skill
+🔧 claude-mem: searching for similar bug history
+🔧 ECC: loading security guidance for auth patterns
+```
+
+### When to Announce
+
+Announce tool usage at these moments:
+1. **First activation**: When a tool is first invoked in the workflow
+2. **Key operations**: When performing impact analysis, review, or research
+3. **Mode switches**: When escalating from fast to standard to deep
+4. **External queries**: When calling MCP tools, web fetches, or external APIs
+5. **Compression**: When caveman or rtk compresses output
+
+### Native vs External
+
+Clearly distinguish between:
+- **Native tools**: Read, Grep, Glob, Edit, Bash (no announcement needed)
+- **External tools**: code-review-graph, caveman, rtk, superpowers, ECC, OpenSpec, GSD, claude-mem (MUST announce)
+
+This transparency helps developers learn the toolchain and understand what capabilities are available.
+
 ## Completion Pipeline
 
 For implementation work (`/tool-feat`, `/tool-fix`), default verification stays lightweight. GSD is reserved for deep, milestone, or cross-session work.

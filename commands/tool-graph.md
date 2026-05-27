@@ -27,10 +27,18 @@ Diagnostic commands for the code-review-graph index. This is a platform support 
 ## Flow
 
 1. Verify `code-review-graph` exists; if missing, tell the user to run `./install.sh --full` or `pipx install code-review-graph && code-review-graph install`.
-2. For `status`, run `code-review-graph status` and summarize graph health.
-3. For `build`, run `code-review-graph build` and report success or failure.
-4. For `update`, run `code-review-graph update` and treat failure as actionable.
-5. For `rebuild`, prefer the upstream rebuild path; ask before deleting local graph storage.
+2. For `status`, run `code-review-graph status` → announce: `🔧 code-review-graph: checking graph health`
+3. For `build`, run `code-review-graph build` → announce: `🔧 code-review-graph: building full graph`
+4. For `update`, run `code-review-graph update` → announce: `🔧 code-review-graph: updating graph`
+5. For `rebuild`, prefer the upstream rebuild path; ask before deleting local graph storage. → announce: `🔧 code-review-graph: rebuilding graph from scratch`
+
+### Toolchain Announcements
+
+When running diagnostic commands, announce them clearly:
+- `🔧 code-review-graph: checking graph health` — for status checks
+- `🔧 code-review-graph: building full graph` — for initial builds
+- `🔧 code-review-graph: updating graph` — for incremental updates
+- `🔧 code-review-graph: rebuilding graph` — for full rebuilds
 
 ## Health Indicators
 

@@ -35,12 +35,26 @@ Single user-facing entry point for keeping Engineer Shovel current. It checks ro
 2. Compare local installed router files (`SKILL.md`, `/tool-*`) with latest repo versions.
 3. Report router drift explicitly as: current, missing, outdated, or extra.
 4. Check component health for base tools and recommended/full integrations.
+   - When checking each component, announce: `🔧 <component>: checking health`
 5. Classify component results as:
    - repairable automatically
    - blocked by scope/runtime/platform limits
    - manual upgrade recommended
 6. If `--full`: sync router files first, then repair missing or unconfigured components.
+   - When repairing, announce: `🔧 <component>: repairing...`
 7. Verify router integrity and component health after update.
+
+### Toolchain Announcements
+
+When checking or repairing components, announce them:
+- `🔧 code-review-graph: checking MCP config` — when verifying graph setup
+- `🔧 caveman: checking installation` — when verifying caveman
+- `🔧 rtk: checking binary` — when verifying RTK
+- `🔧 superpowers: checking plugin` — when verifying superpowers
+- `🔧 claude-mem: checking config` — when verifying memory system
+- `🔧 OpenSpec: checking CLI` — when verifying OpenSpec
+- `🔧 GSD: checking files` — when verifying GSD
+- `🔧 ECC: checking installation` — when verifying ECC
 
 ## Internal Split
 
