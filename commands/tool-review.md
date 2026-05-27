@@ -41,6 +41,15 @@ Shared policy: mode mapping and security gate come from `SKILL.md`; escalation r
 7. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
 8. Review findings may be captured by claude-mem when cross-session pattern detection is useful.
 
+## Review Checklist
+
+- [ ] Correctness: Does the code do what it claims?
+- [ ] Regressions: Could this break existing functionality?
+- [ ] Security: Are there auth, input, or data handling risks?
+- [ ] Maintainability: Is the code clear and maintainable?
+- [ ] Performance: Are there obvious performance issues?
+- [ ] Testing: Is there adequate test coverage?
+
 ## Positioning
 
 - Use this command when review itself is the task.

@@ -41,6 +41,14 @@ This command uses a special mode axis:
 7. Highlight conflicts and confidence.
 8. Route findings to `/tool-plan` (scope/order still unclear), `/tool-feat` (decision made), `/tool-quick` (small obvious change), or documentation. Append routing rationale so research does not become a dead-end artifact.
 
+## Research Quality
+
+- Always cite sources for external facts.
+- Distinguish between verified facts and assumptions.
+- Note confidence levels (high/medium/low).
+- Highlight conflicting evidence explicitly.
+- Provide actionable recommendations, not just raw data.
+
 ## Avoid
 
 Do not run deep multi-source research for questions answerable from local code or official docs.

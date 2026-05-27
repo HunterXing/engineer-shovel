@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 # engineer-shovel — cross-platform installer (macOS/Linux/WSL)
 # Windows: use install.ps1 instead
+#
+# Quick start:
+#   bash install.sh                    # Interactive: prompts for target/mode/scope
+#   bash install.sh --target opencode  # Non-interactive: full install for OpenCode
+#   bash install.sh --target all       # Non-interactive: full install for both
+#   bash install.sh --minimal          # Non-interactive: skill + commands only
 
 set -euo pipefail
 
+VERSION="1.7.5"
 REPO_RAW="https://raw.githubusercontent.com"
 REPO_OWNER="HunterXing"
 REPO_NAME="engineer-shovel"
@@ -447,7 +454,7 @@ install_skill() {
 install_commands() {
   local src_dir
   src_dir="$(dirname "$0")/commands"
-  local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
+  local names=(branch feat fix plan refactor review quick research graph update)
   local count=0
 
   run_or_print mkdir -p "$COMMAND_DIR"
@@ -461,7 +468,7 @@ install_commands() {
     count=$((count + 1))
   done
 
-  ok "Installed ${count} slash command files (${count} total: 10 active + 2 legacy redirects) → ${COMMAND_DIR}/"
+  ok "Installed ${count} slash command files → ${COMMAND_DIR}/"
 }
 
 # ---------- Caveman: Official installer ----------
@@ -1298,7 +1305,7 @@ verify_install() {
   local missing_count=0
   [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing_count=1
 
-  local names=(branch feat fix plan refactor review brainstorm quick blueprint research graph update)
+  local names=(branch feat fix plan refactor review quick research graph update)
   for name in "${names[@]}"; do
     [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing_count=1
   done
@@ -1366,10 +1373,32 @@ main() {
     info "${ENV}: skill=${SKILL_DIR}/engineer-shovel/SKILL.md commands=${COMMAND_DIR}/tool-*.md"
   done
   info "Component strategy remains mixed by design: some tools are pinned, some follow upstream latest, and some are effectively global."
-  info "Next: restart your agent session, then use skill(name=\"engineer-shovel\") or run /tool-* commands."
-  info "Upgrade later with: /tool-update --check  (status) or /tool-update --full  (sync + repair)"
+
+  # Print success summary
+  echo ""
+  echo "╔══════════════════════════════════════════════════════════════╗"
+  echo "║  🪖 Engineer Shovel v${VERSION} — Installation Complete          ║"
+  echo "╚══════════════════════════════════════════════════════════════╝"
+  echo ""
+  ok "Next steps:"
+  echo "  1. Restart your agent session (opencode or claude)"
+  echo "  2. Load the skill: skill(name=\"engineer-shovel\")"
+  echo "  3. Or run commands directly: /tool-quick, /tool-fix, /tool-feat, etc."
+  echo ""
+  info "Useful commands:"
+  echo "  /tool-update --check    # Check installation status"
+  echo "  /tool-update --full     # Sync and repair components"
+  echo "  /tool-graph status      # Check code-review-graph health"
+  echo ""
+
   if [[ "$OS" == "linux" || "$OS" == "macos" ]]; then
-    info "Windows users: use install.ps1 instead — curl -fsSL https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/install.ps1 | powershell -c -"
+    info "Windows users: use install.ps1 instead"
+    echo "  powershell -c \"iex (iwr -useb https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/install.ps1)\""
+  fi
+
+  if [[ "$FAILURES" -gt 0 ]]; then
+    echo ""
+    warn "${FAILURES} optional component(s) had warnings. Run /tool-update --check for details."
   fi
 }
 

@@ -48,22 +48,30 @@ TRACKED_FILES = {
 
 def hash_file(path: Path) -> str | None:
     """Return SHA256 hash of file, or None if file doesn't exist."""
-    if not path.exists():
+    try:
+        if not path.exists():
+            return None
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except (OSError, PermissionError) as e:
+        print(f"Warning: Could not hash {path}: {e}")
         return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def get_installed_files(target: str, scope: str, file_type: str) -> list[Path]:
     """Get list of installed files for given target/scope/type."""
-    base = INSTALL_PATHS[target][scope].get(file_type)
-    if not base or not base.exists():
+    try:
+        base = INSTALL_PATHS[target][scope].get(file_type)
+        if not base or not base.exists():
+            return []
+        
+        if file_type == "skill":
+            return [base / f for f in TRACKED_FILES["skill"]]
+        elif file_type == "commands":
+            return sorted(base.glob("tool-*.md"))
         return []
-    
-    if file_type == "skill":
-        return [base / f for f in TRACKED_FILES["skill"]]
-    elif file_type == "commands":
-        return sorted(base.glob("tool-*.md"))
-    return []
+    except (KeyError, OSError) as e:
+        print(f"Warning: Could not get installed files for {target}/{scope}/{file_type}: {e}")
+        return []
 
 
 def get_repo_files(file_type: str) -> list[Path]:
@@ -94,7 +102,13 @@ def compare_files(installed: list[Path], repo: list[Path]) -> dict:
         else:
             repo_hash = hash_file(repo_path)
             installed_hash = hash_file(installed_path)
-            if repo_hash != installed_hash:
+            if repo_hash is None or installed_hash is None:
+                # If we can't hash, assume outdated
+                result["outdated"].append({
+                    "installed": installed_path,
+                    "repo": repo_path
+                })
+            elif repo_hash != installed_hash:
                 result["outdated"].append({
                     "installed": installed_path,
                     "repo": repo_path
@@ -112,24 +126,31 @@ def compare_files(installed: list[Path], repo: list[Path]) -> dict:
 def sync_files(comparisons: dict, target: str = "opencode", scope: str = "global", dry_run: bool = False) -> int:
     """Sync installed files with repo versions. Returns count of updated files."""
     updated = 0
-    skill_dir = INSTALL_PATHS[target][scope]["skill"]
-    command_dir = INSTALL_PATHS[target][scope]["commands"]
+    try:
+        skill_dir = INSTALL_PATHS[target][scope]["skill"]
+        command_dir = INSTALL_PATHS[target][scope]["commands"]
+    except KeyError as e:
+        print(f"Error: Invalid target/scope combination: {e}")
+        return 0
 
     for repo_path in comparisons["missing"]:
         if dry_run:
             print(f"  DRY-RUN: Would copy {repo_path.name}")
             updated += 1
             continue
-        if repo_path.parent.name == "commands":
-            target_dir = command_dir
-        else:
-            target_dir = skill_dir
+        try:
+            if repo_path.parent.name == "commands":
+                target_dir = command_dir
+            else:
+                target_dir = skill_dir
 
-        target_dir.mkdir(parents=True, exist_ok=True)
-        target_path = target_dir / repo_path.name
-        target_path.write_bytes(repo_path.read_bytes())
-        print(f"  + Added {repo_path.name}")
-        updated += 1
+            target_dir.mkdir(parents=True, exist_ok=True)
+            target_path = target_dir / repo_path.name
+            target_path.write_bytes(repo_path.read_bytes())
+            print(f"  + Added {repo_path.name}")
+            updated += 1
+        except (OSError, PermissionError) as e:
+            print(f"  ✘ Failed to add {repo_path.name}: {e}")
 
     for entry in comparisons["outdated"]:
         installed_path = entry["installed"]
@@ -138,9 +159,12 @@ def sync_files(comparisons: dict, target: str = "opencode", scope: str = "global
             print(f"  DRY-RUN: Would update {installed_path.name}")
             updated += 1
             continue
-        installed_path.write_bytes(repo_path.read_bytes())
-        print(f"  ~ Updated {installed_path.name}")
-        updated += 1
+        try:
+            installed_path.write_bytes(repo_path.read_bytes())
+            print(f"  ~ Updated {installed_path.name}")
+            updated += 1
+        except (OSError, PermissionError) as e:
+            print(f"  ✘ Failed to update {installed_path.name}: {e}")
 
     return updated
 
@@ -417,7 +441,7 @@ def main() -> int:
                     print("✔ Repo updated to latest")
                 else:
                     print("✘ Failed to pull latest changes from remote")
-                    print("  Try: cd /data/newSkills && git pull")
+                    print(f"  Try: cd {ROOT} && git pull")
                     return 1
             else:
                 print("  DRY-RUN: Would pull latest from remote")

@@ -32,6 +32,13 @@ Diagnostic commands for the code-review-graph index. This is a platform support 
 4. For `update`, run `code-review-graph update` and treat failure as actionable.
 5. For `rebuild`, prefer the upstream rebuild path; ask before deleting local graph storage.
 
+## Health Indicators
+
+- **Healthy**: Graph exists, hooks active, recent updates
+- **Stale**: Graph exists but no recent updates
+- **Missing**: No graph directory found
+- **Broken**: Graph exists but status checks fail
+
 ## Auto-Refresh Integration
 
 The graph is automatically kept fresh by git hooks configured at install time:

@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.7.4"
+  version: "1.7.5"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -151,6 +151,8 @@ claude-mem provides auto-capture cross-session memory:
 5. Use Caveman or compact handoffs when context usage grows.
 6. Treat external tools as capability layers with distinct jobs; avoid overlapping routes by default.
 7. Code-review-graph is auto-refreshed by git hooks — never manually refresh during workflow.
+8. Always have a fallback plan if external tools are unavailable.
+9. Document decisions and rationale for future reference.
 
 ## Cross-cutting Security Gate
 
@@ -159,6 +161,15 @@ Enforced on ALL `/tool-*` commands regardless of cost mode. If any change touche
 immediately promote the task to the matching deep route and add a `/tool-review --deep` checkpoint before sign-off.
 
 Individual command files reference this gate with one line; do not repeat the full text.
+
+## Error Recovery
+
+When a workflow encounters errors:
+1. **Tool unavailable**: Fall back to native tools (Grep, Glob, Read, Bash)
+2. **Verification failure**: Revert changes and reassess approach
+3. **External service down**: Use cached data or skip non-critical steps
+4. **Scope creep**: Split work into smaller slices and defer additional scope
+5. **Repeated failures**: Escalate to `/tool-plan --deep` for architectural review
 
 ## Completion Pipeline
 

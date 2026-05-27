@@ -36,6 +36,12 @@ Compression: per SKILL.md enforced mapping — `/caveman lite` for `--fast`, `/c
    Call `rtk gain` before noisy commands (test runs, builds, diff/log inspection).
 4. **Verification Gate**: Run the project-native test/build command. On pass, report what changed and what was verified.
 
+## Error Handling
+
+- If the edit fails or produces unexpected results, stop and report the issue.
+- If verification fails, revert the change and escalate to `/tool-fix`.
+- If the task turns out to be more complex than expected, escalate to `/tool-feat` or `/tool-plan`.
+
 ## Security Gate
 
 If change touches auth, user input, file system, network, secrets, cookies, or SQL, stop treating it as a quick task; promote it to the matching deep route and add `/tool-review --deep` before completion.

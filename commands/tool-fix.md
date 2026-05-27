@@ -44,6 +44,13 @@ Shared policy: mode mapping, security gate, and completion pipeline come from `S
 9. `query_graph(tests_for="<fixed_node>")` to verify test coverage exists for the fix when CRG is already in use.
 10. Re-run project-native test/build, then use `/tool-review --fast` for standard work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
 
+## Error Handling
+
+- If reproduction fails, ask for more details or a minimal reproducible example.
+- If the fix introduces new failures, revert and reassess the approach.
+- If 3+ fix attempts fail, stop and escalate to `/tool-plan --deep` for architectural review.
+- Always verify the fix doesn't break existing functionality.
+
 ## Security Gate
 
 If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.

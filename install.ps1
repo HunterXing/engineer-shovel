@@ -117,7 +117,7 @@ function Install-Skill {
 
 function Install-Commands {
   param([string]$cmdDir)
-  $names = @("branch","feat","fix","plan","refactor","review","brainstorm","quick","blueprint","research","graph","update")
+  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update")
   if ($DryRun) { Info "DRY-RUN: install commands -> $cmdDir"; return }
   New-Item -ItemType Directory -Force -Path $cmdDir | Out-Null
   $count = 0
@@ -467,7 +467,7 @@ function Verify-Install {
   if ($DryRun) { Ok "Dry-run completed"; return }
   $missing = 0
   if (-not (Test-Path (Join-Path $SKILL_DIR "engineer-shovel\SKILL.md"))) { $missing = 1 }
-  $names = @("branch","feat","fix","plan","refactor","review","brainstorm","quick","blueprint","research","graph","update")
+  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update")
   foreach ($name in $names) {
     if (-not (Test-Path (Join-Path $COMMAND_DIR "tool-${name}.md"))) { $missing = 1 }
   }
@@ -498,7 +498,7 @@ Modes:
 
   # Install components by mode
   switch ($Mode) {
-    "minimal" { /* no extras */ }
+    "minimal" { # no extras
     "recommended" {
       Install-Superpowers $script:TARGETS
       Install-CodeReviewGraph

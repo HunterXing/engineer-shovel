@@ -63,6 +63,12 @@ bash scripts/branch-workflow.sh <subcommand> [args...]
 
 Use `/caveman lite` (L2) for branch operations output (per SKILL.md mapping for `--fast`-equivalent operations). Use `/caveman-commit` (L2) for merge commit messages.
 
+## Error Handling
+
+- If branch creation fails, check for naming conflicts or invalid characters.
+- If merge has conflicts, pause and let user resolve manually.
+- If abort is rejected, ensure user confirms before discarding work.
+
 ## Edge Cases
 
 - Uncommitted changes: auto-stashed before branch switch, restored on abort

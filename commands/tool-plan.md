@@ -58,6 +58,16 @@ Search claude-mem only when prior architectural decisions are likely to change t
 6. If the work touches auth, user data, or security-sensitive paths, add `/tool-review --deep` before sign-off.
 7. Execute only after the plan is specific enough that implementation no longer needs new product decisions.
 
+## Plan Quality Checklist
+
+- [ ] Goal is clear and measurable
+- [ ] Non-goals are explicitly stated
+- [ ] Affected files/modules are identified
+- [ ] Execution order is defined
+- [ ] Verification method is specified
+- [ ] Exit criteria are clear
+- [ ] Escalation triggers are documented
+
 ## Escalation
 
 - Unknown technical approach: use `/tool-research` first.

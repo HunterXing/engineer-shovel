@@ -30,11 +30,19 @@ INSTALL_PATHS = {
     },
 }
 
+# Alias: "claude-code" maps to "claude" for compatibility with install.sh
+INSTALL_PATHS["claude-code"] = INSTALL_PATHS["claude"]
+
 
 def install_paths(target: str, scope: str) -> dict:
-    """Get install paths for a given target/scope, including extra key defaults."""
-    base = dict(INSTALL_PATHS[target][scope])
-    base.setdefault("gsd_skills", _default_gsd_skills(target, scope))
+    """Get install paths for a given target/scope, including extra key defaults.
+
+    Accepts "claude" or "claude-code" as target (both map to the same paths).
+    """
+    # Normalize target: "claude-code" -> "claude"
+    normalized = "claude" if target == "claude-code" else target
+    base = dict(INSTALL_PATHS[normalized][scope])
+    base.setdefault("gsd_skills", _default_gsd_skills(normalized, scope))
     return base
 
 

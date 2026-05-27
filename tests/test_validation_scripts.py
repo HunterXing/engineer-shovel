@@ -286,7 +286,7 @@ def test_health_repair_code_review_graph_uses_official_commands(monkeypatch):
 
     module.repair_code_review_graph(runner, ["opencode", "claude"], "global")
 
-    assert any("write_mcp_confg" in str(c) for c in runner.commands)
+    assert any("write_mcp_config" in str(c) for c in runner.commands)
     assert ["code-review-graph", "install", "--platform", "claude-code"] in runner.commands
     assert ["code-review-graph", "build"] in runner.commands
 
@@ -299,7 +299,7 @@ def test_health_repair_code_review_graph_installs_when_missing(monkeypatch):
     module.repair_code_review_graph(runner, ["opencode"], "global")
 
     assert ["pipx", "install", "code-review-graph"] in runner.commands
-    assert any("write_mcp_confg" in str(c) for c in runner.commands)
+    assert any("write_mcp_config" in str(c) for c in runner.commands)
     assert ["code-review-graph", "build"] in runner.commands
 
 

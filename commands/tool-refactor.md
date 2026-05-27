@@ -38,6 +38,14 @@ Shared policy: mode mapping, security gate, and completion behavior come from `S
 7. If the work stops being behavior-preserving or grows into a broad multi-area redesign, switch to `/tool-plan --deep` before continuing.
 8. **Verification Gate**: confirm all tests pass → graph impact check clean → `/tool-review --fast` or Caveman-compressed sanity check → report.
 
+## Safety Rules
+
+- Never mix feature work into a refactor.
+- Always run baseline tests before starting.
+- Refactor in small, verifiable steps.
+- If tests fail at any point, stop and fix before continuing.
+- Keep commits atomic and focused.
+
 ## Security Gate
 
 If change touches auth, security-sensitive paths, or data handling, stop treating it as a routine refactor and add a `/tool-review --deep` checkpoint before sign-off.

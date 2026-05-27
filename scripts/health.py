@@ -29,7 +29,8 @@ STATUS_MANUAL_UPGRADE = "manual-upgrade-recommended"
 def load_dependency_manifest() -> dict[str, dict]:
     try:
         return json.loads(DEPENDENCY_MANIFEST_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Warning: Could not load dependency manifest: {e}")
         return {}
 
 
@@ -53,7 +54,11 @@ def manifest_repair_hint(name: str, target: Optional[str], fallback: str) -> str
 
 
 def which(name: str) -> Optional[str]:
-    return shutil.which(name)
+    """Find executable in PATH with error handling."""
+    try:
+        return shutil.which(name)
+    except Exception:
+        return None
 
 
 @dataclass
@@ -87,15 +92,26 @@ class CommandRunner:
     executor: Optional[Callable[[list[str]], CommandResult]] = None
 
     def run(self, command: list[str]) -> CommandResult:
+        """Run a command with error handling and timeout."""
         self.commands.append(command)
         if self.dry_run:
             return CommandResult(0, "DRY-RUN")
         if self.executor is not None:
             return self.executor(command)
         try:
-            proc = subprocess.run(command, text=True, capture_output=True, check=False)
+            proc = subprocess.run(
+                command,
+                text=True,
+                capture_output=True,
+                check=False,
+                timeout=300  # 5 minute timeout
+            )
         except FileNotFoundError as exc:
             return CommandResult(127, "", str(exc))
+        except subprocess.TimeoutExpired as exc:
+            return CommandResult(124, "", f"Command timed out after {exc.timeout}s")
+        except Exception as exc:
+            return CommandResult(1, "", str(exc))
         return CommandResult(proc.returncode, proc.stdout, proc.stderr)
 
 
@@ -196,7 +212,7 @@ def check_code_review_graph(runner: CommandRunner, scope: str) -> CheckResult:
         )
     if not path and has_uvx:
         # uvx can run code-review-graph on demand for MCP
-        if _has_crg_mcp_opencode():
+        if _has_crg_mcp_opencode() or _has_crg_mcp_claude():
             return CheckResult("code-review-graph", STATUS_OK, "via uvx (on-demand)", target="component")
     if path:
         status = runner.run(["code-review-graph", "status"])
@@ -329,7 +345,6 @@ def check_gsd(target: str, scope: str) -> CheckResult:
 
 def _ecc_cmd_dir() -> Optional[Path]:
     """Find ECC commands directory."""
-    import subprocess
     try:
         result = subprocess.run(["npm", "root", "-g"], text=True, capture_output=True, check=False)
         if result.returncode == 0:
@@ -423,7 +438,7 @@ def repair_code_review_graph(runner: CommandRunner, targets: list[str], scope: s
         if target == "opencode":
             config_path = ROOT / ".opencode/opencode.json" if scope == "local" else HOME / ".config/opencode/opencode.json"
             if runner.dry_run:
-                runner.commands.append(["write_mcp_confg", str(config_path)])
+                runner.commands.append(["write_mcp_config", str(config_path)])
             else:
                 _write_crg_mcp_config(config_path)
             # Remove old-format config if present
@@ -594,44 +609,41 @@ class ComponentDef:
     repair: Callable[..., None]
     needs_target: bool = False
     needs_scope: bool = False
+    check_params: tuple[str, ...] = ()
+    repair_params: tuple[str, ...] = ("runner", "targets")
+    repair_per_target: bool = False
 
 
 COMPONENTS: list[ComponentDef] = [
-    ComponentDef("code-review-graph", check_code_review_graph, repair_code_review_graph, needs_scope=True),
-    ComponentDef("rtk", check_rtk, repair_rtk),
-    ComponentDef("openspec", check_openspec, repair_openspec),
-    ComponentDef("superpowers", check_superpowers, repair_superpowers, needs_target=True),
-    ComponentDef("caveman", check_caveman, repair_caveman, needs_target=True),
-    ComponentDef("claude-mem", check_claude_mem, repair_claude_mem, needs_target=True),
-    ComponentDef("gsd", check_gsd, repair_gsd, needs_target=True, needs_scope=True),
-    ComponentDef("ecc", check_ecc, repair_ecc, needs_target=True, needs_scope=True),
+    ComponentDef("code-review-graph", check_code_review_graph, repair_code_review_graph,
+                 needs_scope=True, check_params=("runner", "scope"), repair_params=("runner", "targets", "scope")),
+    ComponentDef("rtk", check_rtk, repair_rtk,
+                 check_params=("runner",)),
+    ComponentDef("openspec", check_openspec, repair_openspec,
+                 check_params=()),
+    ComponentDef("superpowers", check_superpowers, repair_superpowers,
+                 needs_target=True, check_params=("target", "runner"), repair_per_target=True),
+    ComponentDef("caveman", check_caveman, repair_caveman,
+                 needs_target=True, check_params=("target", "runner")),
+    ComponentDef("claude-mem", check_claude_mem, repair_claude_mem,
+                 needs_target=True, check_params=("target", "runner")),
+    ComponentDef("gsd", check_gsd, repair_gsd,
+                 needs_target=True, needs_scope=True, check_params=("target", "scope"),
+                 repair_params=("runner", "targets", "scope")),
+    ComponentDef("ecc", check_ecc, repair_ecc,
+                 needs_target=True, needs_scope=True, check_params=("target", "runner", "scope"),
+                 repair_params=("runner", "targets", "scope")),
 ]
 
 
 def _component_args(comp: ComponentDef, target: str, runner: CommandRunner, scope: str) -> tuple:
-    if comp.name == "code-review-graph":
-        return (runner, scope)
-    if comp.name == "rtk":
-        return (runner,)
-    if comp.name == "openspec":
-        return ()
-    if comp.name == "gsd":
-        return (target, scope)
-    if comp.needs_scope and comp.needs_target:
-        return (target, runner, scope)
-    if comp.needs_target:
-        return (target, runner)
-    return (runner,)
+    param_map = {"target": target, "runner": runner, "scope": scope}
+    return tuple(param_map[p] for p in comp.check_params)
 
 
 def _repair_args(comp: ComponentDef, targets: list[str], runner: CommandRunner, scope: str) -> tuple:
-    if comp.name == "openspec":
-        return (runner, targets)
-    if comp.needs_scope and (comp.needs_target or comp.name == "code-review-graph"):
-        return (runner, targets, scope)
-    if comp.needs_target:
-        return (runner, targets)
-    return (runner, targets)
+    param_map = {"runner": runner, "targets": targets, "scope": scope}
+    return tuple(param_map[p] for p in comp.repair_params)
 
 
 def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
@@ -658,9 +670,9 @@ def repair_components(checks: list[CheckResult], targets: list[str], runner: Com
     for comp in COMPONENTS:
         if comp.name not in names:
             continue
-        if comp.name == "superpowers":
+        if comp.repair_per_target:
             for target in targets:
-                if any(c.name == "superpowers" and c.target == target and c.needs_repair for c in checks):
+                if any(c.name == comp.name and c.target == target and c.needs_repair for c in checks):
                     comp.repair(*_repair_args(comp, [target], runner, scope))
         else:
             comp.repair(*_repair_args(comp, targets, runner, scope))

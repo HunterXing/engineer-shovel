@@ -58,6 +58,12 @@ Do not use this command as a generic clarification shell.
 7. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
 8. Run `/caveman-stats` (L2) to report session token consumption and savings.
 
+## Error Handling
+
+- If implementation hits unexpected complexity, stop and reassess with `/tool-plan`.
+- If tests fail after implementation, switch to `/tool-fix` to address the failures.
+- If the feature scope creeps, create a new slice and defer additional work.
+
 ## Security Gate
 
 If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.
