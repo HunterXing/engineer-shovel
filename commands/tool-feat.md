@@ -17,25 +17,24 @@ standalone: true
 
 Build the smallest feature slice that can be verified. This command assumes the feature is already clear enough to implement.
 
-## Cost Modes (Self-Contained)
+## Shared Policies
 
-| Mode | When | Caveman | Typical tools |
-|------|------|---------|---------------|
-| `--fast` | Known area, small feature | `/caveman lite` | Direct edit, targeted test |
-| `--standard` | Normal feature (default) | `/caveman full` | CRG context, native tests, light review |
-| `--deep` | External deps, multi-system, high-risk | `/caveman full` → `ultra` | OpenSpec, ECC, GSD |
+See `commands/_shared.md` for:
+- **Cost Modes** — fast/standard/deep with smart mode auto-detection
+- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
+- **Toolchain Announcements** — 🚀 format for external tools
+- **Completion Pipeline** — standard/deep verification steps
+- **Error Recovery** — fallback and escalation strategies
 
-**Smart mode**: If no mode specified, auto-detect:
-- Single file, obvious → `--fast`
+## Command-Specific Logic
+
+### Smart Mode
+
+- Single file, obvious feature → `--fast`
 - Multiple files, clear scope → `--standard`
 - Cross-module, security, ambiguous → `--deep`
 
-## Security Gate (Self-Contained)
-
-If change touches **auth, user input, file system, network, secrets, cookies, SQL, or serialization**:
-→ Immediately promote to `--deep` and add `/tool-review --deep` before completion.
-
-## Before Implementation
+### Before Implementation
 
 If the feature is not yet clear enough to build:
 - **Need scope/order/acceptance** → `/tool-plan`
@@ -44,7 +43,7 @@ If the feature is not yet clear enough to build:
 
 Do not use this command as a generic clarification shell.
 
-## Flow
+### Flow
 
 0. Record baseline: run `/caveman-stats` (L2) to capture session starting token count. → announce: `🚀 **caveman** → recording baseline stats`
    Before editing, verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
@@ -53,7 +52,6 @@ Do not use this command as a generic clarification shell.
    - use `semantic_search_nodes(query="<similar_feature_or_pattern>")` → announce: `🚀 **code-review-graph** → searching for similar patterns`
    - use `query_graph(imports_of="<target_module>")` → announce: `🚀 **code-review-graph** → analyzing module dependencies`
    - use `get_architecture_overview` only when module boundaries are still unclear → announce: `🚀 **code-review-graph** → generating architecture overview`
-   If CRG MCP tools are unavailable in the current harness, use `code-review-graph` CLI or fall back to targeted Glob/Grep/Read.
 2. Default `--standard` path:
    - find an existing pattern
    - implement the smallest verifiable slice
@@ -67,39 +65,11 @@ Do not use this command as a generic clarification shell.
    - multi-phase or cross-session delivery -> GSD
 5. Do not run `openspec init` automatically from this command.
 6. Implement the smallest verifiable slice.
-7. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
+7. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work.
 8. Run `/caveman-stats` (L2) to report session token consumption and savings. → announce: `🚀 **caveman** → reporting token stats`
 
-## Error Handling
+### Error Handling
 
 - If implementation hits unexpected complexity, stop and reassess with `/tool-plan`.
 - If tests fail after implementation, switch to `/tool-fix` to address the failures.
 - If the feature scope creeps, create a new slice and defer additional work.
-
-## Toolchain Announcements
-
-When using external tools, announce them with maximum visibility:
-- `🚀 **code-review-graph** → <action>` — when querying the code graph
-- `🚀 **caveman** → <mode>` — when applying communication compression
-- `🚀 **rtk** → wrapping <command> output` — when compressing shell output
-- `🚀 **claude-mem** → searching for similar history` — when querying cross-session memory
-- `🚀 **ECC** → loading <framework> guidance` — when consulting domain expertise
-
-## Completion Pipeline (Self-Contained)
-
-### `--standard` completion
-1. Run project-native targeted tests/build/typecheck
-2. Use `/tool-review --fast` or Caveman-compressed diff sanity check
-3. Offer `/caveman-commit` suggestion — **NEVER** auto-commit without explicit user request
-
-### `--deep` completion
-1. `skill(name="gsd-verify-work")` — structured acceptance verification against plan/spec
-2. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings
-3. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge
-4. Offer `/caveman-commit` suggestion
-
-## References
-
-- Full router: `skill(name="engineer-shovel")` or `SKILL.md`
-- Architecture: `docs/architecture.md`
-- Token cost: `docs/token-cost.md`

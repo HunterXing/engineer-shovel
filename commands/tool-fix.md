@@ -17,25 +17,24 @@ standalone: true
 
 Start with the cheapest path that can prove the bug is fixed. This is a main workflow command; escalate only when reproduction or root cause is unclear.
 
-## Cost Modes (Self-Contained)
+## Shared Policies
 
-| Mode | When | Caveman | Typical path |
-|------|------|---------|--------------|
-| `--fast` | Known file/function, obvious cause | `/caveman lite` | Confirm location → direct fix + targeted test |
-| `--standard` | Reproducible bug, local scope (default) | `/caveman full` | CRG trace + surgical fix + failing test + regression verify |
-| `--deep` | Flaky, cross-module, security, unknown root cause | `/caveman full` → `ultra` | Deliberate escalation per architecture |
+See `commands/_shared.md` for:
+- **Cost Modes** — fast/standard/deep with smart mode auto-detection
+- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
+- **Toolchain Announcements** — 🚀 format for external tools
+- **Completion Pipeline** — standard/deep verification steps
+- **Error Recovery** — fallback and escalation strategies
 
-**Smart mode**: If no mode specified:
+## Command-Specific Logic
+
+### Smart Mode
+
 - Bug with clear repro → `--fast` or `--standard`
 - Bug without repro → `--standard`
 - Cross-module/security → `--deep`
 
-## Security Gate (Self-Contained)
-
-If change touches **auth, user input, file system, network, secrets, cookies, or SQL**:
-→ Promote to `--deep` and add `/tool-review --deep` before completion.
-
-## Flow
+### Flow
 
 0. Code-review-graph (L2) is auto-refreshed by git hooks. Verify freshness inline.
 1. Reproduce or identify the failing assertion/log.
@@ -54,22 +53,17 @@ If change touches **auth, user input, file system, network, secrets, cookies, or
 9. `query_graph(tests_for="<fixed_node>")` → announce: `🚀 **code-review-graph** → verifying test coverage`
 10. Re-run project-native test/build, then use `/tool-review --fast` for standard work.
 
-## Error Handling
+### Error Handling
 
 - If reproduction fails, ask for more details or a minimal reproducible example.
 - If the fix introduces new failures, revert and reassess the approach.
 - If 3+ fix attempts fail, stop and escalate to `/tool-plan --deep` for architectural review.
 - Always verify the fix doesn't break existing functionality.
 
-## Escalation Rules
+### Escalation Rules
 
 - Single-line typo: use `/tool-quick` instead.
 - Cross-file state, external systems, or unclear ownership: use `--deep`.
 - Prefer `superpowers` for debugging discipline before escalating into broad research.
 - Prefer `ECC` only for framework, security, or integration knowledge gaps.
 - If systematic debugging fails 3+ times, stop iterating locally and move to `/tool-plan --deep`.
-
-## References
-
-- Full router: `skill(name="engineer-shovel")` or `SKILL.md`
-- Architecture: `docs/architecture.md`

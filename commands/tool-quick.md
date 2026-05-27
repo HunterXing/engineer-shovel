@@ -17,21 +17,22 @@ standalone: true
 
 Use this for obvious, low-risk work. This is a primary workflow command, not a gateway into heavier process.
 
-## Cost Modes (Self-Contained)
+## Shared Policies
 
-| Mode | When | Caveman | Example |
-|------|------|---------|---------|
-| `--fast` | Typo, config tweak, 1-line fix (default) | `/caveman lite` | Direct edit |
-| `--standard` | 1-2 file surgical change | `/caveman full` | Edit + tests + review |
+See `commands/_shared.md` for:
+- **Cost Modes** — fast/standard/deep with smart mode auto-detection
+- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
+- **Toolchain Announcements** — 🚀 format for external tools
+- **Completion Pipeline** — standard/deep verification steps
+- **Error Recovery** — fallback and escalation strategies
 
-**Smart mode**: If no mode specified, default to `--fast` for quick tasks.
+## Command-Specific Logic
 
-## Security Gate (Self-Contained)
+### Default Mode
 
-If change touches **auth, user input, file system, network, secrets, cookies, or SQL**:
-→ Stop treating it as a quick task; promote to `/tool-fix --deep` or `/tool-feat --deep` and add `/tool-review --deep` before completion.
+`--fast` for obvious single-file edits. `--standard` only if verification needed.
 
-## Flow
+### Flow
 
 0. Stay cheap by default. Only get code-review-graph context when the target file, symbol, or dependency edge is still unclear after a quick local read.
    - For a specific symbol: `semantic_search_nodes(query="<function_or_class_name>")` → announce: `🚀 **code-review-graph** → searching for <symbol>`
@@ -43,27 +44,16 @@ If change touches **auth, user input, file system, network, secrets, cookies, or
    Call `rtk gain` before noisy commands (test runs, builds, diff/log inspection) → announce: `🚀 **rtk** → wrapping output for compression`
 4. **Verification Gate**: Run the project-native test/build command. On pass, report what changed and what was verified.
 
-## Error Handling
+### Error Handling
 
 - If the edit fails or produces unexpected results, stop and report the issue.
 - If verification fails, revert the change and escalate to `/tool-fix`.
 - If the task turns out to be more complex than expected, escalate to `/tool-feat` or `/tool-plan`.
 
-## Toolchain Announcements
-
-When using external tools, announce them with maximum visibility:
-- `🚀 **code-review-graph** → <action>` — when querying the code graph
-- `🚀 **caveman** → <mode>` — when applying communication compression
-- `🚀 **rtk** → wrapping <command> output` — when compressing shell output
-
-## Avoid
+### Avoid
 
 - No `/tool-plan --deep` unless the task is no longer quick.
 - No `/deep-research`.
 - No OpenSpec.
 - No GSD.
 - No `/tool-review --deep` unless the change unexpectedly becomes high risk.
-
-## References
-
-- Full router: `skill(name="engineer-shovel")` or `SKILL.md`
