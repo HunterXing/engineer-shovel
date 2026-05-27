@@ -8,6 +8,7 @@ allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
 escalates-to: [/tool-plan, /tool-review]
 depends-on: [/tool-research]
 when-to-use: Use for adding new functionality. Includes built-in brainstorm phase when requirements are unclear. Choose the smallest verifiable feature slice.
+standalone: true
 ---
 
 # /tool-feat — New Feature Development
@@ -16,7 +17,23 @@ when-to-use: Use for adding new functionality. Includes built-in brainstorm phas
 
 Build the smallest feature slice that can be verified. This command assumes the feature is already clear enough to implement.
 
-Shared policy: mode mapping, security gate, and completion pipeline come from `SKILL.md`; capability-layer roles and escalation rules live in `docs/architecture.md`. Wrap large test/build output with `rtk gain`.
+## Cost Modes (Self-Contained)
+
+| Mode | When | Caveman | Typical tools |
+|------|------|---------|---------------|
+| `--fast` | Known area, small feature | `/caveman lite` | Direct edit, targeted test |
+| `--standard` | Normal feature (default) | `/caveman full` | CRG context, native tests, light review |
+| `--deep` | External deps, multi-system, high-risk | `/caveman full` → `ultra` | OpenSpec, ECC, GSD |
+
+**Smart mode**: If no mode specified, auto-detect:
+- Single file, obvious → `--fast`
+- Multiple files, clear scope → `--standard`
+- Cross-module, security, ambiguous → `--deep`
+
+## Security Gate (Self-Contained)
+
+If change touches **auth, user input, file system, network, secrets, cookies, SQL, or serialization**:
+→ Immediately promote to `--deep` and add `/tool-review --deep` before completion.
 
 ## Before Implementation
 
@@ -26,12 +43,6 @@ If the feature is not yet clear enough to build:
 - **Need product exploration first** → `skill(name="gsd-explore")`
 
 Do not use this command as a generic clarification shell.
-
-## Cost Modes
-
-- `--fast`: known area, small feature → confirm pattern → implement → target verification
-- `--standard` or default: normal feature, 3-8 files → targeted CRG context → implement → native tests/build → light review
-- `--deep`: external deps, multi-system, milestone, or high-risk feature → escalate deliberately per `docs/architecture.md`
 
 ## Flow
 
@@ -65,12 +76,30 @@ Do not use this command as a generic clarification shell.
 - If tests fail after implementation, switch to `/tool-fix` to address the failures.
 - If the feature scope creeps, create a new slice and defer additional work.
 
-## Security Gate
+## Toolchain Announcements
 
-If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.
+When using external tools, announce them with maximum visibility:
+- `🚀 **code-review-graph** → <action>` — when querying the code graph
+- `🚀 **caveman** → <mode>` — when applying communication compression
+- `🚀 **rtk** → wrapping <command> output` — when compressing shell output
+- `🚀 **claude-mem** → searching for similar history` — when querying cross-session memory
+- `🚀 **ECC** → loading <framework> guidance` — when consulting domain expertise
 
-## Skill Routing
+## Completion Pipeline (Self-Contained)
 
-Use project-native skills and commands from `docs/language-reference.md` instead of loading broad skill sets by default.
-Escalate to superpowers, ECC, OpenSpec, or GSD only when the feature cannot remain decision-light and still be implemented safely.
-Standard feature work should stay close to native code search, implementation, tests/build, and lightweight review.
+### `--standard` completion
+1. Run project-native targeted tests/build/typecheck
+2. Use `/tool-review --fast` or Caveman-compressed diff sanity check
+3. Offer `/caveman-commit` suggestion — **NEVER** auto-commit without explicit user request
+
+### `--deep` completion
+1. `skill(name="gsd-verify-work")` — structured acceptance verification against plan/spec
+2. `skill(name="gsd-code-review")` — phase-scoped review with severity-classified findings
+3. `skill(name="gsd-ship")` — create PR, run review gates, prepare for merge
+4. Offer `/caveman-commit` suggestion
+
+## References
+
+- Full router: `skill(name="engineer-shovel")` or `SKILL.md`
+- Architecture: `docs/architecture.md`
+- Token cost: `docs/token-cost.md`

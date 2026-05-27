@@ -8,6 +8,7 @@ allowed-tools: [Read, Grep, Glob, Edit, Bash, Task]
 escalates-to: [/tool-review, /tool-plan]
 depends-on: []
 when-to-use: Use when behavior is broken, tests fail, logs show regressions, or root cause must be proven before fixing.
+standalone: true
 ---
 
 # /tool-fix — Bug Fixing
@@ -16,13 +17,23 @@ when-to-use: Use when behavior is broken, tests fail, logs show regressions, or 
 
 Start with the cheapest path that can prove the bug is fixed. This is a main workflow command; escalate only when reproduction or root cause is unclear.
 
-Shared policy: mode mapping, security gate, and completion pipeline come from `SKILL.md`; capability-layer roles and escalation rules live in `docs/architecture.md`. Wrap large test/log output with `rtk gain`.
+## Cost Modes (Self-Contained)
 
-## Cost Modes
+| Mode | When | Caveman | Typical path |
+|------|------|---------|--------------|
+| `--fast` | Known file/function, obvious cause | `/caveman lite` | Confirm location → direct fix + targeted test |
+| `--standard` | Reproducible bug, local scope (default) | `/caveman full` | CRG trace + surgical fix + failing test + regression verify |
+| `--deep` | Flaky, cross-module, security, unknown root cause | `/caveman full` → `ultra` | Deliberate escalation per architecture |
 
-- `--fast`: known file/function, obvious cause → confirm location → direct fix + targeted test.
-- `--standard` or default: reproducible bug, local scope → CRG trace + surgical fix + failing test + regression verification + light review.
-- `--deep`: flaky, cross-module, security, or unknown root cause → escalate deliberately per `docs/architecture.md`.
+**Smart mode**: If no mode specified:
+- Bug with clear repro → `--fast` or `--standard`
+- Bug without repro → `--standard`
+- Cross-module/security → `--deep`
+
+## Security Gate (Self-Contained)
+
+If change touches **auth, user input, file system, network, secrets, cookies, or SQL**:
+→ Promote to `--deep` and add `/tool-review --deep` before completion.
 
 ## Flow
 
@@ -33,7 +44,6 @@ Shared policy: mode mapping, security gate, and completion pipeline come from `S
    - `semantic_search_nodes(query="<failing_function>")` → announce: `🚀 **code-review-graph** → locating <function>`
    - `get_affected_flows(entry_point="<node_id>")` → announce: `🚀 **code-review-graph** → tracing execution flow`
    - `query_graph(callers_of="<suspected_root>", depth=2)` → announce: `🚀 **code-review-graph** → analyzing callers`
-   If CRG MCP tools are unavailable in the current harness, use `code-review-graph detect-changes/status` where possible or fall back to targeted Glob/Grep/Read.
 4. If the bug is local and obvious, skip graph work and go straight to the failing file plus targeted verification.
 5. When root cause is still unclear after reproduction, upgrade method rather than broadening scope:
    - use `superpowers` / systematic debugging → announce: `🚀 **superpowers** → loading systematic-debugging skill`
@@ -42,7 +52,7 @@ Shared policy: mode mapping, security gate, and completion pipeline come from `S
 7. Apply a surgical fix.
 8. Run the failing test first, then related tests/build. Wrap large test output with `rtk gain` → announce: `🚀 **rtk** → wrapping test output`
 9. `query_graph(tests_for="<fixed_node>")` → announce: `🚀 **code-review-graph** → verifying test coverage`
-10. Re-run project-native test/build, then use `/tool-review --fast` for standard work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
+10. Re-run project-native test/build, then use `/tool-review --fast` for standard work.
 
 ## Error Handling
 
@@ -51,15 +61,15 @@ Shared policy: mode mapping, security gate, and completion pipeline come from `S
 - If 3+ fix attempts fail, stop and escalate to `/tool-plan --deep` for architectural review.
 - Always verify the fix doesn't break existing functionality.
 
-## Security Gate
-
-If change touches auth, user input, file system, network, secrets, cookies, or SQL, promote it to a security-sensitive route and add `/tool-review --deep` before completion.
-
 ## Escalation Rules
 
 - Single-line typo: use `/tool-quick` instead.
 - Cross-file state, external systems, or unclear ownership: use `--deep`.
 - Prefer `superpowers` for debugging discipline before escalating into broad research.
 - Prefer `ECC` only for framework, security, or integration knowledge gaps.
-- Do not start with GSD or deep research unless evidence says the normal path is insufficient.
-- If systematic debugging fails 3+ times, stop iterating locally and move to `/tool-plan --deep` to reassess architecture or ownership.
+- If systematic debugging fails 3+ times, stop iterating locally and move to `/tool-plan --deep`.
+
+## References
+
+- Full router: `skill(name="engineer-shovel")` or `SKILL.md`
+- Architecture: `docs/architecture.md`
