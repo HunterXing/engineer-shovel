@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS_DIR = str(ROOT / "scripts")
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
 
 
 def load_script(name: str):
@@ -52,43 +56,43 @@ cost-profile: low
 
 
 def test_validate_command_schema_accepts_valid_frontmatter(tmp_path, monkeypatch):
-    module = load_script("validate-command-schema.py")
+    module = load_script("validate.py")
     command_dir = tmp_path / "commands"
     command_dir.mkdir()
     write_command(command_dir / "tool-test.md")
     monkeypatch.setattr(module, "COMMAND_DIR", command_dir)
     monkeypatch.setattr(module, "ROOT", tmp_path)
 
-    assert module.main() == 0
+    assert module.validate_schema() == 0
 
 
 def test_validate_command_schema_rejects_missing_fields(tmp_path, monkeypatch):
-    module = load_script("validate-command-schema.py")
+    module = load_script("validate.py")
     command_dir = tmp_path / "commands"
     command_dir.mkdir()
     write_command(command_dir / "tool-broken.md", include_required=False)
     monkeypatch.setattr(module, "COMMAND_DIR", command_dir)
     monkeypatch.setattr(module, "ROOT", tmp_path)
 
-    assert module.main() == 1
+    assert module.validate_schema() == 1
 
 
 def test_validate_markdown_links_accepts_existing_local_link(tmp_path, monkeypatch):
-    module = load_script("validate-markdown-links.py")
+    module = load_script("validate.py")
     (tmp_path / "docs").mkdir()
     (tmp_path / "README.md").write_text("[Doc](docs/page.md)\n", encoding="utf-8")
     (tmp_path / "docs" / "page.md").write_text("# Page\n", encoding="utf-8")
     monkeypatch.setattr(module, "ROOT", tmp_path)
 
-    assert module.main() == 0
+    assert module.validate_links() == 0
 
 
 def test_validate_markdown_links_rejects_missing_local_link(tmp_path, monkeypatch):
-    module = load_script("validate-markdown-links.py")
+    module = load_script("validate.py")
     (tmp_path / "README.md").write_text("[Missing](docs/missing.md)\n", encoding="utf-8")
     monkeypatch.setattr(module, "ROOT", tmp_path)
 
-    assert module.main() == 1
+    assert module.validate_links() == 1
 
 
 def test_token_benchmark_reports_static_and_unknown_sources(capsys):
@@ -104,12 +108,13 @@ def test_token_benchmark_reports_static_and_unknown_sources(capsys):
     assert report["rtk_project"]["measured_tokens_saved"] is None
 
 
-def test_command_set_stays_at_twelve_with_graph_replacing_statistic():
+def test_command_set_stays_at_ten_after_deprecation_cleanup():
     commands = sorted(path.stem for path in (ROOT / "commands").glob("tool-*.md"))
 
-    assert len(commands) == 12
+    assert len(commands) == 10
     assert "tool-graph" in commands
-    assert "tool-statistic" not in commands
+    assert "tool-brainstorm" not in commands
+    assert "tool-blueprint" not in commands
 
 
 def test_readmes_list_upstream_tool_versions():
@@ -227,25 +232,28 @@ def test_health_detects_project_language_markers(tmp_path, monkeypatch):
 
 def test_health_detects_opencode_gsd_agent_skill_marker(tmp_path, monkeypatch):
     module = load_script("health.py")
+    import paths as p
     monkeypatch.setattr(module, "HOME", tmp_path)
+    monkeypatch.setattr(p, "HOME", tmp_path)
     marker = tmp_path / ".agents" / "skills" / "gsd-core" / "SKILL.md"
     marker.parent.mkdir(parents=True)
     marker.write_text("# GSD\n", encoding="utf-8")
 
     result = module.check_gsd("opencode", "global")
-
     assert result.status == module.STATUS_OK
 
 
 def test_health_detects_local_gsd_command_marker(tmp_path, monkeypatch):
     module = load_script("health.py")
+    import paths as p
     monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(p, "ROOT", tmp_path)
+    monkeypatch.setattr(p, "HOME", tmp_path)
     marker = tmp_path / ".opencode" / "commands" / "gsd-test.md"
     marker.parent.mkdir(parents=True)
     marker.write_text("# GSD\n", encoding="utf-8")
 
     result = module.check_gsd("opencode", "local")
-
     assert result.status == module.STATUS_OK
 
 
@@ -253,7 +261,7 @@ def test_health_code_review_graph_missing_when_binary_absent(monkeypatch):
     module = load_script("health.py")
     monkeypatch.setattr(module, "which", lambda name: None)
 
-    result = module.check_code_review_graph(module.CommandRunner(dry_run=True))
+    result = module.check_code_review_graph(module.CommandRunner(dry_run=True), "global")
 
     assert result.name == "code-review-graph"
     assert result.status == "missing"
@@ -276,9 +284,9 @@ def test_health_repair_code_review_graph_uses_official_commands(monkeypatch):
     monkeypatch.setattr(module, "which", lambda name: "/bin/" + name if name in {"pipx", "code-review-graph"} else None)
     runner = module.CommandRunner(dry_run=True)
 
-    module.repair_code_review_graph(runner, ["opencode", "claude"])
+    module.repair_code_review_graph(runner, ["opencode", "claude"], "global")
 
-    assert ["code-review-graph", "install", "--platform", "opencode"] in runner.commands
+    assert any("write_mcp_confg" in str(c) for c in runner.commands)
     assert ["code-review-graph", "install", "--platform", "claude-code"] in runner.commands
     assert ["code-review-graph", "build"] in runner.commands
 
@@ -288,10 +296,11 @@ def test_health_repair_code_review_graph_installs_when_missing(monkeypatch):
     monkeypatch.setattr(module, "which", lambda name: "/bin/" + name if name == "pipx" else None)
     runner = module.CommandRunner(dry_run=True)
 
-    module.repair_code_review_graph(runner, ["opencode"])
+    module.repair_code_review_graph(runner, ["opencode"], "global")
 
     assert ["pipx", "install", "code-review-graph"] in runner.commands
-    assert ["code-review-graph", "install", "--platform", "opencode"] in runner.commands
+    assert any("write_mcp_confg" in str(c) for c in runner.commands)
+    assert ["code-review-graph", "build"] in runner.commands
 
 
 def test_health_repair_gsd_uses_all_for_both_targets():
@@ -462,3 +471,392 @@ def test_sync_main_sync_runs_health_when_not_skipped(monkeypatch):
 
     assert module.main() == 0
     assert health_calls == [("sync", "opencode", "global", True)]
+
+
+#
+# health.py — remaining check/repair functions
+#
+
+def test_health_check_caveman_opencode_marker_found(tmp_path, monkeypatch):
+    module = load_script("health.py")
+    marker = tmp_path / ".agents" / "skills" / "caveman"
+    marker.mkdir(parents=True)
+    monkeypatch.setattr(module, "HOME", tmp_path)
+
+    result = module.check_caveman("opencode", module.CommandRunner(dry_run=True))
+
+    assert result.name == "caveman"
+    assert result.status == module.STATUS_OK
+
+
+def test_health_check_caveman_opencode_missing(tmp_path, monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "HOME", tmp_path)
+
+    result = module.check_caveman("opencode", module.CommandRunner(dry_run=True))
+
+    assert result.status == module.STATUS_MISSING
+
+
+def test_health_check_caveman_claude_installed(monkeypatch):
+    module = load_script("health.py")
+    runner = module.CommandRunner(
+        executor=lambda cmd: module.CommandResult(0, "caveman\n")
+    )
+
+    result = module.check_caveman("claude", runner)
+
+    assert result.status == module.STATUS_OK
+
+
+def test_health_check_caveman_claude_missing(monkeypatch):
+    module = load_script("health.py")
+    runner = module.CommandRunner(
+        executor=lambda cmd: module.CommandResult(0, "")
+    )
+
+    result = module.check_caveman("claude", runner)
+
+    assert result.status == module.STATUS_MISSING
+
+
+def test_health_check_rtk_missing(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: None)
+
+    result = module.check_rtk(module.CommandRunner(dry_run=True))
+
+    assert result.name == "rtk"
+    assert result.status == module.STATUS_MISSING
+    assert "install.sh" in result.repair
+
+
+def test_health_check_rtk_found(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/usr/local/bin/rtk")
+
+    result = module.check_rtk(module.CommandRunner(dry_run=True))
+
+    assert result.name == "rtk"
+    assert result.status == module.STATUS_OK
+
+
+def test_health_check_superpowers_opencode_plugin_ok(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/usr/local/bin/opencode")
+    monkeypatch.setattr(module, "HOME", Path("/tmp/test_home_sp_op"))
+    runner = module.CommandRunner(
+        executor=lambda cmd: module.CommandResult(0, "installed\n")
+    )
+
+    result = module.check_superpowers("opencode", runner)
+
+    assert result.name == "superpowers"
+    assert result.status == module.STATUS_OK
+
+
+def test_health_check_superpowers_claude_installed(monkeypatch):
+    module = load_script("health.py")
+    runner = module.CommandRunner(
+        executor=lambda cmd: module.CommandResult(0, "superpowers\n")
+    )
+
+    result = module.check_superpowers("claude", runner)
+
+    assert result.name == "superpowers"
+    assert result.status == module.STATUS_OK
+
+
+def test_health_check_ecc_local_blocked():
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    result = module.check_ecc("opencode", runner, "local")
+
+    assert result.name == "ecc"
+    assert result.status == module.STATUS_BLOCKED
+
+
+def test_health_check_ecc_opencode_missing(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "HOME", Path("/tmp/test_home_ecc_missing"))
+    monkeypatch.setattr(module, "_ecc_cmd_dir", lambda: None)
+    runner = module.CommandRunner(dry_run=True)
+
+    result = module.check_ecc("opencode", runner, "global")
+
+    assert result.name == "ecc"
+    assert result.status == module.STATUS_MANUAL_UPGRADE
+
+
+def test_health_repair_openspec(monkeypatch):
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_openspec(runner, ["opencode", "claude"])
+
+    assert ["npm", "install", "-g", "@fission-ai/openspec@latest"] in runner.commands
+
+
+def test_health_repair_rtk_missing(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: None)
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_rtk(runner, ["opencode"])
+
+    assert any("rtk" in str(c) for c in runner.commands)
+    assert ["rtk", "init", "-g", "--opencode"] in runner.commands
+
+
+def test_health_repair_rtk_already_installed(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/usr/local/bin/rtk")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_rtk(runner, ["claude"])
+
+    assert ["rtk", "init", "-g"] in runner.commands
+
+
+def test_health_repair_superpowers_opencode(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: "/usr/local/bin/opencode")
+    monkeypatch.setattr(module, "HOME", Path("/tmp/test_home_sp_repair"))
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_superpowers(runner, "opencode")
+
+    assert ["opencode", "plugin", "superpowers", "-g"] in runner.commands
+
+
+def test_health_repair_superpowers_claude(monkeypatch):
+    module = load_script("health.py")
+    runner = module.CommandRunner(dry_run=True)
+
+    module.repair_superpowers(runner, "claude")
+
+    assert ["claude", "plugin", "install", "superpowers@claude-plugins-official"] in runner.commands
+
+
+def test_health_check_components_includes_all(monkeypatch):
+    module = load_script("health.py")
+    monkeypatch.setattr(module, "which", lambda name: None)
+    runner = module.CommandRunner(dry_run=True)
+
+    checks = module.check_components(["opencode"], runner, "global")
+    names = {c.name for c in checks}
+
+    assert "code-review-graph" in names
+    assert "rtk" in names
+    assert "openspec" in names
+    assert "superpowers" in names
+    assert "caveman" in names
+    assert "claude-mem" in names
+    assert "gsd" in names
+    assert "ecc" in names
+
+
+def test_health_command_runner_file_not_found():
+    module = load_script("health.py")
+    runner = module.CommandRunner()
+
+    result = runner.run(["/nonexistent/binary"])
+
+    assert result.returncode == 127
+
+
+def test_health_check_result_properties():
+    module = load_script("health.py")
+
+    ok = module.CheckResult("test", module.STATUS_OK)
+    assert not ok.needs_repair
+    assert not ok.can_auto_repair
+
+    missing = module.CheckResult("test", module.STATUS_MISSING)
+    assert missing.needs_repair
+    assert missing.can_auto_repair
+
+    blocked = module.CheckResult("test", module.STATUS_BLOCKED)
+    assert blocked.needs_repair
+    assert not blocked.can_auto_repair
+
+
+#
+# sync.py — remaining functions
+#
+
+def test_sync_compare_files_all_scenarios(tmp_path):
+    module = load_script("sync.py")
+    installed_dir = tmp_path / "installed"
+    repo_dir = tmp_path / "repo"
+    installed_dir.mkdir()
+    repo_dir.mkdir()
+
+    (repo_dir / "tool-a.md").write_text("a2", encoding="utf-8")
+    (repo_dir / "tool-b.md").write_text("b", encoding="utf-8")
+    (repo_dir / "tool-c.md").write_text("c", encoding="utf-8")
+
+    (installed_dir / "tool-a.md").write_text("a1", encoding="utf-8")
+    (installed_dir / "tool-b.md").write_text("b", encoding="utf-8")
+    (installed_dir / "tool-d.md").write_text("d", encoding="utf-8")
+
+    installed = sorted(installed_dir.glob("tool-*.md"))
+    repo = sorted(repo_dir.glob("tool-*.md"))
+
+    result = module.compare_files(installed, repo)
+
+    assert len(result["missing"]) == 1
+    assert result["missing"][0].name == "tool-c.md"
+    assert len(result["outdated"]) == 1
+    assert result["outdated"][0]["installed"].name == "tool-a.md"
+    assert len(result["extra"]) == 1
+    assert result["extra"][0].name == "tool-d.md"
+    assert len(result["up_to_date"]) == 1
+    assert result["up_to_date"][0].name == "tool-b.md"
+
+
+def test_sync_compare_files_empty(tmp_path):
+    module = load_script("sync.py")
+
+    result = module.compare_files([], [])
+
+    assert result["missing"] == []
+    assert result["outdated"] == []
+    assert result["extra"] == []
+    assert result["up_to_date"] == []
+
+
+def test_sync_sync_files_dry_run(tmp_path, capsys):
+    module = load_script("sync.py")
+    repo_dir = tmp_path / "repo"
+    repo_dir.mkdir()
+    (repo_dir / "tool-new.md").write_text("new", encoding="utf-8")
+    (repo_dir / "tool-old.md").write_text("old", encoding="utf-8")
+
+    comparison = {
+        "missing": [repo_dir / "tool-new.md"],
+        "outdated": [{"installed": tmp_path / "tool-old.md", "repo": repo_dir / "tool-old.md"}],
+        "extra": [],
+        "up_to_date": [],
+    }
+    monkeypatch = __import__("pytest").MonkeyPatch()
+
+    updated = module.sync_files(comparison, target="opencode", scope="global", dry_run=True)
+    captured = capsys.readouterr().out
+
+    assert updated == 2
+    assert "DRY-RUN: Would copy" in captured
+    assert "DRY-RUN: Would update" in captured
+
+
+def test_sync_extract_version(tmp_path):
+    module = load_script("sync.py")
+    skill = tmp_path / "SKILL.md"
+    skill.write_text('version: "2.0.0"\n', encoding="utf-8")
+
+    ver = module.extract_version(skill)
+
+    assert ver == "2.0.0"
+
+
+def test_sync_extract_version_missing(tmp_path):
+    module = load_script("sync.py")
+    skill = tmp_path / "SKILL.md"
+
+    ver = module.extract_version(skill)
+
+    assert ver is None
+
+
+def test_sync_get_installed_files_nonexistent(tmp_path):
+    module = load_script("sync.py")
+    fake_path = tmp_path / "nonexistent"
+    monkeypatch = __import__("pytest").MonkeyPatch()
+    monkeypatch.setattr(module, "INSTALL_PATHS", {
+        "opencode": {
+            "global": {
+                "skill": fake_path,
+                "commands": fake_path / "commands",
+            }
+        }
+    })
+
+    result = module.get_installed_files("opencode", "global", "commands")
+
+    assert result == []
+
+
+def test_sync_get_repo_files(monkeypatch):
+    module = load_script("sync.py")
+
+    result = module.get_repo_files("commands")
+
+    assert len(result) > 0
+    assert all(f.suffix == ".md" for f in result)
+
+
+def test_sync_get_repo_files_skill(monkeypatch):
+    module = load_script("sync.py")
+
+    result = module.get_repo_files("skill")
+
+    assert len(result) == 1
+    assert "SKILL.md" in result[0].name
+
+
+#
+# inventory.py
+#
+
+def test_inventory_reports_structure(capsys):
+    module = load_script("inventory.py")
+
+    rc = module.main()
+    report = json.loads(capsys.readouterr().out)
+
+    assert rc == 0
+    assert "command_count" in report
+    assert report["command_count"] == 10
+    assert "skill_lines" in report
+    assert "install_lines" in report
+    assert "external_sources" in report
+
+
+def test_inventory_command_names_matches_files():
+    module = load_script("inventory.py")
+
+    names = module.command_names()
+
+    assert len(names) == 10
+    assert "tool-graph" in names
+    assert "tool-quick" in names
+
+
+#
+# validate-installer-sources.py
+#
+
+def test_validate_installer_sources_main():
+    module = load_script("validate-installer-sources.py")
+
+    rc = module.main()
+
+    assert rc == 0
+
+
+#
+# dependency_manifest.json validity
+#
+
+def test_dependency_manifest_is_valid_json():
+    manifest = ROOT / "scripts" / "dependency_manifest.json"
+
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+
+    assert len(data) >= 8
+    for name, entry in data.items():
+        assert "strategy" in entry, f"{name} missing strategy"
+        assert "scope_model" in entry, f"{name} missing scope_model"
+        assert "auto_repair" in entry, f"{name} missing auto_repair"
+        assert "repair_hint" in entry, f"{name} missing repair_hint"

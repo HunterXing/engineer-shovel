@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.4 (2026-05-26)
+
+### Added
+- **Windows support**: New `install.ps1` PowerShell installer for native Windows (PowerShell 5+/Core 7+).
+- **Cross-platform OS detection**: `install.sh` now auto-detects macOS, Linux, and Windows (WSL/Git Bash), with platform-specific hints.
+
+### Fixed
+- **superpowers installation**: Changed from manually editing `opencode.json` to `opencode plugin superpowers` command, compatible with OpenCode 1.15+.
+- **code-review-graph MCP config**: Replaced the old `code-review-graph install --platform opencode` approach (which wrote unrecognized `.opencode.json` format) with proper OpenCode 1.15 `mcp` key format in `.opencode/opencode.json`. Uses `uvx code-review-graph serve` with `type: "local"`.
+
+### Changed
+- `download_file()` now falls back to `wget` if `curl` is unavailable.
+- Pre-requisite checks now show platform-specific install hints (brew, apt).
+- `ensure_tmp_root()` has a more portable fallback for systems without `mktemp`.
+
 ## 1.7.3 (2026-05-10)
 
 ### Changed

@@ -17,6 +17,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+from paths import INSTALL_PATHS  # noqa: E402
+
+
 def print_section(title: str) -> None:
     print(f"\n{title}")
     print("=" * len(title))
@@ -39,34 +42,9 @@ TRACKED_FILES = {
     "skill": ["SKILL.md"],
     "commands": [f"tool-{name}.md" for name in [
         "branch", "feat", "fix", "plan", "refactor", "review",
-        "brainstorm", "quick", "blueprint", "research", "graph", "update"
+        "quick", "research", "graph", "update"
     ]],
 }
-
-# Standard installation locations
-INSTALL_PATHS = {
-    "opencode": {
-        "global": {
-            "skill": Path.home() / ".agents/skills/engineer-shovel",
-            "commands": Path.home() / ".config/opencode/commands",
-        },
-        "local": {
-            "skill": Path("./.agents/skills/engineer-shovel"),
-            "commands": Path("./.opencode/commands"),
-        }
-    },
-    "claude": {
-        "global": {
-            "skill": Path.home() / ".claude/skills/engineer-shovel",
-            "commands": Path.home() / ".claude/commands",
-        },
-        "local": {
-            "skill": Path("./.claude/skills/engineer-shovel"),
-            "commands": Path("./.claude/commands"),
-        }
-    }
-}
-
 
 def hash_file(path: Path) -> str | None:
     """Return SHA256 hash of file, or None if file doesn't exist."""

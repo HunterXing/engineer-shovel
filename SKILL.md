@@ -7,7 +7,7 @@ description: |
   review, quick tasks, research, code graph diagnostics, and sync.
 license: MIT
 metadata:
-  version: "1.7.3"
+  version: "1.7.4"
   category: workflow
   token_profile: lightweight-router
   sources:
@@ -48,8 +48,6 @@ Engineer Shovel is a workflow router for AI-assisted software engineering on Ope
 | Platform support | `/tool-branch` | Branch create, status, review, merge, abort | Low |
 | Platform support | `/tool-graph` | code-review-graph diagnostics only | Low |
 | Platform support | `/tool-update` | Router sync, component health, repair guidance | Low |
-| Compatibility | `/tool-brainstorm` | **[DEPRECATED]** — use `/tool-feat` or `/tool-plan` | — |
-| Compatibility | `/tool-blueprint` | **[DEPRECATED]** — use `/tool-plan --deep` | — |
 
 ## Default Routes
 

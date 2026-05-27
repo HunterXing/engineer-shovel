@@ -65,7 +65,7 @@ bash install.sh --target all
 この最適化サイクルは、公開インターフェースを安定に保ちます：
 
 - `skill(name="engineer-shovel")` は変更されません。
-- `/tool-*` コマンド名は互換性を維持します。10 個がアクティブで、2 個は legacy redirect です。
+- `/tool-*` コマンド名は互換性を維持します。10 個のアクティブコマンドです。
 - `--minimal`、`--recommended`、`--full`、`--dry-run` は変更されません。
 - `--target opencode|claude|all|auto` により、新しいマシンは OpenCode、Claude Code、またはその両方を明示的に選択できます。
 
@@ -111,8 +111,6 @@ RTK はインストールされている場合、git、テスト、ビルド、�
 | `/tool-plan` | 要件と実装の計画 |
 | `/tool-refactor` | 動作を保つクリーンアップ |
 | `/tool-review` | ローカル差分、PR、または深いレビュー |
-| `/tool-brainstorm` | **[非推奨]** — アイデア明確化は `/tool-feat` や `/tool-plan` に内蔵 |
-| `/tool-blueprint` | **[非推奨]** — マルチステップ計画は `/tool-plan --deep` に統合 |
 | `/tool-research` | 証拠の収集と統合 |
 | `/tool-graph` | code-review-graph ステータス、完全ビルド，增分更新、再構築、監視 |
 | `/tool-update` | インストールと同期 |
@@ -121,7 +119,7 @@ RTK はインストールされている場合、git、テスト、ビルド、�
 
 ```
 engineer-shovel/
-├── commands/          # 10 個のアクティブコマンド + legacy redirects
+├── commands/          # 10 個のアクティブコマンド
 ├── docs/              # ランタイムコンテキストから分離された長文リファレンス
 ├── scripts/           # 同期とバリデーションのユーティリティ
 ├── SKILL.md           # 軽量ルーター

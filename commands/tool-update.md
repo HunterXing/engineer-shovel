@@ -51,7 +51,7 @@ Single user-facing entry point for keeping Engineer Shovel current. It checks ro
 
 ## Component Health
 
-Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, plus selected runtimes (`opencode`, `claude`).
+Checks base tools: `git`, `python3`, `pipx`, `node`, `npx`, `uvx`, plus selected runtimes (`opencode`, `claude`).
 
 Checks recommended/full components: RTK, Caveman, code-review-graph, superpowers, OpenSpec, ECC, and GSD.
 
@@ -66,9 +66,21 @@ OpenSpec policy:
 - Do not run `openspec init` automatically because it writes project files.
 - If Node.js is older than 20.19.0, report an actionable warning and skip repair.
 
+### Component Detection Details
+
+| Component | Detection method | Repair path | Notes |
+|---|---|---|---|
+| **RTK** | `which rtk` | `curl ... install.sh` | System binary, always global |
+| **Caveman** | filesystem markers / `claude plugin list` | upstream installer | Per-target check |
+| **code-review-graph** | `which code-review-graph` or `which uvx` + MCP config check | `pipx install` + write MCP config | OpenCode: writes `.opencode/opencode.json` `mcp` key (new format). Claude Code: `code-review-graph install --platform claude-code`. Accepts `uvx` on-demand as alternative to local install. MCP config checked in both global and local locations. |
+| **superpowers** | `opencode plugin superpowers` / config file string match | `opencode plugin superpowers -g` | OpenCode 1.15+: uses `opencode plugin` command. Falls back to git URL in config. |
+| **claude-mem** | config string match / `claude plugin list` | `npx claude-mem install --ide ...` | Requires Bun. Blocked if Bun missing. |
+| **GSD** | filesystem presence of `gsd-*.md` | `npx get-shit-done-cc@latest` | Respects scope and target. |
+| **ECC** | filesystem markers / `claude plugin list` | upstream installer | Blocked for local scope. OpenCode repair is manual-only. |
+
 MCP policy:
-- `code-review-graph install` may configure MCP/rules because upstream explicitly supports this.
-- Superpowers has no separate MCP auto-configuration step; it is configured as a plugin/skills provider.
+- code-review-graph MCP uses OpenCode 1.15+ `mcp` config format (`.opencode/opencode.json` with `type: "local"`), not the deprecated `.opencode.json` `mcpServers` format.
+- Superpowers has no separate MCP auto-configuration step; it is configured as an OpenCode plugin or Claude Code plugin.
 - ECC bundled MCPs are not auto-enabled by default because they may require credentials or duplicate user servers.
 
 Safety:

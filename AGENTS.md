@@ -4,7 +4,7 @@ Engineer Shovel 是 OpenCode 和 Claude Code 的轻量级开发工作流路由�
 
 ## 工具链边界
 
-原生安装内容：轻量级 `engineer-shovel` 技能和 10 个活跃 `/tool-*` 命令（2 个已废弃）。
+原生安装内容：轻量级 `engineer-shovel` 技能和 10 个活跃 `/tool-*` 命令。
 
 ## 快速入口
 
@@ -36,8 +36,6 @@ skill(name="engineer-shovel")
 | `/tool-research` | 代码库感知的技术研究 |
 | `/tool-graph` | code-review-graph 诊断（git hook 自动刷新） |
 | `/tool-update` | 同步和更新安装 |
-| `/tool-brainstorm` | **[已废弃]** — 已内化为 feat/plan 的 Phase 0 |
-| `/tool-blueprint` | **[已废弃]** — 已合并到 plan --deep |
 
 ## 成本模式
 

@@ -61,5 +61,5 @@ Search claude-mem only when prior architectural decisions are likely to change t
 ## Escalation
 
 - Unknown technical approach: use `/tool-research` first.
-- Multi-PR, milestone, or cross-session work is handled by `--deep`; no separate `/tool-blueprint` is needed.
+- Multi-PR, milestone, or cross-session work is handled by `--deep`.
 - Do not default to GSD or OpenSpec when a normal implementation plan is enough.

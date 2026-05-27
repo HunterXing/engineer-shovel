@@ -72,6 +72,8 @@ Security-sensitive work should not stay on a routine path: promote it to the mat
 
 ## Quick Start
 
+### macOS / Linux
+
 ```bash
 # Download, inspect, then run (default: full mode with all components)
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
@@ -93,6 +95,16 @@ bash install.sh --target all
 ./install.sh --target opencode --full --with-graph-build  # Also build initial code-review-graph index
 ```
 
+### Windows (PowerShell 5+ / PowerShell Core)
+
+```powershell
+# Download and run (default: full mode with all components)
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)"
+
+# With explicit parameters
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Mode full -Target opencode -Scope global
+```
+
 The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.
 
 ## Compatibility Notes
@@ -103,12 +115,15 @@ This optimization cycle keeps the public interface stable:
 - All `/tool-*` command names remain stable; 10 are active and 2 legacy redirects remain installed for compatibility.
 - `--minimal`, `--recommended`, `--full`, and `--dry-run` are unchanged.
 - `--target opencode|claude|all|auto` lets fresh machines choose OpenCode, Claude Code, or both explicitly.
+- New `install.ps1` for native Windows support (PowerShell 5+ / PowerShell Core 7+).
 
 New guardrails added:
 
 - Download-first installation is now the recommended documented path.
 - The installer keeps SHA pin verification and now surfaces clearer failure behavior around external installer execution.
 - Validation scripts now have lightweight pytest regression coverage.
+- Superpowers is now installed via `opencode plugin superpowers` instead of manual config editing, compatible with OpenCode 1.15+.
+- code-review-graph MCP now uses the OpenCode 1.15 `mcp` key format (`.opencode/opencode.json`) instead of the deprecated `.opencode.json` file.
 
 Then use either:
 
@@ -174,8 +189,6 @@ RTK is complementary when installed: it compresses noisy Bash/tool outputs such 
 | Platform support | `/tool-graph` | code-review-graph diagnostics |
 | Platform support | `/tool-update` | Router sync, component health, repair guidance |
 
-Legacy redirects still installed for compatibility: `/tool-brainstorm` and `/tool-blueprint`.
-
 ## Escalation Layers
 
 - `code-review-graph`: code understanding and impact analysis for multi-file work
@@ -192,7 +205,7 @@ These layers exist to solve specific problems. Installing them does not mean eve
 ```text
 engineer-shovel/
 ├── .github/           # CI and Pages workflows
-├── commands/          # 12 executable slash commands (10 active + 2 legacy redirects)
+├── commands/          # 10 executable slash commands
 ├── docs/              # long-form references kept out of runtime context
 ├── pages/             # static project site assets
 ├── scripts/           # sync and validation utilities

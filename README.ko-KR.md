@@ -65,7 +65,7 @@ bash install.sh --target all
 이 최적화 주기는 공개 인터페이스를 안정적으로 유지합니다:
 
 - `skill(name="engineer-shovel")`은 변경되지 않습니다.
-- `/tool-*` 명령 이름은 호환성을 유지합니다. 10개는 활성 명령이고 2개는 legacy redirect입니다.
+- `/tool-*` 명령 이름은 호환성을 유지합니다. 10개의 활성 명령입니다.
 - `--minimal`, `--recommended`, `--full`, `--dry-run`은 변경되지 않습니다.
 - `--target opencode|claude|all|auto`를 통해 새 시스템은 OpenCode, Claude Code 또는 둘 다를 명시적으로 선택할 수 있습니다.
 
@@ -111,8 +111,6 @@ RTK는 설치될 때 보완적으로 작동합니다: git, 테스트, 빌드, �
 | `/tool-plan` | 요구사항 및 구현 계획 |
 | `/tool-refactor` | 동작 보존 정리 |
 | `/tool-review` | 로컬 diff, PR 또는 깊은 리뷰 |
-| `/tool-brainstorm` | **[지원 중단]** — 아이디어 명확화는 `/tool-feat` 또는 `/tool-plan`에 내장 |
-| `/tool-blueprint` | **[지원 중단]** — 멀티스텝 계획은 `/tool-plan --deep`에 통합 |
 | `/tool-research` | 증거 수집 및 합성 |
 | `/tool-graph` | code-review-graph 상태, 전체 빌드, 증분 업데이트, 재빌드, 감시 |
 | `/tool-update` | 동기화 및 설치 업데이트 |
@@ -121,7 +119,7 @@ RTK는 설치될 때 보완적으로 작동합니다: git, 테스트, 빌드, �
 
 ```
 engineer-shovel/
-├── commands/          # 10개의 활성 명령 + legacy redirects
+├── commands/          # 10개의 활성 명령
 ├── docs/              # 런타임 컨텍스트에서 분리된 장기 참조
 ├── scripts/           # 동기화 및 검증 유틸리티
 ├── SKILL.md           # 경량 라우터

@@ -1,6 +1,6 @@
 # Installation Modes
 
-`install.sh` supports interactive setup and non-interactive flags for OpenCode, Claude Code, or both.
+`install.sh` (macOS/Linux/WSL) and `install.ps1` (Windows) support interactive setup and non-interactive flags for OpenCode, Claude Code, or both.
 
 ```bash
 ./install.sh --target opencode        # OpenCode default
@@ -11,8 +11,8 @@
 
 ## Targets
 
-- `opencode`: installs skill to `~/.agents/skills/engineer-shovel/`, commands to `~/.config/opencode/commands/`.
-- `claude`: installs skill to `~/.claude/skills/engineer-shovel/`, commands to `~/.claude/commands/`.
+- `opencode`: installs skill to `~/.agents/skills/engineer-shovel/`, commands to `~/.config/opencode/commands/` (Windows: `%APPDATA%\opencode\commands\`).
+- `claude`: installs skill to `~/.claude/skills/engineer-shovel/`, commands to `~/.claude/commands/` (Windows: `%USERPROFILE%\.claude\commands\`).
 - `all`: installs to both targets.
 - `auto`: detects `opencode` first, then `claude`; defaults to OpenCode paths if neither found.
 
@@ -144,3 +144,39 @@ Dry-run note:
 ## Non-interactive Default
 
 In non-interactive contexts: `--target auto --scope global --full`. Use explicit flags for scripts and CI.
+
+## Windows (PowerShell)
+
+Use `install.ps1` for native Windows support (PowerShell 5+ or PowerShell Core 7+):
+
+```powershell
+# Quick start (default: full, auto-detect)
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)"
+
+# Explicit parameters
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Mode full -Target opencode -Scope global
+
+# Minimal install
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Mode minimal
+
+# Dry run
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -DryRun
+```
+
+Or download first:
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1 -OutFile install.ps1
+Get-Content install.ps1 | Select-Object -First 50  # inspect
+.\install.ps1 -Mode full -Target opencode
+```
+
+### Windows limitations
+
+- **ECC** is not supported on Windows; use WSL for ECC features.
+- **RTK** requires manual install from GitHub releases.
+- **Caveman** uses the upstream PowerShell installer.
+- **code-review-graph** uses `uvx` (via pip/uv) to run the MCP server.
+- **claude-mem** requires Bun (install separately).
+
+For the best experience on Windows, consider using [WSL](https://learn.microsoft.com/en-us/windows/wsl/) and running `install.sh` within the Linux environment.

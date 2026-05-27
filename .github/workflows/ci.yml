@@ -15,18 +15,12 @@ jobs:
       - name: Check required files
         run: |
           set -euo pipefail
-          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh scripts/inventory.py scripts/validate-command-schema.py scripts/validate-references.py scripts/validate-markdown-links.py scripts/token-benchmark.py scripts/validate-installer-sources.py docs/architecture.md docs/token-cost.md docs/install.md docs/language-reference.md; do
+          for f in SKILL.md README.md README_zh.md CHANGELOG.md LICENSE install.sh scripts/validate.py scripts/inventory.py scripts/token-benchmark.py scripts/validate-installer-sources.py docs/architecture.md docs/token-cost.md docs/install.md docs/language-reference.md; do
             test -f "$f" || { echo "missing: $f"; exit 1; }
           done
 
-      - name: Validate command schema
-        run: python3 scripts/validate-command-schema.py
-
-      - name: Validate command references
-        run: python3 scripts/validate-references.py
-
-      - name: Validate markdown links
-        run: python3 scripts/validate-markdown-links.py
+      - name: Validate all (schema, references, links)
+        run: python3 scripts/validate.py all
 
       - name: Validate installer source pins
         run: python3 scripts/validate-installer-sources.py

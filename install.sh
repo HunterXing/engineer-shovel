@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# engineer-shovel — token-aware installer
+# engineer-shovel — cross-platform installer (macOS/Linux/WSL)
+# Windows: use install.ps1 instead
 
 set -euo pipefail
 
@@ -7,6 +8,25 @@ REPO_RAW="https://raw.githubusercontent.com"
 REPO_OWNER="HunterXing"
 REPO_NAME="engineer-shovel"
 REPO_URL="${REPO_RAW}/${REPO_OWNER}/${REPO_NAME}/main"
+
+# --- OS detection ---
+detect_os() {
+  case "$(uname -s)" in
+    Darwin) echo "macos" ;;
+    Linux)  echo "linux" ;;
+    MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
+    *)      echo "unknown" ;;
+  esac
+}
+
+OS="$(detect_os)"
+if [[ "$OS" == "windows" ]]; then
+  echo "⚠ Windows detected. This script requires WSL or Git Bash."
+  echo "  For native Windows support, use:"
+  echo "    powershell -c \"iex (iwr -useb ${REPO_URL}/install.ps1)\""
+  echo ""
+  echo "  Continuing with limited support (WSL/Git Bash mode)..."
+fi
 
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 RTK_REPO="https://github.com/rtk-ai/rtk"
@@ -26,6 +46,7 @@ SCOPE_SET=0
 ENV="opencode"
 SKILL_DIR="$HOME/.agents/skills"
 COMMAND_DIR="$HOME/.config/opencode/commands"
+OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
 PLUGIN_CACHE_DIR="$HOME/.claude/plugins/cache"
 DRY_RUN=0
 WITH_GRAPH_BUILD=0
@@ -224,16 +245,24 @@ download_file() {
   local target_path="$2"
 
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "DRY-RUN: curl -fsSL --retry 3 ${url} -o ${target_path}"
+    info "DRY-RUN: download ${url} -> ${target_path}"
     return 0
   fi
 
-  curl -fsSL --retry 3 --retry-delay 2 "$url" -o "$target_path"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --retry 3 --retry-delay 2 "$url" -o "$target_path"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q --retry-connrefused --tries=3 "$url" -O "$target_path"
+  else
+    err "Neither curl nor wget found"
+    return 1
+  fi
 }
 
 ensure_tmp_root() {
   if [[ -z "$TMP_ROOT" ]]; then
-    TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/engineer-shovel.XXXXXX")"
+    TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/engineer-shovel.XXXXXX" 2>/dev/null || echo "/tmp/engineer-shovel.$$")"
+    mkdir -p "$TMP_ROOT"
   fi
 }
 
@@ -280,11 +309,34 @@ check_prereqs() {
 
   if [[ ${#missing[@]} -gt 0 ]]; then
     err "Missing required tools: ${missing[*]}"
+    case "$OS" in
+      macos) info "Install: brew install ${missing[*]}" ;;
+      linux) info "Install: apt install ${missing[*]}  (or your distro's equivalent)" ;;
+    esac
     exit 1
   fi
 
   if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
     warn "Running as root will install files under HOME=${HOME}. Re-run without sudo if this is not intended."
+  fi
+
+  # Ensure pipx is available
+  if ! command -v pipx >/dev/null 2>&1; then
+    if command -v python3 >/dev/null 2>&1; then
+      info "Installing pipx via pip..."
+      if python3 -m pip install --user pipx 2>&1; then
+        python3 -m pipx ensurepath 2>/dev/null || true
+        # Try to find pipx after install
+        export PATH="$HOME/.local/bin:$PATH"
+        if ! command -v pipx >/dev/null 2>&1; then
+          warn "pipx installed but not in PATH. Add ~/.local/bin to your PATH."
+        fi
+      else
+        warn "pipx install failed; some features may be unavailable"
+      fi
+    else
+      warn "python3 not found; pipx install skipped"
+    fi
   fi
 }
 
@@ -345,9 +397,11 @@ set_target_paths() {
       if [[ "$SCOPE" == "local" ]]; then
         SKILL_DIR="./.agents/skills"
         COMMAND_DIR="./.opencode/commands"
+        OPENCODE_CONFIG_DIR="./.opencode"
       else
         SKILL_DIR="$HOME/.agents/skills"
         COMMAND_DIR="$HOME/.config/opencode/commands"
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
       fi
       ;;
     claude-code)
@@ -509,6 +563,7 @@ install_ecc() {
   fi
   if [[ -d "$PLUGIN_CACHE_DIR/ecc/ecc" || -d "$HOME/.claude/ecc" || -d "${OPENCODE_HOME:-$HOME/.config/opencode}/ecc" ]]; then
     ok "ECC already installed"
+    link_ecc_commands
     return 0
   fi
 
@@ -535,9 +590,129 @@ install_ecc() {
       fi
     fi
     ok "ECC install attempted"
+    link_ecc_commands
   else
     record_failure "Could not clone pinned ECC source. Install manually: /plugin install ecc@ecc"
   fi
+}
+
+# ---------- ECC command symlinks ----------
+
+_ecc_cmd_dir() {
+  local dir
+  dir="$(npm root -g 2>/dev/null)/ecc-universal/commands" && [[ -d "$dir" ]] && { echo "$dir"; return 0; }
+  dir="${NODE_PATH%%:*}/ecc-universal/commands" 2>/dev/null && [[ -d "$dir" ]] && { echo "$dir"; return 0; }
+  # Check common global install locations
+  for prefix in /usr/local/lib/node_modules /usr/lib/node_modules "$HOME/.local/share/vfox/cache/nodejs"/*/lib/node_modules; do
+    dir="$prefix/ecc-universal/commands"
+    [[ -d "$dir" ]] && { echo "$dir"; return 0; }
+  done
+  return 1
+}
+
+link_ecc_commands() {
+  if [[ "$SCOPE" == "local" ]]; then
+    info "Skipping ECC command symlinks for local scope"
+    return 0
+  fi
+
+  local src_dir
+  src_dir="$(_ecc_cmd_dir)" || {
+    info "ECC commands directory not found; skipping symlinks"
+    return 0
+  }
+
+  local cmd_dir="$HOME/.config/opencode/commands"
+  run_or_print mkdir -p "$cmd_dir"
+
+  local count=0
+  for f in "$src_dir"/*.md; do
+    local name
+    name="$(basename "$f")"
+    local target="$cmd_dir/$name"
+    if [[ -f "$target" ]]; then
+      if [[ ! -L "$target" ]]; then
+        warn "Skipping ${name}: regular file exists (manual resolution needed)"
+      fi
+      continue
+    fi
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      info "DRY-RUN: ln -s ${f} ${target}"
+    else
+      ln -sf "$f" "$target"
+    fi
+    count=$((count + 1))
+  done
+
+  if [[ "$count" -gt 0 ]]; then
+    ok "Symlinked ${count} ECC commands → ${cmd_dir}/"
+  fi
+}
+
+# ---------- superpowers command wrappers ----------
+
+_gen_superpowers_commands() {
+  local cmd_dir="$HOME/.config/opencode/commands"
+  run_or_print mkdir -p "$cmd_dir"
+
+  local count=0
+
+  # Each entry: cmd_name skill_name description
+  _gen_sp_cmd() {
+    local cmd_name="$1" skill_name="$2" desc="$3" target="$cmd_dir/superpowers:${cmd_name}.md"
+    [[ -f "$target" ]] && return
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      info "DRY-RUN: create command /superpowers:${cmd_name} → skill(${skill_name})"
+    else
+      cat > "$target" <<CMDFILE
+---
+description: ${desc}
+---
+
+# /superpowers:${cmd_name}
+
+Load the **${skill_name}** skill from superpowers:
+
+\`\`\`
+skill(name="${skill_name}")
+\`\`\`
+
+Follow its instructions exactly.
+CMDFILE
+    fi
+    count=$((count + 1))
+  }
+
+  _gen_sp_cmd brainstorm brainstorming "Structured ideation for design decisions and creative problem-solving"
+  _gen_sp_cmd parallel-agents dispatching-parallel-agents "Orchestrate parallel subagents for independent work streams"
+  _gen_sp_cmd execute-plan executing-plans "Execute structured plans with verification checkpoints"
+  _gen_sp_cmd finish-branch finishing-a-development-branch "Complete and verify a development branch before merge"
+  _gen_sp_cmd receive-review receiving-code-review "Process and respond to code review feedback systematically"
+  _gen_sp_cmd request-review requesting-code-review "Prepare and submit code changes for review"
+  _gen_sp_cmd subagent-dev subagent-driven-development "Decompose complex tasks via specialized subagents"
+  _gen_sp_cmd debug systematic-debugging "Scientific method debugging pipeline with root cause tracing"
+  _gen_sp_cmd tdd test-driven-development "Test-driven development: red-green-refactor workflow"
+  _gen_sp_cmd git-worktrees using-git-worktrees "Manage parallel development with git worktrees"
+  _gen_sp_cmd superpowers using-superpowers "List, discover, and manage available superpowers skills"
+  _gen_sp_cmd verify verification-before-completion "Structured verification checklist before task sign-off"
+  _gen_sp_cmd write-plan writing-plans "Create structured planning documentation and execution roadmaps"
+  _gen_sp_cmd write-skill writing-skills "Create and maintain reusable skill files"
+
+  if [[ "$count" -gt 0 ]]; then
+    ok "Created ${count} superpowers command wrappers → ${cmd_dir}/"
+  fi
+}
+
+_superpowers_skills_dir() {
+  # Find superpowers package directory
+  local sp
+  sp="$(npm root -g 2>/dev/null)/superpowers/skills" && [[ -d "$sp" ]] && { echo "$sp"; return 0; }
+  sp="${NODE_PATH%%:*}/superpowers/skills" 2>/dev/null && [[ -d "$sp" ]] && { echo "$sp"; return 0; }
+  # Check cache locations
+  for prefix in "$HOME/.cache/opencode/packages/superpowers@"*/node_modules/superpowers/skills; do
+    [[ -d "$prefix" ]] && { echo "$prefix"; return 0; }
+  done
+  return 1
 }
 
 _gsd_provisioned() {
@@ -605,40 +780,46 @@ install_gsd() {
 }
 
 _superpowers_opencode_installed() {
+  # Check via opencode plugin command (preferred)
+  if command -v opencode >/dev/null 2>&1; then
+    local out
+    out="$(opencode plugin superpowers 2>&1)" || true
+    echo "$out" | grep -qi "installed\|already" && return 0
+  fi
+  # Fallback: check config file
   local config_file="$HOME/.config/opencode/opencode.json"
   [[ -f "$config_file" ]] && grep -q "superpowers" "$config_file" 2>/dev/null
 }
 
 install_superpowers_opencode() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "DRY-RUN: Add superpowers plugin to ~/.config/opencode/opencode.json"
+    info "DRY-RUN: opencode plugin superpowers -g"
+    info "DRY-RUN: generate superpowers command wrappers"
     return 0
   fi
 
   if _superpowers_opencode_installed; then
     ok "Superpowers already configured for OpenCode"
+    _gen_superpowers_commands
     return 0
   fi
 
+  if command -v opencode >/dev/null 2>&1; then
+    info "Installing superpowers via opencode plugin..."
+    opencode plugin superpowers -g 2>&1 && {
+      ok "Superpowers installed for OpenCode"
+      _gen_superpowers_commands
+      return 0
+    }
+    warn "opencode plugin superpowers failed; falling back to config edit"
+  fi
+
+  # Fallback: manually write plugin entry to opencode.json (legacy)
   local config_dir="$HOME/.config/opencode"
   local config_file="$config_dir/opencode.json"
-  
   mkdir -p "$config_dir"
-  
-  if [[ ! -f "$config_file" ]]; then
-    # Create new config file with plugin array
-    cat > "$config_file" <<'EOF'
-{
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
-}
-EOF
-    ok "Created opencode.json with superpowers plugin"
-    return 0
-  fi
 
-  # Config file exists, try to add superpowers to plugin array
   if command -v node >/dev/null 2>&1; then
-    # Use node to safely modify JSON
     node -e "
       const fs = require('fs');
       const path = '$config_file';
@@ -655,9 +836,8 @@ EOF
         console.log('superpowers already in opencode.json');
       }
     "
-    ok "Superpowers plugin added to opencode.json"
-  else
-    # Fallback: use Python to safely modify JSON
+    ok "Superpowers plugin added to opencode.json (legacy)"
+  elif command -v python3 >/dev/null 2>&1; then
     python3 -c "
 import json, sys
 path = sys.argv[1]
@@ -673,9 +853,11 @@ if entry not in data['plugin']:
 with open(path, 'w') as f:
     json.dump(data, f, indent=2)
     f.write('\n')
-" "$config_file" || \
-        warn "Could not auto-add superpowers. Add manually: \"superpowers@git+https://github.com/obra/superpowers.git\""
+" "$config_file" || warn "Could not add superpowers. Add manually: opencode plugin superpowers -g"
+  else
+    warn "No node or python3 found. Install manually: opencode plugin superpowers -g"
   fi
+  _gen_superpowers_commands
 }
 
 install_superpowers_claude() {
@@ -728,20 +910,70 @@ install_rtk() {
     return 0
   fi
 
-  info "Installing RTK via official installer..."
-  local rtk_output
-  if rtk_output="$(curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh 2>&1)"; then
-    printf '%s\n' "$rtk_output"
-    init_rtk
-  elif command -v cargo >/dev/null 2>&1; then
-    warn "RTK official installer failed; trying pinned cargo install."
-    if cargo install --git "$RTK_REPO" --rev "$RTK_SHA" rtk 2>&1; then
-      init_rtk
-    else
-      record_failure "RTK install failed. Manual: curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"
-    fi
+  # Use a background subshell with timeout for the official installer
+  info "Installing RTK via official installer (may take a minute)..."
+  local rtk_installed=0
+
+  # Attempt 1: official installer with 90s timeout
+  local tmp_rtk_out
+  tmp_rtk_out="$(mktemp "${TMPDIR:-/tmp}/rtk-install.XXXXXX")"
+  if timeout 90 bash -c "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh" > "$tmp_rtk_out" 2>&1; then
+    cat "$tmp_rtk_out"
+    rm -f "$tmp_rtk_out"
+    rtk_installed=1
   else
-    record_failure "RTK install failed and cargo not found. Manual: install from ${RTK_REPO} releases."
+    local rtk_exit=$?
+    rm -f "$tmp_rtk_out"
+    info "Official installer timed out (exit ${rtk_exit}). Trying fallback..."
+  fi
+
+  # Attempt 2: cargo install (if available)
+  if [[ "$rtk_installed" -eq 0 ]] && command -v cargo >/dev/null 2>&1; then
+    info "Installing RTK via cargo (pinned commit)..."
+    if timeout 300 cargo install --git "$RTK_REPO" --rev "$RTK_SHA" rtk 2>&1; then
+      rtk_installed=1
+    else
+      warn "cargo install failed"
+    fi
+  fi
+
+  # Attempt 3: download prebuilt binary for common platforms
+  if [[ "$rtk_installed" -eq 0 ]]; then
+    local arch=""
+    case "$(uname -m)" in
+      x86_64|amd64) arch="x86_64" ;;
+      aarch64|arm64) arch="arm64" ;;
+    esac
+    local os=""
+    case "$OS" in
+      macos) os="apple-darwin" ;;
+      linux) os="unknown-linux-gnu" ;;
+    esac
+    if [[ -n "$arch" && -n "$os" ]]; then
+      local rtk_url="https://github.com/rtk-ai/rtk/releases/latest/download/rtk-${arch}-${os}.tar.gz"
+      info "Downloading RTK prebuilt binary from ${rtk_url}..."
+      local tmp_dir
+      tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/rtk-dl.XXXXXX")"
+      if curl -fsSL --retry 3 "$rtk_url" -o "$tmp_dir/rtk.tar.gz" && tar xzf "$tmp_dir/rtk.tar.gz" -C "$tmp_dir" 2>/dev/null; then
+        local rtk_bin
+        rtk_bin="$(find "$tmp_dir" -name 'rtk' -type f 2>/dev/null | head -1)"
+        if [[ -n "$rtk_bin" ]]; then
+          install -d "$HOME/.local/bin" && install "$rtk_bin" "$HOME/.local/bin/rtk"
+          export PATH="$HOME/.local/bin:$PATH"
+          if command -v rtk >/dev/null 2>&1; then
+            info "RTK prebuilt binary installed to ~/.local/bin/rtk"
+            rtk_installed=1
+          fi
+        fi
+      fi
+      rm -rf "$tmp_dir"
+    fi
+  fi
+
+  if [[ "$rtk_installed" -eq 1 ]]; then
+    init_rtk
+  else
+    record_failure "RTK install failed. Manual: curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"
   fi
 }
 
@@ -772,13 +1004,82 @@ init_rtk() {
   done
 }
 
+# ---------- MCP config writer ----------
+
+_add_crg_mcp_to_config() {
+  local config_file="$1"
+  local config_dir
+  config_dir="$(dirname "$config_file")"
+  mkdir -p "$config_dir"
+
+  if command -v node >/dev/null 2>&1; then
+    node -e "
+      const fs = require('fs');
+      const path = '$config_file';
+      let config = {};
+      try { config = JSON.parse(fs.readFileSync(path, 'utf8')); } catch(e) { config = { '\\\$schema': 'https://opencode.ai/config.json' }; }
+      if (!config.mcp) config.mcp = {};
+      config.mcp['code-review-graph'] = {
+        type: 'local',
+        command: ['uvx', 'code-review-graph', 'serve'],
+        enabled: true
+      };
+      fs.writeFileSync(path, JSON.stringify(config, null, 2) + '\n');
+      console.log('Added code-review-graph MCP to ' + path);
+    " 2>&1
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -c "
+import json, sys, os
+path = sys.argv[1]
+config = {}
+if os.path.exists(path):
+    with open(path) as f:
+        config = json.load(f)
+if '\$schema' not in config and not os.path.exists(path):
+    config['\$schema'] = 'https://opencode.ai/config.json'
+if 'mcp' not in config:
+    config['mcp'] = {}
+config['mcp']['code-review-graph'] = {
+    'type': 'local',
+    'command': ['uvx', 'code-review-graph', 'serve'],
+    'enabled': True
+}
+with open(path, 'w') as f:
+    json.dump(config, f, indent=2)
+    f.write('\n')
+print('Added code-review-graph MCP to ' + path)
+" "$config_file" 2>&1
+  else
+    cat >> "$config_file" <<'MCPCFG'
+
+  "mcp": {
+    "code-review-graph": {
+      "type": "local",
+      "command": ["uvx", "code-review-graph", "serve"],
+      "enabled": true
+    }
+  }
+MCPCFG
+    warn "Could not safely merge MCP config; appended template to ${config_file}. Fix manually."
+    return 1
+  fi
+  return 0
+}
+
 install_code_review_graph() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
     info "DRY-RUN: pipx install code-review-graph || python3 -m pip install --user code-review-graph"
     local target
     for target in "${TARGETS[@]}"; do
       case "$target" in
-        opencode) info "DRY-RUN: code-review-graph install --platform opencode" ;;
+        opencode)
+          info "DRY-RUN: add MCP to opencode config"
+          if [[ "$SCOPE" == "local" ]]; then
+            info "  config: ./.opencode/opencode.json"
+          else
+            info "  config: ~/.config/opencode/opencode.json"
+          fi
+          ;;
         claude-code) info "DRY-RUN: code-review-graph install --platform claude-code" ;;
       esac
     done
@@ -790,7 +1091,7 @@ install_code_review_graph() {
     return 0
   fi
 
-  if ! command -v code-review-graph >/dev/null 2>&1; then
+  if ! command -v code-review-graph >/dev/null 2>&1 && ! command -v uvx >/dev/null 2>&1; then
     info "Installing code-review-graph from PyPI..."
     if command -v pipx >/dev/null 2>&1; then
       pipx install code-review-graph 2>&1 || record_failure "code-review-graph pipx install failed"
@@ -801,31 +1102,45 @@ install_code_review_graph() {
     fi
   fi
 
-  if command -v code-review-graph >/dev/null 2>&1; then
-    local target platform_flag
-    for target in "${TARGETS[@]}"; do
-      case "$target" in
-        opencode) platform_flag="opencode" ;;
-        claude-code) platform_flag="claude-code" ;;
-        *) platform_flag="" ;;
-      esac
-      if [[ -n "$platform_flag" ]]; then
-        info "Configuring code-review-graph MCP for ${platform_flag}..."
-        code-review-graph install --platform "$platform_flag" 2>&1 || record_failure "code-review-graph install --platform ${platform_flag} failed; run manually"
-      fi
-    done
-    if [[ "$WITH_GRAPH_BUILD" -ne 1 ]]; then
-      info "Skipping code-review-graph build; pass --with-graph-build to run it."
-      return 0
-    fi
-    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      info "Building code-review-graph for current repository..."
-      code-review-graph build 2>&1 || record_failure "code-review-graph build failed; run manually: code-review-graph build"
-    else
-      info "Skipping code-review-graph build outside a git worktree"
-    fi
+  # Configure MCP server (OpenCode uses new format; Claude Code uses old format)
+  local target
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      opencode)
+        local opencode_config
+        if [[ "$SCOPE" == "local" ]]; then
+          opencode_config="./.opencode/opencode.json"
+          mkdir -p ./.opencode
+        else
+          opencode_config="$HOME/.config/opencode/opencode.json"
+        fi
+        info "Configuring code-review-graph MCP for OpenCode..."
+        _add_crg_mcp_to_config "$opencode_config" || record_failure "Failed to configure code-review-graph MCP"
+        if command -v code-review-graph >/dev/null 2>&1; then
+          info "Removing old-format MCP config if present..."
+          rm -f .opencode.json 2>/dev/null || true
+        fi
+        ;;
+      claude-code)
+        if command -v code-review-graph >/dev/null 2>&1; then
+          info "Configuring code-review-graph for Claude Code..."
+          code-review-graph install --platform claude-code 2>&1 || record_failure "code-review-graph install --platform claude-code failed; run manually"
+        else
+          record_failure "code-review-graph not installed; MCP config for Claude Code requires the binary"
+        fi
+        ;;
+    esac
+  done
+
+  if [[ "$WITH_GRAPH_BUILD" -ne 1 ]]; then
+    info "Skipping code-review-graph build; pass --with-graph-build to run it."
+    return 0
+  fi
+  if command -v code-review-graph >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    info "Building code-review-graph for current repository..."
+    code-review-graph build 2>&1 || record_failure "code-review-graph build failed; run manually: code-review-graph build"
   else
-    record_failure "code-review-graph unavailable after install. See ${CODE_REVIEW_GRAPH_REPO}"
+    info "Skipping code-review-graph build (no git worktree or binary not found)"
   fi
 }
 
@@ -869,7 +1184,9 @@ _claude_mem_installed() {
   case "$target" in
     opencode)
       local config="$HOME/.config/opencode/opencode.json"
-      [[ -f "$config" ]] && grep -qi "claude-mem" "$config" 2>/dev/null && return 0
+      if [[ -f "$config" ]] && grep -qi "claude-mem" "$config" 2>/dev/null; then return 0; fi
+      local config2="$HOME/.config/opencode/opencode.jsonc"
+      if [[ -f "$config2" ]] && grep -qi "claude-mem" "$config2" 2>/dev/null; then return 0; fi
       return 1
       ;;
     claude-code)
@@ -904,9 +1221,22 @@ install_claude_mem_for_target() {
     return 0
   fi
 
+  # Auto-install Bun if missing
   if ! command -v bun >/dev/null 2>&1; then
-    record_failure "claude-mem requires Bun. Install: curl -fsSL https://bun.sh/install | bash"
-    return 1
+    info "Bun not found; installing Bun first..."
+    local bun_ok=0
+    # Official Bun installer
+    if curl -fsSL https://bun.sh/install | bash 2>&1; then
+      export PATH="$HOME/.bun/bin:$PATH"
+      if command -v bun >/dev/null 2>&1; then
+        info "Bun installed successfully"
+        bun_ok=1
+      fi
+    fi
+    if [[ "$bun_ok" -eq 0 ]]; then
+      record_failure "Bun install failed. claude-mem requires Bun. Install: curl -fsSL https://bun.sh/install | bash"
+      return 1
+    fi
   fi
 
   info "Installing claude-mem for ${target}..."
@@ -1000,6 +1330,8 @@ main() {
   check_prereqs
   resolve_targets
 
+  info "OS: ${OS} | target: ${TARGETS[*]} | scope: ${SCOPE} | mode: ${MODE}"
+
   case "$MODE" in
     minimal)
       ;;
@@ -1036,6 +1368,9 @@ main() {
   info "Component strategy remains mixed by design: some tools are pinned, some follow upstream latest, and some are effectively global."
   info "Next: restart your agent session, then use skill(name=\"engineer-shovel\") or run /tool-* commands."
   info "Upgrade later with: /tool-update --check  (status) or /tool-update --full  (sync + repair)"
+  if [[ "$OS" == "linux" || "$OS" == "macos" ]]; then
+    info "Windows users: use install.ps1 instead — curl -fsSL https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/install.ps1 | powershell -c -"
+  fi
 }
 
 main "$@"

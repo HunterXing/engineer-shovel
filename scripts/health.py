@@ -13,10 +13,10 @@ import shutil
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
-ROOT = Path(__file__).resolve().parents[1]
-HOME = Path.home()
+from paths import HOME, ROOT, install_paths
+
 DEPENDENCY_MANIFEST_PATH = ROOT / "scripts" / "dependency_manifest.json"
 
 STATUS_OK = "ok"
@@ -40,7 +40,7 @@ def manifest_entry(name: str) -> dict:
     return DEPENDENCY_MANIFEST.get(name, {})
 
 
-def manifest_repair_hint(name: str, target: str | None, fallback: str) -> str:
+def manifest_repair_hint(name: str, target: Optional[str], fallback: str) -> str:
     repair_hint = manifest_entry(name).get("repair_hint")
     if isinstance(repair_hint, str):
         return repair_hint
@@ -52,7 +52,7 @@ def manifest_repair_hint(name: str, target: str | None, fallback: str) -> str:
     return fallback
 
 
-def which(name: str) -> str | None:
+def which(name: str) -> Optional[str]:
     return shutil.which(name)
 
 
@@ -84,7 +84,7 @@ class CommandResult:
 class CommandRunner:
     dry_run: bool = False
     commands: list[list[str]] = field(default_factory=list)
-    executor: Callable[[list[str]], CommandResult] | None = None
+    executor: Optional[Callable[[list[str]], CommandResult]] = None
 
     def run(self, command: list[str]) -> CommandResult:
         self.commands.append(command)
@@ -105,35 +105,6 @@ def expand_targets(target: str) -> list[str]:
     return [target]
 
 
-def install_paths(target: str, scope: str) -> dict[str, Path | list[Path]]:
-    return {
-        "opencode": {
-            "global": {
-                "skill": HOME / ".agents/skills/engineer-shovel",
-                "commands": HOME / ".config/opencode/commands",
-                "gsd_skills": [HOME / ".agents/skills", HOME / ".config/opencode/skills"],
-            },
-            "local": {
-                "skill": ROOT / ".agents/skills/engineer-shovel",
-                "commands": ROOT / ".opencode/commands",
-                "gsd_skills": [ROOT / ".agents/skills", ROOT / ".opencode/skills"],
-            },
-        },
-        "claude": {
-            "global": {
-                "skill": HOME / ".claude/skills/engineer-shovel",
-                "commands": HOME / ".claude/commands",
-                "gsd_skills": [HOME / ".claude/skills"],
-            },
-            "local": {
-                "skill": ROOT / ".claude/skills/engineer-shovel",
-                "commands": ROOT / ".claude/commands",
-                "gsd_skills": [ROOT / ".claude/skills"],
-            },
-        },
-    }[target][scope]
-
-
 def check_base_dependencies(targets: list[str], runner: CommandRunner) -> list[CheckResult]:
     del runner
     names = ["git", "python3", "pipx", "node", "npx"]
@@ -147,6 +118,8 @@ def check_base_dependencies(targets: list[str], runner: CommandRunner) -> list[C
         path = which(name)
         if path:
             checks.append(CheckResult(name=name, status=STATUS_OK, detail=path, target="base"))
+        elif name == "pipx":
+            checks.append(CheckResult(name="pipx", status=STATUS_MISSING, detail="not found in PATH", repair="python3 -m pip install --user pipx && python3 -m pipx ensurepath", target="base"))
         else:
             checks.append(CheckResult(name=name, status=STATUS_MISSING, detail="not found in PATH", target="base"))
     return checks
@@ -172,16 +145,24 @@ def detect_project_rule_packs() -> list[str]:
 
 
 def _has_crg_mcp_opencode() -> bool:
-    """Check if code-review-graph MCP is configured in OpenCode config."""
-    config = HOME / ".config/opencode/opencode.json"
-    if not config.exists():
-        return False
-    try:
-        data = json.loads(config.read_text(encoding="utf-8"))
-        mcp = data.get("mcpServers", data.get("mcp", {}))
-        return "code-review-graph" in mcp
-    except (json.JSONDecodeError, OSError):
-        return False
+    """Check if code-review-graph MCP is configured in OpenCode config (global or local)."""
+    candidates = [
+        HOME / ".config/opencode/opencode.json",
+        HOME / ".config/opencode/opencode.jsonc",
+        ROOT / ".opencode/opencode.json",
+        ROOT / ".opencode.json",
+    ]
+    for config in candidates:
+        if not config.exists():
+            continue
+        try:
+            data = json.loads(config.read_text(encoding="utf-8"))
+            mcp = data.get("mcpServers", data.get("mcp", {}))
+            if "code-review-graph" in mcp:
+                return True
+        except (json.JSONDecodeError, OSError):
+            continue
+    return False
 
 
 def _has_crg_mcp_claude() -> bool:
@@ -202,33 +183,60 @@ def _has_crg_mcp_claude() -> bool:
     return False
 
 
-def check_code_review_graph(runner: CommandRunner) -> CheckResult:
+def check_code_review_graph(runner: CommandRunner, scope: str) -> CheckResult:
     path = which("code-review-graph")
-    if not path:
+    has_uvx = which("uvx") is not None
+    if not path and not has_uvx:
         return CheckResult(
             name="code-review-graph",
             status=STATUS_MISSING,
-            detail="not found in PATH",
-            repair=manifest_repair_hint("code-review-graph", None, "pipx install code-review-graph && code-review-graph install && code-review-graph build"),
+            detail="not found in PATH (no code-review-graph or uvx)",
+            repair=manifest_repair_hint("code-review-graph", None, "pipx install code-review-graph"),
             target="component",
         )
-    status = runner.run(["code-review-graph", "status"])
-    graph_dir = ROOT / ".code-review-graph"
-    if status.returncode != 0:
-        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "status failed", "code-review-graph install", "component")
-    if not graph_dir.exists():
-        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "graph not built", "code-review-graph build", "component")
+    if not path and has_uvx:
+        # uvx can run code-review-graph on demand for MCP
+        if _has_crg_mcp_opencode():
+            return CheckResult("code-review-graph", STATUS_OK, "via uvx (on-demand)", target="component")
+    if path:
+        status = runner.run(["code-review-graph", "status"])
+        graph_dir = ROOT / ".code-review-graph"
+        if status.returncode != 0:
+            return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "status failed", "code-review-graph build", "component")
+        if not graph_dir.exists():
+            return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "graph not built", "code-review-graph build", "component")
     if not _has_crg_mcp_opencode() and not _has_crg_mcp_claude():
-        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "MCP not configured", manifest_repair_hint("code-review-graph", None, "code-review-graph install --platform opencode"), "component")
-    return CheckResult("code-review-graph", STATUS_OK, path, target="component")
+        repair_hint = manifest_repair_hint("code-review-graph", None, "add MCP config to opencode.json")
+        return CheckResult("code-review-graph", STATUS_UNCONFIGURED, "MCP not configured", repair_hint, "component")
+    return CheckResult("code-review-graph", STATUS_OK, path or "via uvx (on-demand)", target="component")
 
 
 def check_superpowers(target: str, runner: CommandRunner) -> CheckResult:
     if target == "opencode":
-        config = HOME / ".config/opencode/opencode.json"
-        if config.exists() and "superpowers@git+https://github.com/obra/superpowers.git" in config.read_text(encoding="utf-8"):
-            return CheckResult("superpowers", STATUS_OK, str(config), target=target)
-        return CheckResult("superpowers", STATUS_UNCONFIGURED, "OpenCode plugin missing", manifest_repair_hint("superpowers", target, "add plugin entry to opencode.json"), target)
+        # Check via opencode plugin command first (OpenCode 1.15+)
+        result = runner.run(["opencode", "plugin", "superpowers"])
+        plugin_ok = "installed" in result.stdout.lower() or "already" in result.stdout.lower()
+        # Check command wrappers exist (superpowers:brainstorm, etc.)
+        cmd_dir = HOME / ".config/opencode" / "commands"
+        wrappers = ["superpowers:brainstorm.md", "superpowers:tdd.md", "superpowers:debug.md", "superpowers:superpowers.md"]
+        has_wrappers = all((cmd_dir / w).exists() for w in wrappers)
+        if plugin_ok and has_wrappers:
+            return CheckResult("superpowers", STATUS_OK, "opencode plugin + /superpowers:* wrappers", target=target)
+        if plugin_ok:
+            return CheckResult("superpowers", STATUS_OK, "opencode plugin superpowers", target=target)
+        # Fallback: check config file for git URL or plugin name
+        for config_path in [
+            HOME / ".config/opencode/opencode.json",
+            HOME / ".config/opencode/opencode.jsonc",
+            ROOT / ".opencode/opencode.json",
+        ]:
+            if config_path.exists():
+                raw = config_path.read_text(encoding="utf-8")
+                if "superpowers" in raw.lower():
+                    status = STATUS_OK if has_wrappers else STATUS_UNCONFIGURED
+                    detail = str(config_path) + (" + wrappers" if has_wrappers else " (wrappers missing)")
+                    return CheckResult("superpowers", status, detail, target=target)
+        return CheckResult("superpowers", STATUS_UNCONFIGURED, "OpenCode plugin missing", manifest_repair_hint("superpowers", target, "opencode plugin superpowers -g"), target)
 
     result = runner.run(["claude", "plugin", "list"])
     if result.returncode == 0 and "superpowers" in result.stdout.lower():
@@ -299,6 +307,7 @@ def check_openspec() -> CheckResult:
 
 
 def check_gsd(target: str, scope: str) -> CheckResult:
+
     paths = install_paths(target, scope)
     command_dir = paths["commands"]
     skill_dirs = paths["gsd_skills"]
@@ -307,6 +316,10 @@ def check_gsd(target: str, scope: str) -> CheckResult:
         skill_dir.exists() and any(skill_dir.glob("gsd-*/SKILL.md"))
         for skill_dir in skill_dirs
     )
+    # GSD v1.39+ installs agent files to ~/.config/opencode/agents/
+    agent_dir = HOME / ".config/opencode/agents"
+    if not has_gsd and agent_dir.exists():
+        has_gsd = any(agent_dir.glob("gsd-*.md"))
     if has_gsd:
         return CheckResult("gsd", STATUS_OK, f"GSD files found ({scope})", target=target)
     flag = "--opencode" if target == "opencode" else "--claude"
@@ -314,13 +327,62 @@ def check_gsd(target: str, scope: str) -> CheckResult:
     return CheckResult("gsd", STATUS_MISSING, f"GSD files missing ({scope})", manifest_repair_hint("gsd", target, f"npx -y get-shit-done-cc@latest {flag} {scope_flag}"), target)
 
 
+def _ecc_cmd_dir() -> Optional[Path]:
+    """Find ECC commands directory."""
+    import subprocess
+    try:
+        result = subprocess.run(["npm", "root", "-g"], text=True, capture_output=True, check=False)
+        if result.returncode == 0:
+            p = Path(result.stdout.strip()) / "ecc-universal" / "commands"
+            if p.exists():
+                return p
+    except Exception:
+        pass
+    # Fallback: common install locations
+    for prefix in [
+        Path("/usr/local/lib/node_modules"),
+        Path("/usr/lib/node_modules"),
+        HOME / ".local/share/vfox/cache/nodejs",
+    ]:
+        if prefix.exists():
+            for child in prefix.iterdir() if prefix.is_dir() else []:
+                p = child / "lib/node_modules/ecc-universal/commands"
+                if p.exists():
+                    return p
+    return None
+
+
+def _ecc_commands_linked(cmd_dir: Path) -> bool:
+    """Check if ECC commands are symlinked into the given commands directory."""
+    src = _ecc_cmd_dir()
+    if not src:
+        return False  # ECC not installed
+    linked = 0
+    for f in src.iterdir():
+        if f.suffix == ".md":
+            target = cmd_dir / f.name
+            if target.is_symlink() and target.resolve() == f.resolve():
+                linked += 1
+    # At least one symlink == ECC commands are linked
+    return linked > 0
+
+
 def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
     if scope == "local":
         return CheckResult("ecc", STATUS_BLOCKED, "local scope not supported", "use --scope global or skip ECC for project-local installs", target)
     if target == "opencode":
         markers = [HOME / ".config/opencode/ecc", HOME / ".config/opencode/commands/plan.md"]
-        if any(path.exists() for path in markers):
-            return CheckResult("ecc", STATUS_OK, "OpenCode ECC marker found", target=target)
+        has_marker = any(path.exists() for path in markers)
+        cmd_dir = HOME / ".config/opencode" / "commands"
+        has_symlinks = _ecc_commands_linked(cmd_dir)
+        if has_marker and has_symlinks:
+            return CheckResult("ecc", STATUS_OK, "installed + commands linked", target=target)
+        if has_marker and not has_symlinks:
+            return CheckResult("ecc", STATUS_UNCONFIGURED, "ECC installed but commands not linked", "link ECC commands to opencode commands dir", target)
+        if has_symlinks:
+            return CheckResult("ecc", STATUS_OK, "commands linked", target=target)
+        if _ecc_cmd_dir():
+            return CheckResult("ecc", STATUS_UNCONFIGURED, "ECC found on disk but not linked for OpenCode", "link ECC commands to opencode commands dir", target)
         return CheckResult("ecc", STATUS_MANUAL_UPGRADE, "OpenCode ECC automatic repair not implemented", manifest_repair_hint("ecc", target, "run the ECC installer manually for OpenCode"), target)
 
     plugin_list = runner.run(["claude", "plugin", "list"])
@@ -333,28 +395,43 @@ def check_ecc(target: str, runner: CommandRunner, scope: str) -> CheckResult:
     return CheckResult("ecc", STATUS_MISSING, "Claude plugin missing", manifest_repair_hint("ecc", target, "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code"), target)
 
 
-def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
-    checks = [check_code_review_graph(runner), check_rtk(runner), check_openspec()]
-    for target in targets:
-        checks.extend([
-            check_superpowers(target, runner),
-            check_caveman(target, runner),
-            check_claude_mem(target, runner),
-            check_gsd(target, scope),
-            check_ecc(target, runner, scope),
-        ])
-    return checks
+def _write_crg_mcp_config(config_path: Path) -> None:
+    """Write code-review-graph MCP in OpenCode 1.15 format."""
+    data = {}
+    if config_path.exists():
+        data = json.loads(config_path.read_text(encoding="utf-8") or "{}")
+    if "$schema" not in data:
+        data["$schema"] = "https://opencode.ai/config.json"
+    if "mcp" not in data:
+        data["mcp"] = {}
+    data["mcp"]["code-review-graph"] = {
+        "type": "local",
+        "command": ["uvx", "code-review-graph", "serve"],
+        "enabled": True,
+    }
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
-def repair_code_review_graph(runner: CommandRunner, targets: list[str]) -> None:
-    if not which("code-review-graph"):
+def repair_code_review_graph(runner: CommandRunner, targets: list[str], scope: str) -> None:
+    if not which("code-review-graph") and not which("uvx"):
         if which("pipx"):
             runner.run(["pipx", "install", "code-review-graph"])
         else:
             runner.run(["python3", "-m", "pip", "install", "--user", "code-review-graph"])
     for target in targets:
-        platform_flag = "opencode" if target == "opencode" else "claude-code"
-        runner.run(["code-review-graph", "install", "--platform", platform_flag])
+        if target == "opencode":
+            config_path = ROOT / ".opencode/opencode.json" if scope == "local" else HOME / ".config/opencode/opencode.json"
+            if runner.dry_run:
+                runner.commands.append(["write_mcp_confg", str(config_path)])
+            else:
+                _write_crg_mcp_config(config_path)
+            # Remove old-format config if present
+            old = ROOT / ".opencode.json"
+            if old.exists():
+                old.unlink()
+        else:
+            runner.run(["code-review-graph", "install", "--platform", "claude-code"])
     if (ROOT / ".git").exists():
         runner.run(["code-review-graph", "build"])
 
@@ -363,6 +440,12 @@ def repair_superpowers(runner: CommandRunner, target: str) -> None:
     if target == "claude":
         runner.run(["claude", "plugin", "install", "superpowers@claude-plugins-official"])
         return
+    # OpenCode 1.15+: use opencode plugin command
+    if which("opencode"):
+        runner.run(["opencode", "plugin", "superpowers", "-g"])
+        _repair_superpowers_wrappers(runner)
+        return
+    # Fallback: write git URL to config
     config = HOME / ".config/opencode/opencode.json"
     config.parent.mkdir(parents=True, exist_ok=True)
     if config.exists():
@@ -385,6 +468,53 @@ def repair_superpowers(runner: CommandRunner, target: str) -> None:
         runner.commands.append(["write", str(config), entry])
     else:
         config.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    _repair_superpowers_wrappers(runner)
+
+
+SUPERPOWERS_COMMANDS = {
+    "superpowers:brainstorm": ("brainstorming", "Structured ideation for design decisions and creative problem-solving"),
+    "superpowers:parallel-agents": ("dispatching-parallel-agents", "Orchestrate parallel subagents for independent work streams"),
+    "superpowers:execute-plan": ("executing-plans", "Execute structured plans with verification checkpoints"),
+    "superpowers:finish-branch": ("finishing-a-development-branch", "Complete and verify a development branch before merge"),
+    "superpowers:receive-review": ("receiving-code-review", "Process and respond to code review feedback systematically"),
+    "superpowers:request-review": ("requesting-code-review", "Prepare and submit code changes for review"),
+    "superpowers:subagent-dev": ("subagent-driven-development", "Decompose complex tasks via specialized subagents"),
+    "superpowers:debug": ("systematic-debugging", "Scientific method debugging pipeline with root cause tracing"),
+    "superpowers:tdd": ("test-driven-development", "Test-driven development: red-green-refactor workflow"),
+    "superpowers:git-worktrees": ("using-git-worktrees", "Manage parallel development with git worktrees"),
+    "superpowers:superpowers": ("using-superpowers", "List, discover, and manage available superpowers skills"),
+    "superpowers:verify": ("verification-before-completion", "Structured verification checklist before task sign-off"),
+    "superpowers:write-plan": ("writing-plans", "Create structured planning documentation and execution roadmaps"),
+    "superpowers:write-skill": ("writing-skills", "Create and maintain reusable skill files"),
+}
+
+
+def _repair_superpowers_wrappers(runner: CommandRunner) -> None:
+    """Generate /superpowers:* command wrappers for each superpowers skill."""
+    cmd_dir = HOME / ".config/opencode" / "commands"
+    cmd_dir.mkdir(parents=True, exist_ok=True)
+    for cmd_name, (skill_name, desc) in SUPERPOWERS_COMMANDS.items():
+        target = cmd_dir / f"{cmd_name}.md"
+        if target.exists():
+            continue
+        if runner.dry_run:
+            runner.commands.append(["write", str(target), f"wraps skill({skill_name})"])
+            continue
+        content = f"""---
+description: {desc}
+---
+
+# /{cmd_name}
+
+Load the **{skill_name}** skill from superpowers:
+
+```
+skill(name="{skill_name}")
+```
+
+Follow its instructions exactly.
+"""
+        target.write_text(content, encoding="utf-8")
 
 
 def repair_caveman(runner: CommandRunner, targets: list[str]) -> None:
@@ -406,6 +536,9 @@ def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
 
 
 def repair_claude_mem(runner: CommandRunner, targets: list[str]) -> None:
+    # Auto-install Bun if missing
+    if not which("bun"):
+        runner.run(["bash", "-lc", "curl -fsSL https://bun.sh/install | bash"])
     for target in targets:
         ide = "opencode" if target == "opencode" else "claude"
         runner.run(["npx", "-y", "claude-mem", "install", "--ide", ide])
@@ -425,6 +558,23 @@ def repair_gsd(runner: CommandRunner, targets: list[str], scope: str) -> None:
     runner.run(["npx", "-y", "get-shit-done-cc@latest", flag, scope_flag])
 
 
+def _link_ecc_commands(cmd_dir: Path, runner: CommandRunner) -> None:
+    """Symlink ECC command files into OpenCode commands directory."""
+    src = _ecc_cmd_dir()
+    if not src:
+        return
+    cmd_dir.parent.mkdir(parents=True, exist_ok=True)
+    cmd_dir.mkdir(exist_ok=True)
+    for f in src.iterdir():
+        if f.suffix == ".md":
+            target = cmd_dir / f.name
+            if not target.exists():
+                if runner.dry_run:
+                    runner.commands.append(["ln", "-s", str(f), str(target)])
+                else:
+                    target.symlink_to(f)
+
+
 def repair_ecc(runner: CommandRunner, targets: list[str], scope: str) -> None:
     if scope == "local":
         runner.commands.append(["blocked", "ecc-local", "use --scope global or skip ECC"])
@@ -433,28 +583,87 @@ def repair_ecc(runner: CommandRunner, targets: list[str], scope: str) -> None:
         runner.run(["claude", "plugin", "marketplace", "add", "https://github.com/affaan-m/everything-claude-code"])
         runner.run(["claude", "plugin", "install", "everything-claude-code@everything-claude-code"])
     if "opencode" in targets:
-        runner.commands.append(["blocked", "ecc-opencode", "manual install required"])
+        cmd_dir = HOME / ".config/opencode" / "commands"
+        _link_ecc_commands(cmd_dir, runner)
+
+
+@dataclass
+class ComponentDef:
+    name: str
+    check: Callable[..., CheckResult]
+    repair: Callable[..., None]
+    needs_target: bool = False
+    needs_scope: bool = False
+
+
+COMPONENTS: list[ComponentDef] = [
+    ComponentDef("code-review-graph", check_code_review_graph, repair_code_review_graph, needs_scope=True),
+    ComponentDef("rtk", check_rtk, repair_rtk),
+    ComponentDef("openspec", check_openspec, repair_openspec),
+    ComponentDef("superpowers", check_superpowers, repair_superpowers, needs_target=True),
+    ComponentDef("caveman", check_caveman, repair_caveman, needs_target=True),
+    ComponentDef("claude-mem", check_claude_mem, repair_claude_mem, needs_target=True),
+    ComponentDef("gsd", check_gsd, repair_gsd, needs_target=True, needs_scope=True),
+    ComponentDef("ecc", check_ecc, repair_ecc, needs_target=True, needs_scope=True),
+]
+
+
+def _component_args(comp: ComponentDef, target: str, runner: CommandRunner, scope: str) -> tuple:
+    if comp.name == "code-review-graph":
+        return (runner, scope)
+    if comp.name == "rtk":
+        return (runner,)
+    if comp.name == "openspec":
+        return ()
+    if comp.name == "gsd":
+        return (target, scope)
+    if comp.needs_scope and comp.needs_target:
+        return (target, runner, scope)
+    if comp.needs_target:
+        return (target, runner)
+    return (runner,)
+
+
+def _repair_args(comp: ComponentDef, targets: list[str], runner: CommandRunner, scope: str) -> tuple:
+    if comp.name == "openspec":
+        return (runner, targets)
+    if comp.needs_scope and (comp.needs_target or comp.name == "code-review-graph"):
+        return (runner, targets, scope)
+    if comp.needs_target:
+        return (runner, targets)
+    return (runner, targets)
+
+
+def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
+    checks: list[CheckResult] = []
+    for comp in COMPONENTS:
+        if comp.needs_target:
+            for target in targets:
+                checks.append(comp.check(*_component_args(comp, target, runner, scope)))
+        else:
+            checks.append(comp.check(*_component_args(comp, "", runner, scope)))
+    return checks
 
 
 def repair_components(checks: list[CheckResult], targets: list[str], runner: CommandRunner, scope: str) -> None:
     names = {check.name for check in checks if check.can_auto_repair}
-    if "code-review-graph" in names:
-        repair_code_review_graph(runner, targets)
-    if "rtk" in names:
-        repair_rtk(runner, targets)
-    if "openspec" in names:
-        repair_openspec(runner, targets)
-    if "gsd" in names:
-        repair_gsd(runner, targets, scope)
-    if "caveman" in names:
-        repair_caveman(runner, targets)
-    for target in targets:
-        if any(check.name == "superpowers" and check.target == target and check.needs_repair for check in checks):
-            repair_superpowers(runner, target)
-    if "claude-mem" in names:
-        repair_claude_mem(runner, targets)
-    if "ecc" in names:
-        repair_ecc(runner, targets, scope)
+    if "pipx" in names and not which("pipx"):
+        if which("python3"):
+            runner.run(["python3", "-m", "pip", "install", "--user", "pipx"])
+            runner.run(["python3", "-m", "pipx", "ensurepath"])
+        elif which("python"):
+            runner.run(["python", "-m", "pip", "install", "--user", "pipx"])
+            runner.run(["python", "-m", "pipx", "ensurepath"])
+
+    for comp in COMPONENTS:
+        if comp.name not in names:
+            continue
+        if comp.name == "superpowers":
+            for target in targets:
+                if any(c.name == "superpowers" and c.target == target and c.needs_repair for c in checks):
+                    comp.repair(*_repair_args(comp, [target], runner, scope))
+        else:
+            comp.repair(*_repair_args(comp, targets, runner, scope))
 
 
 def print_report(title: str, checks: list[CheckResult]) -> None:

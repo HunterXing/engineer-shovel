@@ -52,7 +52,7 @@ Engineer Shovel 是一个面向 OpenCode / Claude Code 的轻量工作流路由�
 
 ## 能力边界
 
-Engineer Shovel 原生安装的是轻量路由器和 `/tool-*` 命令（10 个活跃 + 2 个兼容重定向）。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：OpenSpec、ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
+Engineer Shovel 原生安装的是轻量路由器和 `/tool-*` 命令（10 个活跃）。完整工作流里更深的能力来自 recommended/full 模式安装或配置的可选外部工具：OpenSpec、ECC、GSD、superpowers、code-review-graph、Caveman 和 RTK。
 
 Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Caveman、RTK 或 code-review-graph 等外部能力，需要对应工具已经安装并处于健康状态。
 
@@ -69,6 +69,8 @@ Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Ca
 如果任务涉及安全敏感路径，不应继续停留在常规路线，应提升到对应的 deep 路径，并在完成前补一个 `/tool-review --deep` 检查点。
 
 ## 快速开始
+
+### macOS / Linux
 
 ```bash
 # 下载、检查、运行（默认：全量安装所有组件）
@@ -91,6 +93,16 @@ bash install.sh --target all
 ./install.sh --target opencode --full --with-graph-build  # 同时构建初始 code-review-graph 索引
 ```
 
+### Windows（PowerShell 5+ / PowerShell Core）
+
+```powershell
+# 下载并安装（默认：全量安装所有组件）
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)"
+
+# 指定参数
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Mode full -Target opencode -Scope global
+```
+
 安装器会在 staging 可选依赖前校验外部仓库的 pinned SHA。相比直接 pipe 到 Bash，先下载再执行更安全，因为你可以检查脚本内容，也能避免服务端根据 pipe 场景返回不同内容。
 
 ## 兼容性说明
@@ -98,15 +110,19 @@ bash install.sh --target all
 这轮优化保持了公开接口不变：
 
 - `skill(name="engineer-shovel")` 不变。
-- `/tool-*` 指令名称保持兼容；10 个活跃命令 + 2 个 legacy 重定向仍会安装。
+- `/tool-*` 指令名称保持兼容；10 个命令仍会安装。
 - `--minimal`、`--recommended`、`--full`、`--dry-run` 不变。
-- 新增 `--target opencode|claude|all|auto`，新机器可以明确选择安装到 OpenCode、Claude Code 或两者都装。
+- `--target opencode|claude|all|auto`，新机器可以明确选择安装到 OpenCode、Claude Code 或两者都装。
+- 新增 `install.ps1` 支持 Windows 原生安装（PowerShell 5+ / PowerShell Core 7+）。
 
 新增的 guardrail：
 
-- 文档层面默认推荐“先下载、检查、再执行”。
+- 文档层面默认推荐"先下载、检查、再执行"。
 - 安装器保留 SHA 校验，并对外部 installer 失败给出更清晰的边界。
 - Python 校验脚本新增了轻量 pytest 回归测试。
+- superpowers 通过 `opencode plugin superpowers` 安装，兼容 OpenCode 1.15+，不再手工编辑配置文件。
+- code-review-graph MCP 使用 OpenCode 1.15 新版 `mcp` 配置格式（`.opencode/opencode.json`），废弃旧版 `.opencode.json` 文件。
+- `install.sh` 自动检测 macOS/Linux/Windows 环境，Windows 下引导到 `install.ps1`。
 
 会话中使用：
 
@@ -171,8 +187,6 @@ Caveman 建议按模式默认启用：`fast` 用 lite，`standard` 用 full，`d
 | 平台辅助 | `/tool-branch` | 分支生命周期管理 |
 | 平台辅助 | `/tool-graph` | code-review-graph 诊断 |
 | 平台辅助 | `/tool-update` | 路由同步、组件健康、升级修复 |
-
-> **v1.4.0**: `/tool-brainstorm` 已内化为 `/tool-feat` 和 `/tool-plan` 的 Phase 0；`/tool-blueprint` 已合并到 `/tool-plan --deep`。这两个命令文件保留重定向说明。
 
 ## 能力升级层
 
