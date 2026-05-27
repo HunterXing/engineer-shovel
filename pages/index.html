@@ -34,7 +34,7 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.7.3 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.7.4 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
@@ -51,6 +51,19 @@
       <div class="stat"><span class="stat-num">8</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
       <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
       <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
+    </div>
+    <div class="hero-terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot"></span>
+        <span class="terminal-dot"></span>
+        <span class="terminal-dot"></span>
+        <span class="terminal-title">install.sh</span>
+      </div>
+      <div class="terminal-body">
+        <span class="terminal-prompt">$</span>
+        <span class="terminal-cmd">curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash</span>
+        <span class="terminal-cursor"></span>
+      </div>
     </div>
     <div class="scroll-hint" id="scroll-hint">
       <span data-i18n="hero.scroll">Scroll to explore</span>
@@ -180,18 +193,32 @@
       <h2 class="section-title" data-i18n="start.title">Quick Start</h2>
       <p class="section-sub" data-i18n="start.sub">Download → Inspect → Run. Three steps to ready.</p>
     </div>
+    <div class="os-tabs">
+      <button class="os-tab active" data-os="unix">macOS / Linux</button>
+      <button class="os-tab" data-os="windows">Windows</button>
+    </div>
     <div class="steps-container">
       <div class="step-item" data-step="1">
         <div class="step-num">01</div>
         <div class="step-content">
           <h3 class="step-title" data-i18n="start.step1.title">Download Installer</h3>
           <p class="step-desc" data-i18n="start.step1.desc">Download first, inspect the content, then run. Default: full install all components.</p>
-          <div class="code-block">
+          <div class="code-block os-block unix-block">
             <div class="code-lang">bash</div>
             <pre><code>curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh</code></pre>
             <button class="copy-btn" data-copy="curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
 less install.sh">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="code-block os-block windows-block" style="display:none">
+            <div class="code-lang">powershell</div>
+            <pre><code>Invoke-WebRequest -Uri https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1 -OutFile install.ps1
+Get-Content install.ps1 | Select-Object -First 50</code></pre>
+            <button class="copy-btn" data-copy="Invoke-WebRequest -Uri https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1 -OutFile install.ps1
+Get-Content install.ps1 | Select-Object -First 50">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Copy
             </button>
@@ -202,8 +229,8 @@ less install.sh">
         <div class="step-num">02</div>
         <div class="step-content">
           <h3 class="step-title" data-i18n="start.step2.title">Choose Install Mode</h3>
-          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code. Recommended installs the core stack; full adds ECC and GSD.</p>
-          <div class="code-block">
+          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code across macOS, Linux, and Windows. Recommended installs the core stack; full adds ECC and GSD.</p>
+          <div class="code-block os-block unix-block">
             <div class="code-lang">bash</div>
             <pre><code># OpenCode full install (default)
 bash install.sh --target opencode
@@ -220,6 +247,27 @@ bash install.sh --target all</code></pre>
 bash install.sh --target opencode --recommended
 bash install.sh --target opencode --minimal
 bash install.sh --target all">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="code-block os-block windows-block" style="display:none">
+            <div class="code-lang">powershell</div>
+            <pre><code># OpenCode full install (default)
+.\install.ps1 -Mode full -Target opencode
+
+# Core stack: Caveman + RTK + CRG + superpowers + OpenSpec
+.\install.ps1 -Mode recommended
+
+# Skill + commands only
+.\install.ps1 -Mode minimal
+
+# Install for Claude Code
+.\install.ps1 -Target claude</code></pre>
+            <button class="copy-btn" data-copy=".\install.ps1 -Mode full -Target opencode
+.\install.ps1 -Mode recommended
+.\install.ps1 -Mode minimal
+.\install.ps1 -Target claude">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Copy
             </button>
@@ -351,7 +399,7 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.7.3 · MIT License</span>
+        <span class="footer-version">v1.7.4 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>

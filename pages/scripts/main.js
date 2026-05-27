@@ -1,11 +1,11 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.7.3 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
+   v1.7.4 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.7.3 · MIT License',
+    'hero.badge': 'v1.7.4 · MIT License',
     'hero.subtitle': 'Lightweight AI development workflow router for OpenCode / Claude Code',
     'hero.desc': 'Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.',
     'hero.note': 'Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.',
@@ -42,7 +42,7 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.7.3 · MIT License',
+    'hero.badge': 'v1.7.4 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的轻量 AI 开发工作流路由器',
     'hero.desc': '先走主工作流命令。把 review、research 和外部工具保留为按需升级，而不是默认仪式。',
     'hero.note': '默认路线：quick / fix / feat / plan。辅助路线：review / refactor / research。平台路线：branch / graph / update。',
@@ -162,6 +162,18 @@ function initLanguageToggle() {
   setLanguage(saved);
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+  });
+}
+
+function initOsTabs() {
+  document.querySelectorAll('.os-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const os = tab.dataset.os;
+      document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.os-block').forEach(b => b.style.display = 'none');
+      document.querySelectorAll('.' + os + '-block').forEach(b => b.style.display = '');
+    });
   });
 }
 
@@ -1153,6 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollHint();
   initScrollAnimations();
   initLanguageToggle();
+  initOsTabs();
   initRoutePicker();
   renderCommands();
   initStepExecution();
