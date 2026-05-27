@@ -3,6 +3,12 @@
 ## 1.7.5 (2026-05-27)
 
 ### Added
+- **Command Aliases**: New `/tool-alias` command with short aliases (`/q`, `/f`, `/fe`, `/p`, `/r`, `/rf`, `/rs`, `/b`, `/g`, `/u`) for faster workflow.
+- **Startup Health Check**: New `scripts/startup-check.py` for automatic tool availability checking on session start.
+- **Smart Mode Recommendation**: Auto-detection of task complexity to recommend `--fast`, `--standard`, or `--deep` mode.
+- **Cache Layer**: Intelligent caching for code-review-graph queries (impact_radius, architecture_overview, test_coverage) with configurable TTL.
+- **Configuration as Code**: New `.engineer-shovel.yaml` configuration file for version-controlled settings.
+- **Progressive Disclosure**: New `SKILL-lite.md` for ultra-lightweight Level 1 loading (essential commands only).
 - **Toolchain Awareness**: All 10 commands now announce external tool usage with `🚀 **Tool Name** → action` format, making it impossible to miss which tools are powering the workflow.
 - **Error Handling**: Added comprehensive error handling sections to all command files with clear recovery paths.
 - **Quality Checklists**: Added verification checklists to `tool-plan`, `tool-review`, and `tool-refactor` commands.
@@ -14,7 +20,7 @@
 
 ### Changed
 - **install.sh**: Added version display, improved success summary with next steps, and better error reporting.
-- **SKILL.md**: Added Error Recovery section and Toolchain Awareness specification.
+- **SKILL.md**: Added Error Recovery section, Toolchain Awareness specification, Quick Start guide, Command Aliases, Smart Mode Recommendation, and Cache Layer documentation.
 - **scripts/health.py**: Added timeouts (300s) and better exception handling for subprocess calls.
 - **scripts/sync.py**: Added permission error handling for file operations.
 - **commands**: Enhanced all 10 commands with toolchain announcements and boundary condition checks.

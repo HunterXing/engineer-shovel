@@ -205,7 +205,7 @@ These layers exist to solve specific problems. Installing them does not mean eve
 ```text
 engineer-shovel/
 ├── .github/           # CI and Pages workflows
-├── commands/          # 10 executable slash commands
+├── commands/          # 11 executable slash commands
 ├── docs/              # long-form references kept out of runtime context
 ├── pages/             # static project site assets
 ├── scripts/           # sync and validation utilities

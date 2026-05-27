@@ -1,0 +1,72 @@
+# Engineer Shovel Configuration
+# Place this file in your project root or home directory
+# Version: 1.7.5
+
+version: "1.7.5"
+
+# Default settings
+defaults:
+  mode: standard          # fast | standard | deep
+  target: opencode        # opencode | claude | all
+  scope: global           # global | local
+  caveman: true           # Enable caveman compression
+  rtk: true               # Enable RTK compression
+
+# Command aliases (shortcuts)
+aliases:
+  q: quick
+  f: fix
+  fe: feat
+  p: plan
+  r: review
+  rf: refactor
+  rs: research
+  b: branch
+  g: graph
+  u: update
+
+# Cost mode shortcuts
+mode_shortcuts:
+  "--f": "--fast"
+  "--s": "--standard"
+  "--d": "--deep"
+
+# Tool configuration
+tools:
+  code-review-graph:
+    enabled: true
+    auto_refresh: true      # Git hooks auto-refresh
+    cache_ttl: 300          # 5 minutes
+  caveman:
+    enabled: true
+    default_mode: full      # lite | full | ultra
+  rtk:
+    enabled: true
+    threshold: 100          # Lines before wrapping
+  superpowers:
+    enabled: true
+  claude-mem:
+    enabled: true
+    auto_capture: true
+
+# Cache settings
+cache:
+  enabled: true
+  max_size: 100             # Max cached entries
+  ttl_multiplier: 1.0       # Adjust all TTLs
+
+# Smart mode recommendation
+smart_mode:
+  enabled: true
+  auto_detect: true         # Auto-detect complexity
+  security_auto_deep: true  # Auto --deep for security
+
+# Health check
+health_check:
+  on_startup: true          # Run check on session start
+  verbose: false            # Show detailed output
+
+# Output settings
+output:
+  toolchain_announcements: true  # Show 🚀 announcements
+  compact_mode: false            # Minimal output

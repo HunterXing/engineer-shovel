@@ -48,6 +48,7 @@ Engineer Shovel is a workflow router for AI-assisted software engineering on Ope
 | Platform support | `/tool-branch` | Branch create, status, review, merge, abort | Low |
 | Platform support | `/tool-graph` | code-review-graph diagnostics only | Low |
 | Platform support | `/tool-update` | Router sync, component health, repair guidance | Low |
+| Reference | `/tool-alias` | Command aliases and shortcuts | N/A |
 
 ## Default Routes
 
@@ -162,6 +163,52 @@ immediately promote the task to the matching deep route and add a `/tool-review 
 
 Individual command files reference this gate with one line; do not repeat the full text.
 
+## Smart Mode Recommendation
+
+When the user doesn't specify a cost mode, recommend based on task complexity:
+
+### Auto-Detection Rules
+
+| Signal | Recommended Mode | Reasoning |
+|--------|------------------|-----------|
+| Single file, obvious change | `--fast` | Low risk, quick verification |
+| Multiple files, clear scope | `--standard` | Normal development |
+| Cross-module, security, ambiguous | `--deep` | High risk needs careful analysis |
+| Bug with clear repro | `--fast` or `--standard` | Known location |
+| Bug without repro | `--standard` | Need investigation |
+| New feature, clear spec | `--standard` | Known requirements |
+| New feature, vague spec | `--deep` | Need clarification |
+| Refactor, small scope | `--fast` | Behavior-preserving |
+| Refactor, large scope | `--standard` | Need impact analysis |
+
+### Recommendation Format
+
+When recommending a mode, use this format:
+
+```
+💡 Recommended: --<mode> (reason)
+```
+
+Example:
+```
+💡 Recommended: --standard (multi-file change detected)
+```
+
+### Escalation Triggers
+
+Auto-escalate to `--deep` when:
+- Security-sensitive code touched
+- More than 5 files affected
+- Cross-module dependencies unclear
+- User explicitly requests thorough analysis
+
+### De-escalation Triggers
+
+Auto-de-escalate to `--fast` when:
+- Single file, obvious change
+- No dependencies affected
+- Clear verification path
+
 ## Error Recovery
 
 When a workflow encounters errors:
@@ -170,6 +217,43 @@ When a workflow encounters errors:
 3. **External service down**: Use cached data or skip non-critical steps
 4. **Scope creep**: Split work into smaller slices and defer additional scope
 5. **Repeated failures**: Escalate to `/tool-plan --deep` for architectural review
+
+## Cache Layer
+
+To reduce redundant token consumption, the system uses intelligent caching:
+
+### Cacheable Operations
+
+| Operation | TTL | Invalidation |
+|-----------|-----|--------------|
+| `impact_radius` | 5 min | On commit |
+| `architecture_overview` | 30 min | On file change |
+| `test_coverage` | 10 min | On test file change |
+| `callers_of` | 5 min | On commit |
+| `callees_of` | 5 min | On commit |
+
+### Cache Behavior
+
+- **Hit**: Use cached result, skip tool invocation → saves tokens
+- **Miss**: Query tool normally, cache result
+- **Stale**: TTL expired, re-query on next access
+- **Invalidated**: File changed, cache cleared
+
+### When to Use Cache
+
+```
+✅ Use cache: Repeated queries in same session
+✅ Use cache: Impact analysis before/after fix
+❌ Skip cache: First query after commit
+❌ Skip cache: Cross-session queries (use claude-mem)
+```
+
+### Token Savings
+
+With caching enabled:
+- Repeated impact analysis: ~80% token reduction
+- Architecture overview: ~90% token reduction (expensive query)
+- Test coverage checks: ~70% token reduction
 
 ## Toolchain Awareness
 
@@ -269,3 +353,38 @@ If you're new to Engineer Shovel, start here:
 | `--fast` | Small, obvious changes | Lowest |
 | `--standard` | Normal development | Medium |
 | `--deep` | Complex, risky, or security-sensitive | Higher |
+
+## Command Aliases
+
+For faster workflow, use these short aliases:
+
+| Alias | Full Command | Example |
+|-------|--------------|---------|
+| `/q` | `/tool-quick` | `/q "fix typo"` |
+| `/f` | `/tool-fix` | `/f --s "login bug"` |
+| `/fe` | `/tool-feat` | `/fe "dark mode"` |
+| `/p` | `/tool-plan` | `/p --d "refactor auth"` |
+| `/r` | `/tool-review` | `/r` |
+| `/rf` | `/tool-refactor` | `/rf "clean utils"` |
+| `/rs` | `/tool-research` | `/rs --web "compare X vs Y"` |
+| `/b` | `/tool-branch` | `/b create feat add-login` |
+| `/g` | `/tool-graph` | `/g status` |
+| `/u` | `/tool-update` | `/u --check` |
+
+Cost mode shortcuts: `--f` = `--fast`, `--s` = `--standard`, `--d` = `--deep`
+
+## Startup Health Check
+
+On session start, the system automatically checks tool availability:
+
+```
+🪖 Engineer Shovel v1.7.5 — Health Check
+✅ caveman: installed
+✅ rtk: installed  
+✅ code-review-graph: installed
+⚠️ superpowers: not configured
+⚠️ OpenSpec: not installed
+📊 5/7 tools ready
+```
+
+Use `/tool-update --check` for detailed component status.

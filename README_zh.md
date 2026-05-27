@@ -46,6 +46,7 @@ Engineer Shovel 是一个面向 OpenCode / Claude Code 的轻量工作流路由�
 - 主工作流命令：`/tool-quick`、`/tool-fix`、`/tool-feat`、`/tool-plan`
 - 工程辅助命令：`/tool-review`、`/tool-refactor`、`/tool-research`
 - 平台辅助命令：`/tool-branch`、`/tool-graph`、`/tool-update`
+- 参考命令：`/tool-alias`（命令别名和快捷方式）
 - 核心原则：大多数任务应停留在主工作流层
 
 `plan`、`review`、`research` 不是所有任务的必经前门；外部工具也不是默认仪式，而是遇到特定问题时才升级的能力层。
