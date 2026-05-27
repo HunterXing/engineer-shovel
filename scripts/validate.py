@@ -91,7 +91,7 @@ def validate_schema() -> int:
 # ── references ──────────────────────────────────────────────────────
 
 DOCS = [
-    ROOT / "SKILL.md", ROOT / "README.md", ROOT / "README_zh.md",
+    ROOT / "SKILL.md", ROOT / "SKILL-full.md", ROOT / "README.md", ROOT / "README_zh.md",
     *sorted((ROOT / "docs").glob("*.md")),
     *sorted(COMMAND_DIR.glob("*.md")),
 ]
@@ -114,10 +114,19 @@ def validate_references() -> int:
     for command in sorted(commands):
         if f"/{command}" not in readme_zh:
             errors.append(f"README_zh.md: missing command reference /{command}")
-    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    
+    # Check SKILL-full.md (Level 2) for all command references
+    skill_full = (ROOT / "SKILL-full.md").read_text(encoding="utf-8")
     for command in sorted(commands):
+        if f"/{command}" not in skill_full:
+            errors.append(f"SKILL-full.md: missing command table reference /{command}")
+    
+    # SKILL.md (Level 1) only needs main workflow commands
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    main_commands = {"tool-quick", "tool-fix", "tool-feat", "tool-plan"}
+    for command in sorted(main_commands):
         if f"/{command}" not in skill:
-            errors.append(f"SKILL.md: missing command table reference /{command}")
+            errors.append(f"SKILL.md: missing main workflow command reference /{command}")
 
     research = (COMMAND_DIR / "tool-research.md").read_text(encoding="utf-8")
     if "special mode axis" not in research or "--quick" not in research or "--web" not in research:
