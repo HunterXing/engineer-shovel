@@ -177,20 +177,20 @@ When a workflow encounters errors:
 
 ### Announcement Format
 
-Use this format when activating a tool:
+Use this format when activating a tool — make it **impossible to miss**:
 
 ```
-🔧 [Tool Name]: <what it's doing>
+🚀 **[Tool Name]** → <what it's doing>
 ```
 
 Examples:
 ```
-🔧 code-review-graph: analyzing impact radius for auth module
-🔧 caveman: compressing output (full mode)
-🔧 rtk: wrapping large test suite output
-🔧 superpowers: loading systematic-debugging skill
-🔧 claude-mem: searching for similar bug history
-🔧 ECC: loading security guidance for auth patterns
+🚀 **code-review-graph** → analyzing impact radius for auth module
+🚀 **caveman** → compressing output (full mode)
+🚀 **rtk** → wrapping large test suite output
+🚀 **superpowers** → loading systematic-debugging skill
+🚀 **claude-mem** → searching for similar bug history
+🚀 **ECC** → loading security guidance for auth patterns
 ```
 
 ### When to Announce
@@ -206,7 +206,7 @@ Announce tool usage at these moments:
 
 Clearly distinguish between:
 - **Native tools**: Read, Grep, Glob, Edit, Bash (no announcement needed)
-- **External tools**: code-review-graph, caveman, rtk, superpowers, ECC, OpenSpec, GSD, claude-mem (MUST announce)
+- **External tools**: code-review-graph, caveman, rtk, superpowers, ECC, OpenSpec, GSD, claude-mem (MUST announce with 🚀)
 
 This transparency helps developers learn the toolchain and understand what capabilities are available.
 

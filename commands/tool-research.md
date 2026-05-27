@@ -31,23 +31,23 @@ This command uses a special mode axis:
 ## Flow
 
 1. Define the exact decision the research should inform.
-2. Search claude-mem for prior research conclusions when historical decisions are likely to matter. → announce: `🔧 claude-mem: searching for prior research`
+2. Search claude-mem for prior research conclusions when historical decisions are likely to matter. → announce: `🚀 **claude-mem** → searching for prior research`
 3. Query code-review-graph (L2) for relevant existing implementation and patterns:
-   - `semantic_search_nodes(query="<topic_keywords>")` → announce: `🔧 code-review-graph: searching for related code`
-   - `query_graph(callees_of="<related_node>")` → announce: `🔧 code-review-graph: analyzing dependency context`
+   - `semantic_search_nodes(query="<topic_keywords>")` → announce: `🚀 **code-review-graph** → searching for related code`
+   - `query_graph(callees_of="<related_node>")` → announce: `🚀 **code-review-graph** → analyzing dependency context`
 4. Search the smallest source set likely to answer it.
-5. Use ECC only when the decision depends on specialized framework, language, security, or integration knowledge that local code and normal docs will not answer well. → announce: `🔧 ECC: loading <domain> expertise`
+5. Use ECC only when the decision depends on specialized framework, language, security, or integration knowledge that local code and normal docs will not answer well. → announce: `🚀 **ECC** → loading <domain> expertise`
 6. Cite or name sources when facts are current/external.
 7. Highlight conflicts and confidence.
 8. Route findings to `/tool-plan` (scope/order still unclear), `/tool-feat` (decision made), `/tool-quick` (small obvious change), or documentation. Append routing rationale so research does not become a dead-end artifact.
 
 ### Toolchain Announcements
 
-When using external tools, announce them clearly:
-- `🔧 code-review-graph: <action>` — when searching codebase for patterns
-- `🔧 ECC: loading <domain> expertise` — when consulting specialized knowledge
-- `🔧 claude-mem: searching for prior research` — when checking historical decisions
-- `🔧 WebFetch: fetching <source>` — when retrieving external documentation
+When using external tools, announce them with maximum visibility:
+- `🚀 **code-review-graph** → <action>` — when searching codebase for patterns
+- `🚀 **ECC** → loading <domain> expertise` — when consulting specialized knowledge
+- `🚀 **claude-mem** → searching for prior research` — when checking historical decisions
+- `🚀 **WebFetch** → fetching <source>` — when retrieving external documentation
 
 ## Research Quality
 

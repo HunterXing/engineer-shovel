@@ -39,9 +39,9 @@ Search claude-mem only when prior architectural decisions are likely to change t
 
 1. Restate goal, non-goals, and what must be true before execution can start.
 2. Identify likely affected files/modules via code-review-graph (L2, auto-refreshed):
-   - `detect_changes` to assess impact scope → announce: `🔧 code-review-graph: detecting change scope`
-   - `get_impact_radius(target="<key_module>")` → announce: `🔧 code-review-graph: analyzing impact radius`
-   - `get_architecture_overview` for module boundaries (deep mode only) → announce: `🔧 code-review-graph: generating architecture overview`
+   - `detect_changes` to assess impact scope → announce: `🚀 **code-review-graph** → detecting change scope`
+   - `get_impact_radius(target="<key_module>")` → announce: `🚀 **code-review-graph** → analyzing impact radius`
+   - `get_architecture_overview` for module boundaries (deep mode only) → announce: `🚀 **code-review-graph** → generating architecture overview`
    If CRG MCP tools are unavailable, use the `code-review-graph` CLI where possible or fall back to targeted Glob/Grep/Read.
 3. Define the minimum plan contract:
    - scope and non-goals
@@ -60,12 +60,12 @@ Search claude-mem only when prior architectural decisions are likely to change t
 
 ### Toolchain Announcements
 
-When using external tools, announce them clearly:
-- `🔧 code-review-graph: <action>` — when analyzing code structure or impact
-- `🔧 ECC: loading <domain> guidance` — when consulting specialized knowledge
-- `🔧 OpenSpec: creating durable spec` — when generating persistent artifacts
-- `🔧 GSD: orchestrating multi-phase delivery` — when planning milestone work
-- `🔧 superpowers: loading writing-plans skill` — when using structured planning methods
+When using external tools, announce them with maximum visibility:
+- `🚀 **code-review-graph** → <action>` — when analyzing code structure or impact
+- `🚀 **ECC** → loading <domain> guidance` — when consulting specialized knowledge
+- `🚀 **OpenSpec** → creating durable spec` — when generating persistent artifacts
+- `🚀 **GSD** → orchestrating multi-phase delivery` — when planning milestone work
+- `🚀 **superpowers** → loading writing-plans skill` — when using structured planning methods
 
 ## Plan Quality Checklist
 

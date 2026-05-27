@@ -28,9 +28,9 @@ Shared policy: mode mapping and security gate come from `SKILL.md`; escalation r
 
 1. Select local, PR, or post-implementation mode from the input.
 2. Code-review-graph (L2, auto-refreshed) is the default intelligence layer for real review work:
-   - `detect_changes` for risk-scored diff analysis → announce: `🔧 code-review-graph: analyzing changes for risk`
-   - `get_review_context(changes="<diff>")` for token-efficient review snippets → announce: `🔧 code-review-graph: generating review context`
-   - `get_impact_radius(target="<changed_module>")` for blast-radius detection → announce: `🔧 code-review-graph: checking blast radius`
+   - `detect_changes` for risk-scored diff analysis → announce: `🚀 **code-review-graph** → analyzing changes for risk`
+   - `get_review_context(changes="<diff>")` for token-efficient review snippets → announce: `🚀 **code-review-graph** → generating review context`
+   - `get_impact_radius(target="<changed_module>")` for blast-radius detection → announce: `🚀 **code-review-graph** → checking blast radius`
 3. For trivial one-file sanity checks, a fast local diff read may be enough; keep CRG for cases where graph context adds real value.
 4. For PR review with `--standard` or `--deep`, inspect repository-native review comments, CI status, and merge blockers if available; keep this command focused on findings rather than platform automation.
 5. Review for correctness, regressions, security, and maintainability.
@@ -39,7 +39,7 @@ Shared policy: mode mapping and security gate come from `SKILL.md`; escalation r
    - `/tool-refactor` for cleanup or structure issues
    - `/tool-feat` for missing behavior or acceptance gaps
 7. Re-run the same or stronger review mode after changes until findings are resolved or explicitly accepted.
-8. Review findings may be captured by claude-mem when cross-session pattern detection is useful. → announce: `🔧 claude-mem: storing review findings`
+8. Review findings may be captured by claude-mem when cross-session pattern detection is useful. → announce: `🚀 **claude-mem** → storing review findings`
 
 ## Review Checklist
 

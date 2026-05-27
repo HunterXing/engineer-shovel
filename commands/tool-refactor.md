@@ -26,12 +26,12 @@ Shared policy: mode mapping, security gate, and completion behavior come from `S
 
 ## Flow
 
-1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites. → announce: `🔧 rtk: wrapping baseline test output`
-2. Search claude-mem for prior refactor rationale when historical decisions or naming context matter. → announce: `🔧 claude-mem: searching for prior refactor context`
+1. Run baseline tests before any edits. Wrap with `rtk gain` for large suites. → announce: `🚀 **rtk** → wrapping baseline test output`
+2. Search claude-mem for prior refactor rationale when historical decisions or naming context matter. → announce: `🚀 **claude-mem** → searching for prior refactor context`
 3. Code-review-graph (L2, auto-refreshed) is the default structural aid for refactor work:
-   - `get_impact_radius(target="<function_or_module>")` → announce: `🔧 code-review-graph: analyzing impact radius`
-   - `refactor_tool` to check for dead code or plan renames safely → announce: `🔧 code-review-graph: checking for dead code`
-   - `semantic_search_nodes(query="<similar_pattern>")` → announce: `🔧 code-review-graph: finding similar patterns`
+   - `get_impact_radius(target="<function_or_module>")` → announce: `🚀 **code-review-graph** → analyzing impact radius`
+   - `refactor_tool` to check for dead code or plan renames safely → announce: `🚀 **code-review-graph** → checking for dead code`
+   - `semantic_search_nodes(query="<similar_pattern>")` → announce: `🚀 **code-review-graph** → finding similar patterns`
 4. Refactor one logical unit at a time.
 5. Re-run the same verification after each step.
 6. Compare behavior, public APIs, and performance-sensitive paths.

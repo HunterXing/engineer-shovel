@@ -35,13 +35,13 @@ Do not use this command as a generic clarification shell.
 
 ## Flow
 
-0. Record baseline: run `/caveman-stats` (L2) to capture session starting token count. → announce: `🔧 caveman: recording baseline stats`
+0. Record baseline: run `/caveman-stats` (L2) to capture session starting token count. → announce: `🚀 **caveman** → recording baseline stats`
    Before editing, verify you are not on `main`/`master`; if you are, run `/tool-branch create feat <description>` first.
 1. Explore the smallest useful context first:
    - search existing code for matching patterns before adding new structure
-   - use `semantic_search_nodes(query="<similar_feature_or_pattern>")` → announce: `🔧 code-review-graph: searching for similar patterns`
-   - use `query_graph(imports_of="<target_module>")` → announce: `🔧 code-review-graph: analyzing module dependencies`
-   - use `get_architecture_overview` only when module boundaries are still unclear → announce: `🔧 code-review-graph: generating architecture overview`
+   - use `semantic_search_nodes(query="<similar_feature_or_pattern>")` → announce: `🚀 **code-review-graph** → searching for similar patterns`
+   - use `query_graph(imports_of="<target_module>")` → announce: `🚀 **code-review-graph** → analyzing module dependencies`
+   - use `get_architecture_overview` only when module boundaries are still unclear → announce: `🚀 **code-review-graph** → generating architecture overview`
    If CRG MCP tools are unavailable in the current harness, use `code-review-graph` CLI or fall back to targeted Glob/Grep/Read.
 2. Default `--standard` path:
    - find an existing pattern
@@ -52,12 +52,12 @@ Do not use this command as a generic clarification shell.
 4. Escalate only by trigger:
    - decision needs evidence first -> `/tool-research`
    - durable acceptance or reviewable agreement -> OpenSpec
-   - framework/security/integration guidance -> ECC → announce: `🔧 ECC: loading <framework> guidance`
+   - framework/security/integration guidance -> ECC → announce: `🚀 **ECC** → loading <framework> guidance`
    - multi-phase or cross-session delivery -> GSD
 5. Do not run `openspec init` automatically from this command.
 6. Implement the smallest verifiable slice.
 7. Run diagnostics, related tests, typecheck/build, then `/tool-review --fast` for `--standard` work. Deep-mode verify/review/ship stays in the shared completion pipeline from `SKILL.md`.
-8. Run `/caveman-stats` (L2) to report session token consumption and savings. → announce: `🔧 caveman: reporting token stats`
+8. Run `/caveman-stats` (L2) to report session token consumption and savings. → announce: `🚀 **caveman** → reporting token stats`
 
 ## Error Handling
 
