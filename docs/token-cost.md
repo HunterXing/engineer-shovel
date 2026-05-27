@@ -9,6 +9,7 @@ Engineer Shovel uses cost-aware escalation: start cheap, verify, escalate only w
 3. Durable spec and deep review/orchestration paths (OpenSpec artifacts, `/tool-review --deep`, GSD phase execution).
 4. Multi-source research workflows.
 5. Loading broad skill sets for small tasks.
+6. **Repeated queries** — same impact/architecture queries in one session.
 
 ## Cost Tiers
 
@@ -40,6 +41,29 @@ RTK compresses Bash/tool outputs (git, tests, builds, logs) before they enter LL
 
 Use RTK for: git status/diff/log, test/build output, long directory listings, repeated logs/stack traces.
 
+## Cache Layer
+
+Cache reduces redundant queries within a session:
+
+| Operation | TTL | Token Savings |
+|-----------|-----|---------------|
+| `impact_radius` | 5 min | ~80% |
+| `architecture_overview` | 30 min | ~90% |
+| `test_coverage` | 10 min | ~70% |
+| `callers_of` | 5 min | ~80% |
+| `callees_of` | 5 min | ~80% |
+
+**Cache behavior**:
+- **Hit**: Use cached result, skip tool invocation → saves tokens
+- **Miss**: Query tool normally, cache result
+- **Stale**: TTL expired, re-query on next access
+- **Invalidated**: File changed, cache cleared
+
+**When to skip cache**:
+- First query after commit
+- Cross-session queries (use claude-mem instead)
+- When fresh data is critical
+
 ## Default Policy
 
 - Low-cost tools for small, deterministic work.
@@ -49,6 +73,32 @@ Use RTK for: git status/diff/log, test/build output, long directory listings, re
 - Targeted verification before broad review.
 - Caveman compression before escalating to broader agents.
 - RTK-wrapped shell output for noisy commands.
+- **Cache** repeated queries to save tokens.
+- **Smart mode** auto-detects complexity when mode not specified.
+
+## Smart Mode Recommendation
+
+When user doesn't specify a mode, auto-detect based on signals:
+
+| Signal | Recommended Mode | Token Impact |
+|--------|------------------|--------------|
+| Single file, obvious change | `--fast` | Lowest |
+| Multiple files, clear scope | `--standard` | Medium |
+| Cross-module, security, ambiguous | `--deep` | Higher |
+| Bug with clear repro | `--fast` | Lowest |
+| Bug without repro | `--standard` | Medium |
+| New feature, clear spec | `--standard` | Medium |
+| New feature, vague spec | `--deep` | Higher |
+
+**Auto-escalation triggers** (→ `--deep`):
+- Security-sensitive code
+- More than 5 files affected
+- Cross-module dependencies unclear
+
+**Auto-de-escalation triggers** (→ `--fast`):
+- Single file, obvious change
+- No dependencies affected
+- Clear verification path
 
 ## Practical Savings
 
@@ -61,5 +111,10 @@ Use upstream tools directly:
 - RTK statistics: `rtk gain --project --format json` (project), `rtk gain` (global), `rtk session` (adoption).
 - code-review-graph: `/tool-graph status`.
 - OpenSpec: `openspec --version`; initialize per project with `openspec init` only when specs are needed.
+- Cache: check cache hit rate with `/tool-graph status`.
 - RTK hook audit: `rtk hook-audit` (requires `RTK_HOOK_AUDIT=1`).
 - Avoid `rtk gain --history` (may panic on non-ASCII paths in RTK 0.37.2).
+
+---
+
+*Last updated: 2026-05-27 — v1.7.5*

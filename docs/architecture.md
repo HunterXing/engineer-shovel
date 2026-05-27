@@ -11,6 +11,7 @@ For a mode-first view of the same system, see [`docs/mode-routing.md`](mode-rout
 - Main workflow commands: `quick`, `fix`, `feat`, `plan`
 - Support commands: `review`, `refactor`, `research`
 - Platform commands: `branch`, `graph`, `update`
+- Reference commands: `alias` (command shortcuts)
 - Escalation layers: `superpowers`, `ECC`, `OpenSpec`, `GSD`
 
 The product promise is simple:
@@ -18,6 +19,7 @@ The product promise is simple:
 1. Pick the lightest command that matches the job.
 2. Stay in the main workflow layer unless a clear trigger forces escalation.
 3. Treat external systems as narrow capability layers, not default ceremony.
+4. Use aliases for faster entry: `/q`, `/f`, `/fe`, `/p`, `/r`, `/rf`, `/rs`, `/b`, `/g`, `/u`
 
 ### Scenario-First Routing
 
@@ -56,6 +58,11 @@ Layer 0: Compression (always-on)
   caveman → LLM output compression (lite/full/ultra — enforced by cost mode)
   rtk    → Tool output compression (rtk gain for large outputs only: builds, full suites, long logs)
 
+Layer 0.5: Cache (always-on)
+  impact_radius cache → 5min TTL, invalidated on commit
+  architecture_overview cache → 30min TTL, invalidated on file change
+  test_coverage cache → 10min TTL, invalidated on test file change
+
 Layer 1: Code Intelligence (default when useful)
   code-review-graph → semantic_search_nodes / query_graph / get_impact_radius
                       get_affected_flows / detect_changes / get_review_context
@@ -87,11 +94,14 @@ Layer 5: Project Orchestration (deep/milestone only)
 1. Escalate bottom-up — move up layers only when a clear trigger is present.
 2. Command first, layer second — choose `quick`/`fix`/`feat`/`plan` before thinking about OpenSpec, ECC, or GSD.
 3. Compression is always on — caveman manages LLM verbosity, rtk manages noisy tool output.
-4. Code intelligence is background support — use CRG when available, but keep `/tool-graph` as a diagnostic command.
-5. claude-mem persists cross-session context; it complements, not replaces, the router.
-6. OpenSpec stores durable agreement; ECC supplies specialized guidance; GSD handles multi-phase orchestration.
-7. Full install exposes capability; it does not imply full workflow on every task.
-8. Standard work should remain close to native implementation and verification.
+4. Cache is always on — repeated queries use cached results to save tokens.
+5. Code intelligence is background support — use CRG when available, but keep `/tool-graph` as a diagnostic command.
+6. claude-mem persists cross-session context; it complements, not replaces, the router.
+7. OpenSpec stores durable agreement; ECC supplies specialized guidance; GSD handles multi-phase orchestration.
+8. Full install exposes capability; it does not imply full workflow on every task.
+9. Standard work should remain close to native implementation and verification.
+10. Progressive disclosure — load only what's needed: Level 1 (lite), Level 2 (standard), Level 3 (full).
+11. Smart mode — auto-detect task complexity when mode not specified.
 
 ### Tool-Fit Rules
 
@@ -113,6 +123,7 @@ Layer 5: Project Orchestration (deep/milestone only)
 |------|------|----------------|------------|
 | **caveman** | LLM communication compression | Always on, tiered by mode | ~75% prompt reduction |
 | **rtk** | Tool output compression | `rtk gain` before test/build/git | Noisy output compression |
+| **cache** | Query result caching | Always on, TTL-based | ~80% reduction for repeated queries |
 | **code-review-graph** | Code knowledge graph | Git hooks auto-refresh, queried silently | Low (~100-500 tokens/query) |
 | **claude-mem** | Cross-session memory | Auto-capture via hooks, progressive disclosure | Very Low (~100 tokens/query) |
 | **superpowers** | Development methodology | Single-task method upgrade: clarify, debug, TDD, review discipline | Medium-High (multi-turn) |
@@ -228,5 +239,5 @@ RTK notes:
 
 ---
 
-*Based on claude-mem + OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK integration*
-*Last updated: 2026-05-10 — v1.7.3*
+*Based on claude-mem + OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK + Cache + Smart Mode integration*
+*Last updated: 2026-05-27 — v1.7.5*

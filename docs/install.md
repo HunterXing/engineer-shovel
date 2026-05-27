@@ -95,6 +95,7 @@ python3 scripts/sync.py check   # router files only
 python3 scripts/sync.py sync    # router files only
 python3 scripts/health.py check --target both --scope global
 python3 scripts/health.py repair --target both --scope global
+python3 scripts/startup-check.py  # quick health check on session start
 ```
 
 Responsibility split:
@@ -140,6 +141,56 @@ Dry-run note:
 - `--dry-run` preview recommended before bootstrapping unfamiliar machines.
 - Dependency lock strategy is documented in `docs/dependency-policy.md`.
 - Component strategy metadata is also recorded in `scripts/dependency_manifest.json` to reduce drift between docs and health reporting.
+
+## Configuration File
+
+Engineer Shovel supports a configuration file for version-controlled settings:
+
+```yaml
+# .engineer-shovel.yaml (project root or home directory)
+version: "1.7.5"
+defaults:
+  mode: standard
+  target: opencode
+  scope: global
+aliases:
+  q: quick
+  f: fix
+tools:
+  code-review-graph:
+    enabled: true
+    cache_ttl: 300
+cache:
+  enabled: true
+smart_mode:
+  enabled: true
+health_check:
+  on_startup: true
+```
+
+See `.engineer-shovel.yaml` in the repository root for the full template.
+
+## Startup Health Check
+
+On session start, run a quick health check:
+
+```bash
+python3 scripts/startup-check.py
+```
+
+Output:
+```
+🪖 Engineer Shovel — Health Check
+========================================
+✅ Caveman: installed
+✅ RTK: installed
+✅ Code Review Graph: installed
+⚠️ Superpowers: not configured
+⚠️ OpenSpec: not installed
+========================================
+📊 5/7 tools ready
+💡 Most tools ready. Use /tool-update --check for details.
+```
 
 ## Non-interactive Default
 

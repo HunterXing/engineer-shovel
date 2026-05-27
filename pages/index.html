@@ -34,7 +34,7 @@
 
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="hero">
-    <div class="hero-badge" data-i18n="hero.badge">v1.7.4 · MIT License</div>
+    <div class="hero-badge" data-i18n="hero.badge">v1.7.5 · MIT License</div>
     <h1 class="hero-title">
       <span class="hero-title-icon">🪖</span>
       <span class="hero-title-text">Engineer Shovel</span>
@@ -47,10 +47,10 @@
       <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
+      <div class="stat"><span class="stat-num">11</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
       <div class="stat"><span class="stat-num">8</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
-      <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
-      <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Cost Modes</span></div>
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.aliases">Aliases</span></div>
     </div>
     <div class="hero-terminal">
       <div class="terminal-bar">
@@ -115,7 +115,7 @@
   <!-- ===================== COMMANDS ===================== -->
   <section class="section" id="commands">
     <div class="section-header">
-      <h2 class="section-title" data-i18n="commands.title">10 Commands</h2>
+      <h2 class="section-title" data-i18n="commands.title">11 Commands</h2>
       <p class="section-sub" data-i18n="commands.sub">Choose commands by task type first. Main workflow commands handle most work; support and platform commands appear only when needed.</p>
     </div>
     <div class="commands-grid" id="commands-grid"></div>
@@ -185,6 +185,67 @@
       </div>
     </div>
     <p class="mode-note" data-i18n="modes.note">Special case: `/tool-research` uses `--quick / --web / --deep` because it routes by evidence source and research depth, not the main execution-cost axis.</p>
+  </section>
+
+  <!-- ===================== ALIASES ===================== -->
+  <section class="section section-dark" id="aliases">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="aliases.title">Command Aliases</h2>
+      <p class="section-sub" data-i18n="aliases.sub">Short aliases for faster workflow. Type less, do more.</p>
+    </div>
+    <div class="aliases-grid">
+      <div class="alias-item">
+        <code>/q</code>
+        <span>→</span>
+        <code>/tool-quick</code>
+      </div>
+      <div class="alias-item">
+        <code>/f</code>
+        <span>→</span>
+        <code>/tool-fix</code>
+      </div>
+      <div class="alias-item">
+        <code>/fe</code>
+        <span>→</span>
+        <code>/tool-feat</code>
+      </div>
+      <div class="alias-item">
+        <code>/p</code>
+        <span>→</span>
+        <code>/tool-plan</code>
+      </div>
+      <div class="alias-item">
+        <code>/r</code>
+        <span>→</span>
+        <code>/tool-review</code>
+      </div>
+      <div class="alias-item">
+        <code>/rf</code>
+        <span>→</span>
+        <code>/tool-refactor</code>
+      </div>
+      <div class="alias-item">
+        <code>/rs</code>
+        <span>→</span>
+        <code>/tool-research</code>
+      </div>
+      <div class="alias-item">
+        <code>/b</code>
+        <span>→</span>
+        <code>/tool-branch</code>
+      </div>
+      <div class="alias-item">
+        <code>/g</code>
+        <span>→</span>
+        <code>/tool-graph</code>
+      </div>
+      <div class="alias-item">
+        <code>/u</code>
+        <span>→</span>
+        <code>/tool-update</code>
+      </div>
+    </div>
+    <p class="alias-note" data-i18n="aliases.note">Cost mode shortcuts: <code>--f</code> = <code>--fast</code>, <code>--s</code> = <code>--standard</code>, <code>--d</code> = <code>--deep</code></p>
   </section>
 
   <!-- ===================== QUICK START ===================== -->
@@ -367,11 +428,14 @@ skill(name="engineer-shovel")
     <div class="boundary-layout">
       <div class="boundary-core">
         <h3 class="boundary-title" data-i18n="boundary.core.title">Native Install (Minimal)</h3>
-        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 10 active /tool-* commands plus legacy redirects.</p>
+        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 11 active /tool-* commands plus legacy redirects.</p>
         <div class="boundary-list">
           <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.1">Lightweight SKILL.md router</span></div>
-          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">10 active /tool-* commands</span></div>
-          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.3">install.sh installer</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">11 active /tool-* commands</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.3">10 command aliases (/q, /f, /fe, etc.)</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.4">install.sh installer</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.5">Startup health check</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.6">Configuration file support</span></div>
         </div>
       </div>
       <div class="boundary-arrow">
@@ -399,7 +463,7 @@ skill(name="engineer-shovel")
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-logo">🪖 Engineer Shovel</span>
-        <span class="footer-version">v1.7.4 · MIT License</span>
+        <span class="footer-version">v1.7.5 · MIT License</span>
       </div>
       <div class="footer-links">
         <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>

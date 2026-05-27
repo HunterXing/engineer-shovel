@@ -2,6 +2,25 @@
 
 Engineer Shovel works best when you route by engineering scenario first, then add capability layers only when they solve a real problem.
 
+## Quick Reference with Aliases
+
+| Scenario | Full Command | Alias | Example |
+|----------|--------------|-------|---------|
+| Small obvious edit | `/tool-quick` | `/q` | `/q "fix typo"` |
+| Reproducible bug | `/tool-fix` | `/f` | `/f --s "login bug"` |
+| Clear feature slice | `/tool-feat` | `/fe` | `/fe "dark mode"` |
+| Unclear scope/order | `/tool-plan` | `/p` | `/p --d "refactor auth"` |
+| Code review | `/tool-review` | `/r` | `/r` |
+| Refactoring | `/tool-refactor` | `/rf` | `/rf "clean utils"` |
+| Decision needs evidence | `/tool-research` | `/rs` | `/rs --web "compare X"` |
+| Branch management | `/tool-branch` | `/b` | `/b create feat add-login` |
+| Graph diagnostics | `/tool-graph` | `/g` | `/g status` |
+| Sync & update | `/tool-update` | `/u` | `/u --check` |
+
+Cost mode shortcuts: `--f` = `--fast`, `--s` = `--standard`, `--d` = `--deep`
+
+---
+
 ## Small Obvious Edit
 
 - Start with: `/tool-quick`
