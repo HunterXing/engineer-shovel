@@ -1,107 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Engineer Shovel</title>
-<style>
-:root {
-  --bg: #080c14;
-  --card: #111827;
-  --border: #1e2d4a;
-  --text: #e8edf5;
-  --muted: #8b9dc4;
-  --accent: #4f8ef7;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-.container {
-  max-width: 640px;
-  text-align: center;
-}
-.logo { font-size: 3rem; margin-bottom: 0.5rem; }
-h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-.tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 0.75rem; }
-.ver { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
-.links {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 2.5rem;
-}
-.links a {
-  color: var(--accent);
-  text-decoration: none;
-  border: 1px solid var(--border);
-  padding: 0.5rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: background 0.15s, border-color 0.15s;
-}
-.links a:hover { background: var(--card); border-color: var(--accent); }
-.cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  text-align: left;
-}
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-}
-.card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
-.card p { font-size: 0.8rem; color: var(--muted); }
-@media (max-width: 480px) {
-  .cards { grid-template-columns: 1fr; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineer Shovel — Lightweight AI Dev Workflow Router</title>
+  <meta name="description" content="Lightweight workflow router for OpenCode / Claude Code. Start with quick, fix, feat, or plan. Use review and research as support routes, and upgrade to external capability layers only when needed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-<div class="container">
-  <div class="logo">&#x1FA2E;</div>
-  <h1>Engineer Shovel</h1>
-  <p class="tagline">Lightweight AI development workflow router for OpenCode / Claude Code</p>
-  <p class="ver">v1.7.4 &middot; MIT License</p>
+  <canvas id="bg-canvas"></canvas>
 
-  <div class="links">
-    <a href="https://github.com/HunterXing/engineer-shovel">GitHub</a>
-    <a href="https://github.com/HunterXing/engineer-shovel#readme">README</a>
-    <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/install.md">Install</a>
-    <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/architecture.md">Architecture</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <span class="nav-logo">🪖 Engineer Shovel</span>
+      <div class="nav-links">
+        <a href="#commands" data-i18n="nav.commands">Commands</a>
+        <a href="#cost-modes" data-i18n="nav.modes">Cost Modes</a>
+        <a href="#quickstart" data-i18n="nav.start">Quick Start</a>
+        <a href="#upstream" data-i18n="nav.upstream">Upstream</a>
+        <div class="lang-toggle" id="lang-toggle">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="zh">中文</button>
+        </div>
+        <a href="https://github.com/HunterXing/engineer-shovel" target="_blank" class="nav-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="hero">
+    <div class="hero-badge" data-i18n="hero.badge">v1.7.3 · MIT License</div>
+    <h1 class="hero-title">
+      <span class="hero-title-icon">🪖</span>
+      <span class="hero-title-text">Engineer Shovel</span>
+    </h1>
+    <p class="hero-subtitle" data-i18n="hero.subtitle">Lightweight AI development workflow router for OpenCode / Claude Code</p>
+    <p class="hero-desc" data-i18n="hero.desc">Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.</p>
+    <p class="hero-note" data-i18n="hero.note">Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.</p>
+    <div class="hero-actions">
+      <a href="#quickstart" class="btn btn-primary" data-i18n="hero.btn.start">Quick Start</a>
+      <a href="#commands" class="btn btn-secondary" data-i18n="hero.btn.commands">View Commands</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label" data-i18n="hero.stats.commands">Commands</span></div>
+      <div class="stat"><span class="stat-num">8</span><span class="stat-label" data-i18n="hero.stats.tools">Upstream Tools</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label" data-i18n="hero.stats.modes">Install Modes</span></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label" data-i18n="hero.stats.langs">Languages</span></div>
+    </div>
+    <div class="scroll-hint" id="scroll-hint">
+      <span data-i18n="hero.scroll">Scroll to explore</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </section>
+
+  <!-- ===================== ROUTE PICKER ===================== -->
+  <section class="section" id="route-picker">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="picker.title">Choose Your Route</h2>
+      <p class="section-sub" data-i18n="picker.sub">Route by engineering scenario first. Use this visual picker when you want the fastest path into the right command.</p>
+    </div>
+    <div class="route-picker-grid">
+      <button class="route-card" data-command="/tool-quick">
+        <span class="route-label" data-i18n="picker.quick.label">Small obvious edit</span>
+        <span class="route-command">/tool-quick</span>
+        <span class="route-desc" data-i18n="picker.quick.desc">Typos, tiny config edits, 1-2 file surgical changes.</span>
+      </button>
+      <button class="route-card" data-command="/tool-fix">
+        <span class="route-label" data-i18n="picker.fix.label">Bug or regression</span>
+        <span class="route-command">/tool-fix</span>
+        <span class="route-desc" data-i18n="picker.fix.desc">Broken behavior, failing tests, logs, or regressions.</span>
+      </button>
+      <button class="route-card" data-command="/tool-feat">
+        <span class="route-label" data-i18n="picker.feat.label">New behavior to build</span>
+        <span class="route-command">/tool-feat</span>
+        <span class="route-desc" data-i18n="picker.feat.desc">Add the smallest verifiable feature slice once the goal is clear.</span>
+      </button>
+      <button class="route-card" data-command="/tool-plan">
+        <span class="route-label" data-i18n="picker.plan.label">Scope or order unclear</span>
+        <span class="route-command">/tool-plan</span>
+        <span class="route-desc" data-i18n="picker.plan.desc">Use when execution is blocked by unclear scope, ownership, order, or acceptance.</span>
+      </button>
+      <button class="route-card" data-command="/tool-review">
+        <span class="route-label" data-i18n="picker.review.label">Review is the task</span>
+        <span class="route-command">/tool-review</span>
+        <span class="route-desc" data-i18n="picker.review.desc">Use when you need findings on a diff, PR, or implementation.</span>
+      </button>
+      <button class="route-card" data-command="/tool-research">
+        <span class="route-label" data-i18n="picker.research.label">Decision needs evidence</span>
+        <span class="route-command">/tool-research</span>
+        <span class="route-desc" data-i18n="picker.research.desc">Gather local, web, or deep evidence before planning or implementation.</span>
+      </button>
+    </div>
+    <p class="route-picker-note" data-i18n="picker.note">Platform operations still live in `/tool-branch`, `/tool-graph`, and `/tool-update`.</p>
+  </section>
+
+  <!-- ===================== COMMANDS ===================== -->
+  <section class="section" id="commands">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="commands.title">10 Commands</h2>
+      <p class="section-sub" data-i18n="commands.sub">Choose commands by task type first. Main workflow commands handle most work; support and platform commands appear only when needed.</p>
+    </div>
+    <div class="commands-grid" id="commands-grid"></div>
+  </section>
+
+  <!-- ===================== COST MODES ===================== -->
+  <section class="section section-dark" id="cost-modes">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="modes.title">Cost Modes</h2>
+      <p class="section-sub" data-i18n="modes.sub">Choose the mode matching task complexity. Default: cheapest mode that still verifies.</p>
+    </div>
+    <div class="modes-grid">
+      <div class="mode-card" data-mode="fast">
+        <div class="mode-card-header">
+          <span class="mode-label mode-fast">--fast</span>
+          <span class="mode-title" data-i18n="modes.fast.title">Low risk · Clear scope</span>
+        </div>
+        <ul class="mode-list">
+          <li data-i18n="modes.fast.1">Typo fixes</li>
+          <li data-i18n="modes.fast.2">1-2 file edits</li>
+          <li data-i18n="modes.fast.3">Known-location config changes</li>
+        </ul>
+        <div class="mode-tools">
+          <span class="tool-tag">/caveman lite</span>
+          <span class="tool-tag">CRG search</span>
+          <span class="tool-tag">mem capture</span>
+          <span class="tool-tag">skip RTK</span>
+        </div>
+      </div>
+      <div class="mode-card" data-mode="standard">
+        <div class="mode-card-header">
+          <span class="mode-label mode-standard">--standard</span>
+          <span class="mode-title" data-i18n="modes.standard.title">Normal development</span>
+        </div>
+        <ul class="mode-list">
+          <li data-i18n="modes.standard.1">New feature implementation</li>
+          <li data-i18n="modes.standard.2">Medium refactoring</li>
+          <li data-i18n="modes.standard.3">Local diff review</li>
+        </ul>
+        <div class="mode-tools">
+          <span class="tool-tag">/caveman full</span>
+          <span class="tool-tag">CRG trace</span>
+          <span class="tool-tag">mem search</span>
+          <span class="tool-tag">RTK (large)</span>
+          <span class="tool-tag">OpenSpec optional</span>
+          <span class="tool-tag">light review</span>
+        </div>
+      </div>
+      <div class="mode-card" data-mode="deep">
+        <div class="mode-card-header">
+          <span class="mode-label mode-deep">--deep</span>
+          <span class="mode-title" data-i18n="modes.deep.title">High risk · Cross-system · Ambiguous</span>
+        </div>
+        <ul class="mode-list">
+          <li data-i18n="modes.deep.1">Architecture decisions</li>
+          <li data-i18n="modes.deep.2">Cross-module debugging</li>
+          <li data-i18n="modes.deep.3">Deep research</li>
+        </ul>
+        <div class="mode-tools">
+          <span class="tool-tag">/caveman ultra</span>
+          <span class="tool-tag">CRG arch</span>
+          <span class="tool-tag">mem search</span>
+          <span class="tool-tag">OpenSpec/spec plan</span>
+          <span class="tool-tag">GSD pipeline</span>
+          <span class="tool-tag">deep review</span>
+        </div>
+      </div>
+    </div>
+    <p class="mode-note" data-i18n="modes.note">Special case: `/tool-research` uses `--quick / --web / --deep` because it routes by evidence source and research depth, not the main execution-cost axis.</p>
+  </section>
+
+  <!-- ===================== QUICK START ===================== -->
+  <section class="section" id="quickstart">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="start.title">Quick Start</h2>
+      <p class="section-sub" data-i18n="start.sub">Download → Inspect → Run. Three steps to ready.</p>
+    </div>
+    <div class="steps-container">
+      <div class="step-item" data-step="1">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3 class="step-title" data-i18n="start.step1.title">Download Installer</h3>
+          <p class="step-desc" data-i18n="start.step1.desc">Download first, inspect the content, then run. Default: full install all components.</p>
+          <div class="code-block">
+            <div class="code-lang">bash</div>
+            <pre><code>curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
+less install.sh</code></pre>
+            <button class="copy-btn" data-copy="curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
+less install.sh">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="step-item" data-step="2">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3 class="step-title" data-i18n="start.step2.title">Choose Install Mode</h3>
+          <p class="step-desc" data-i18n="start.step2.desc">Supports OpenCode / Claude Code. Recommended installs the core stack; full adds ECC and GSD.</p>
+          <div class="code-block">
+            <div class="code-lang">bash</div>
+            <pre><code># OpenCode full install (default)
+bash install.sh --target opencode
+
+# Core stack: Caveman + RTK + CRG + superpowers + OpenSpec
+bash install.sh --target opencode --recommended
+
+# Skill + commands only
+bash install.sh --target opencode --minimal
+
+# Install for both OpenCode and Claude Code
+bash install.sh --target all</code></pre>
+            <button class="copy-btn" data-copy="bash install.sh --target opencode
+bash install.sh --target opencode --recommended
+bash install.sh --target opencode --minimal
+bash install.sh --target all">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="step-item" data-step="3">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3 class="step-title" data-i18n="start.step3.title">Start Using</h3>
+          <p class="step-desc" data-i18n="start.step3.desc">Load the skill in session or call commands directly. Start with the main workflow commands before reaching for support or platform routes.</p>
+          <div class="code-block">
+            <div class="code-lang">text</div>
+            <pre><code># Load skill
+skill(name="engineer-shovel")
+
+# Or call commands directly
+/tool-quick --fast "fix a README typo"
+/tool-fix --standard "investigate failing login test"
+/tool-plan --standard "plan rollout for X"
+/tool-research --quick "compare local patterns for X"</code></pre>
+            <button class="copy-btn" data-copy="skill(name=&quot;engineer-shovel&quot;)
+
+/tool-quick --fast &quot;fix a README typo&quot;
+/tool-fix --standard &quot;investigate failing login test&quot;
+/tool-plan --standard &quot;plan rollout for X&quot;
+/tool-research --quick &quot;compare local patterns for X&quot;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== UPSTREAM ===================== -->
+  <section class="section section-dark" id="upstream">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="upstream.title">Upstream Tools</h2>
+      <p class="section-sub" data-i18n="upstream.sub">Recommended mode installs the core stack. Full mode adds ECC and GSD for deep orchestration.</p>
+    </div>
+    <div class="upstream-table">
+      <div class="ut-header">
+        <span data-i18n="upstream.col.tool">Tool</span>
+        <span data-i18n="upstream.col.ver">Version</span>
+        <span data-i18n="upstream.col.role">Role</span>
+      </div>
+      <div class="ut-row" data-tool="OpenSpec">
+        <span class="ut-name">OpenSpec</span>
+        <span class="ut-ver">latest</span>
+        <span class="ut-desc" data-i18n="upstream.openspec">Spec-driven artifacts: proposal, specs, design, tasks, verify, archive. CLI installed; project init stays explicit.</span>
+      </div>
+      <div class="ut-row" data-tool="ECC">
+        <span class="ut-name">ECC</span>
+        <span class="ut-ver">v1.10.0</span>
+        <span class="ut-desc" data-i18n="upstream.ecc">On-demand capability guidance: architecture tradeoffs, security-focused research, integration patterns, and specialized workflows.</span>
+      </div>
+      <div class="ut-row" data-tool="GSD">
+        <span class="ut-name">GSD</span>
+        <span class="ut-ver">v1.39.0</span>
+        <span class="ut-desc" data-i18n="upstream.gsd">Deep project orchestration: phase execution, structured verification pipeline (verify-work → code-review → ship)</span>
+      </div>
+      <div class="ut-row" data-tool="superpowers">
+        <span class="ut-name">superpowers</span>
+        <span class="ut-ver">v5.0.7</span>
+        <span class="ut-desc" data-i18n="upstream.sp">Method layer for clarification, TDD, debugging, and verification discipline.</span>
+      </div>
+      <div class="ut-row" data-tool="code-review-graph">
+        <span class="ut-name">code-review-graph</span>
+        <span class="ut-ver">v2.3.2</span>
+        <span class="ut-desc" data-i18n="upstream.crg">Local code knowledge graph, MCP review context, impact analysis</span>
+      </div>
+      <div class="ut-row" data-tool="claude-mem">
+        <span class="ut-name">claude-mem</span>
+        <span class="ut-ver">v12.6.0</span>
+        <span class="ut-desc" data-i18n="upstream.cmem">Auto-capture cross-session memory: decisions, preferences, bug history. Progressive disclosure (search → timeline → get_observations). SQLite + Chroma.</span>
+      </div>
+      <div class="ut-row" data-tool="Caveman">
+        <span class="ut-name">Caveman</span>
+        <span class="ut-ver">v1.7.0</span>
+        <span class="ut-desc" data-i18n="upstream.caveman">LLM output token compression with enforced 3-tier mode mapping (lite/full/ultra per cost mode)</span>
+      </div>
+      <div class="ut-row" data-tool="RTK">
+        <span class="ut-name">RTK</span>
+        <span class="ut-ver">v0.38.0</span>
+        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression with smart trigger (output >500 lines only)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CAPABILITY BOUNDARY ===================== -->
+  <section class="section" id="capability-boundary">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="boundary.title">Capability Boundary</h2>
+    </div>
+    <div class="boundary-layout">
+      <div class="boundary-core">
+        <h3 class="boundary-title" data-i18n="boundary.core.title">Native Install (Minimal)</h3>
+        <p class="boundary-desc" data-i18n="boundary.core.desc">Engineer Shovel ships the lightweight router and 10 active /tool-* commands plus legacy redirects.</p>
+        <div class="boundary-list">
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.1">Lightweight SKILL.md router</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.2">10 active /tool-* commands</span></div>
+          <div class="b-item"><span class="b-dot b-native"></span><span data-i18n="boundary.core.3">install.sh installer</span></div>
+        </div>
+      </div>
+      <div class="boundary-arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="boundary-ext">
+        <h3 class="boundary-title" data-i18n="boundary.ext.title">Optional External Tools (recommended / full)</h3>
+        <p class="boundary-desc" data-i18n="boundary.ext.desc">Deeper capabilities come from optional external tools configured by recommended / full mode.</p>
+        <div class="boundary-list">
+          <div class="b-item"><span class="b-dot b-ext"></span>OpenSpec — Durable spec artifacts</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>ECC — On-demand capability library</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>GSD — Deep project orchestration</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>superpowers — Method and verification discipline</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>code-review-graph — Local code knowledge graph</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>claude-mem — Cross-session memory auto-capture</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>Caveman — Output token compression</div>
+          <div class="b-item"><span class="b-dot b-ext"></span>RTK — Shell output compression</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-logo">🪖 Engineer Shovel</span>
+        <span class="footer-version">v1.7.3 · MIT License</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/HunterXing/engineer-shovel" target="_blank">GitHub</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/architecture.md" target="_blank" data-i18n="footer.docs">Docs</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/install.md" target="_blank" data-i18n="footer.install">Install</a>
+        <a href="https://github.com/HunterXing/engineer-shovel/blob/main/docs/token-cost.md" target="_blank" data-i18n="footer.cost">Cost Model</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== WORKFLOW MODAL ===================== -->
+  <div class="wf-modal" id="wf-modal">
+    <div class="wf-modal-backdrop" id="wf-modal-backdrop"></div>
+    <div class="wf-modal-panel">
+      <div class="wf-modal-header">
+        <div class="wf-modal-title-row">
+          <span class="wf-modal-cmd" id="wf-modal-cmd"></span>
+          <span class="wf-modal-tag" id="wf-modal-tag"></span>
+        </div>
+        <button class="wf-modal-close" id="wf-modal-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="wf-modal-sub" id="wf-modal-sub"></p>
+      <div class="wf-modal-tools-row" id="wf-modal-tools"></div>
+      <div class="wf-modal-tabs" id="wf-modal-tabs"></div>
+      <div class="wf-modal-body" id="wf-modal-body"></div>
+    </div>
   </div>
 
-  <div class="cards">
-    <div class="card">
-      <h3>&#x1F525; Quick / Fix / Feat / Plan</h3>
-      <p>Main workflow commands for everyday engineering tasks.</p>
-    </div>
-    <div class="card">
-      <h3>&#x1F50D; Review / Refactor / Research</h3>
-      <p>Support commands for analysis and improvement.</p>
-    </div>
-    <div class="card">
-      <h3>&#x1F4E6; Branch / Graph / Update</h3>
-      <p>Platform operations for versioning, analysis, and maintenance.</p>
-    </div>
-    <div class="card">
-      <h3>&#x2699;&#xFE0F; Cost Modes</h3>
-      <p>--fast (low risk) / --standard (normal) / --deep (complex).</p>
-    </div>
-  </div>
-</div>
+  <script src="scripts/main.js"></script>
 </body>
 </html>
