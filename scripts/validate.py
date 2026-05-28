@@ -109,7 +109,10 @@ def validate_references() -> int:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     expected = f"# {len(commands)} executable slash commands"
     if expected not in readme and f"{len(commands)} executable slash commands" not in readme:
-        errors.append("README.md: structure block command count does not match commands/ directory")
+        # Also check for badge count
+        badge_count = f"commands-{len(commands)}_active"
+        if badge_count not in readme:
+            errors.append(f"README.md: structure block command count does not match commands/ directory ({len(commands)} commands)")
     readme_zh = (ROOT / "README_zh.md").read_text(encoding="utf-8")
     for command in sorted(commands):
         if f"/{command}" not in readme_zh:

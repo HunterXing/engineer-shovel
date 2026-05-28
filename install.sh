@@ -70,9 +70,13 @@ usage() {
   cat <<'USAGE'
 Usage: ./install.sh [--minimal|--recommended|--full] [--target opencode|claude|all|auto] [--scope global|local]
 
+One-click install:
+  bash install.sh --yes              # Full install for OpenCode, global scope (no prompts)
+  curl -fsSL <url>/install.sh | bash -s -- --yes
+
 Modes:
   --minimal      Install only engineer-shovel skill and slash commands.
-  --recommended Install skill, commands, Caveman, RTK, code-review-graph,
+  --recommended  Skill, commands, Caveman, RTK, code-review-graph,
                  superpowers, and OpenSpec.
   --full         Install recommended components plus ECC and GSD,
                   engineer-shovel skill, and commands.
@@ -92,6 +96,10 @@ Scope:
                   Default for non-interactive use.
   --scope local   Install to project directory (./.agents/skills, ./.opencode/, ./.claude/).
                   ECC skipped (no project-scope support). RTK is system-wide and stays global.
+
+Flags:
+  --yes, -y      Non-interactive: full install for OpenCode global (equivalent to
+                 --full --target opencode --scope global). Suppresses all prompts.
 
 When run in a terminal without explicit mode/target/scope, the installer prompts interactively
 in order: target → mode → scope.
@@ -141,6 +149,7 @@ parse_args() {
       --local) SCOPE="local"; SCOPE_SET=1 ;;
       --dry-run) DRY_RUN=1 ;;
       --with-graph-build) WITH_GRAPH_BUILD=1 ;;
+      --yes|-y) TARGET="opencode"; TARGET_SET=1; MODE="full"; MODE_SET=1; SCOPE="global"; SCOPE_SET=1 ;;
       -h|--help) usage; exit 0 ;;
       *) err "Unknown option: $1"; usage; exit 1 ;;
     esac
@@ -329,11 +338,14 @@ check_prereqs() {
 
   # Ensure pipx is available
   if ! command -v pipx >/dev/null 2>&1; then
+    # Add common paths before checking
+    export PATH="$HOME/.local/bin:$HOME/Library/Python/3.9/bin:$HOME/Library/Python/3.10/bin:$HOME/Library/Python/3.11/bin:$HOME/Library/Python/3.12/bin:$HOME/Library/Python/3.13/bin:$PATH"
+  fi
+  if ! command -v pipx >/dev/null 2>&1; then
     if command -v python3 >/dev/null 2>&1; then
       info "Installing pipx via pip..."
       if python3 -m pip install --user pipx 2>&1; then
         python3 -m pipx ensurepath 2>/dev/null || true
-        # Try to find pipx after install
         export PATH="$HOME/.local/bin:$PATH"
         if ! command -v pipx >/dev/null 2>&1; then
           warn "pipx installed but not in PATH. Add ~/.local/bin to your PATH."
@@ -454,7 +466,7 @@ install_skill() {
 install_commands() {
   local src_dir
   src_dir="$(dirname "$0")/commands"
-  local names=(branch feat fix plan refactor review quick research graph update)
+  local names=(branch feat fix plan refactor review quick research graph update alias)
   local count=0
 
   run_or_print mkdir -p "$COMMAND_DIR"
@@ -1305,7 +1317,7 @@ verify_install() {
   local missing_count=0
   [[ -s "$SKILL_DIR/engineer-shovel/SKILL.md" ]] || missing_count=1
 
-  local names=(branch feat fix plan refactor review quick research graph update)
+  local names=(branch feat fix plan refactor review quick research graph update alias)
   for name in "${names[@]}"; do
     [[ -s "$COMMAND_DIR/tool-${name}.md" ]] || missing_count=1
   done
@@ -1380,14 +1392,29 @@ main() {
   echo "║  🪖 Engineer Shovel v${VERSION} — Installation Complete          ║"
   echo "╚══════════════════════════════════════════════════════════════╝"
   echo ""
+  # Show installed version comparison
+  local installed_version=""
+  if [[ -f "$SKILL_DIR/engineer-shovel/SKILL.md" ]]; then
+    installed_version="$(grep -o 'version: "[^"]*"' "$SKILL_DIR/engineer-shovel/SKILL.md" 2>/dev/null | head -1 | sed 's/version: "//;s/"//' || true)"
+  fi
+
   ok "Next steps:"
   echo "  1. Restart your agent session (opencode or claude)"
   echo "  2. Load the skill: skill(name=\"engineer-shovel\")"
   echo "  3. Or run commands directly: /tool-quick, /tool-fix, /tool-feat, etc."
   echo ""
+
+  if [[ -n "$installed_version" && "$installed_version" != "$VERSION" ]]; then
+    info "Upgraded: v${installed_version} → v${VERSION}"
+    echo ""
+  fi
+
+  info "Upgrade later:"
+  echo "  bash install.sh --target opencode           # Re-run installer"
+  echo "  bash install.sh --yes                       # One-click upgrade (no prompts)"
+  echo ""
   info "Useful commands:"
   echo "  /tool-update --check    # Check installation status"
-  echo "  /tool-update --full     # Sync and repair components"
   echo "  /tool-graph status      # Check code-review-graph health"
   echo ""
 

@@ -16,7 +16,7 @@
   <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-  <img alt="Commands" src="https://img.shields.io/badge/commands-10_active-5865F2?style=flat-square">
+  <img alt="Commands" src="https://img.shields.io/badge/commands-11_active-5865F2?style=flat-square">
   <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
 </p>
@@ -71,7 +71,19 @@ Minimal 安装会刻意保持小而轻。如果某个流程提到 GSD、ECC、Ca
 
 ## 快速开始
 
-### macOS / Linux
+### 一键安装（推荐）
+
+```bash
+# macOS / Linux — 一行命令，无交互提示
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows PowerShell
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+这会为 OpenCode 全局安装完整栈（skill + 命令 + 所有可选组件），无需交互提示。
+
+### macOS / Linux（交互式）
 
 ```bash
 # 下载、检查、运行（默认：全量安装所有组件）
@@ -85,9 +97,6 @@ bash install.sh --target opencode
 # 非交互安装：同时安装到 OpenCode 和 Claude Code
 bash install.sh --target all
 
-# 如果你已经信任来源，也可以使用快捷方式：
-# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
-
 # 其他模式
 ./install.sh --target opencode --recommended  # 核心栈：Caveman、RTK、CRG、superpowers、OpenSpec
 ./install.sh --target opencode --minimal      # 只安装 Skill + 命令
@@ -97,7 +106,7 @@ bash install.sh --target all
 ### Windows（PowerShell 5+ / PowerShell Core）
 
 ```powershell
-# 下载并安装（默认：全量安装所有组件）
+# 交互式：全量安装所有组件
 powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)"
 
 # 指定参数
@@ -105,6 +114,20 @@ powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engin
 ```
 
 安装器会在 staging 可选依赖前校验外部仓库的 pinned SHA。相比直接 pipe 到 Bash，先下载再执行更安全，因为你可以检查脚本内容，也能避免服务端根据 pipe 场景返回不同内容。
+
+## 升级
+
+重新运行相同的安装命令即可升级到最新版本，已有文件会被安全覆盖。
+
+```bash
+# macOS / Linux — 一键升级
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+安装器会自动检测旧版本并显示版本变化（如 `Upgraded: v1.7.5 → v1.8.0`）。
 
 ## 兼容性说明
 

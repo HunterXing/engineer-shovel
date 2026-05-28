@@ -11,6 +11,11 @@ import shutil
 import sys
 from pathlib import Path
 
+# Ensure scripts directory is importable
+SCRIPTS_DIR = str(Path(__file__).resolve().parent)
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
+
 # Tool definitions: (name, check_command, display_name)
 TOOLS = [
     ("caveman", None, "Caveman"),

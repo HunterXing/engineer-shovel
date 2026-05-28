@@ -37,6 +37,20 @@ Minimal インストールは意図的に小さく保たれています。ワー
 
 ## クイックスタート
 
+### ワンクリックインストール（推奨）
+
+```bash
+# macOS / Linux — 1行、プロンプトなし
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows PowerShell
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+OpenCode 用のフルスタック（skill + コマンド + すべてのオプションコンポーネント）がインストールされます。プロンプトなし。
+
+### macOS / Linux（対話型）
+
 ```bash
 # ダウンロード，检查，実行（デフォルト：全コンポーネントのフルモード）
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
@@ -48,9 +62,6 @@ bash install.sh --target opencode
 
 # 非対話型：OpenCode と Claude Code の両方にインストール
 bash install.sh --target all
-
-# ソースをすでに信頼している場合のショートカット：
-# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # その他のモード
 ./install.sh --target opencode --recommended  # Core stack: Caveman + RTK + CRG + superpowers + OpenSpec

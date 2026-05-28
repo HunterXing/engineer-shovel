@@ -13,9 +13,16 @@ import hashlib
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
+from urllib.request import urlopen, Request
+from urllib.error import URLError
 
 ROOT = Path(__file__).resolve().parents[1]
+
+REPO_OWNER = "HunterXing"
+REPO_NAME = "engineer-shovel"
+RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/main"
 
 from paths import INSTALL_PATHS  # noqa: E402
 
@@ -42,7 +49,7 @@ TRACKED_FILES = {
     "skill": ["SKILL.md"],
     "commands": [f"tool-{name}.md" for name in [
         "branch", "feat", "fix", "plan", "refactor", "review",
-        "quick", "research", "graph", "update"
+        "quick", "research", "graph", "update", "alias"
     ]],
 }
 
@@ -81,6 +88,53 @@ def get_repo_files(file_type: str) -> list[Path]:
     if file_type == "commands":
         return sorted((ROOT / "commands").glob("tool-*.md"))
     return []
+
+
+def _is_git_repo() -> bool:
+    """Check if ROOT is inside a git repository."""
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False
+        )
+        return proc.returncode == 0
+    except (FileNotFoundError, OSError):
+        return False
+
+
+def _download_file(url: str) -> bytes | None:
+    """Download a file from URL. Returns bytes or None on failure."""
+    try:
+        req = Request(url, headers={"User-Agent": "engineer-shovel-sync"})
+        with urlopen(req, timeout=30) as resp:
+            return resp.read()
+    except (URLError, OSError, TimeoutError) as e:
+        print(f"  Warning: Could not download {url}: {e}")
+        return None
+
+
+def _download_remote_files(file_type: str, tmp_dir: Path) -> list[Path]:
+    """Download latest files from GitHub raw URL into tmp_dir. Returns list of paths."""
+    paths = []
+    if file_type == "skill":
+        for name in TRACKED_FILES["skill"]:
+            url = f"{RAW_BASE}/{name}"
+            content = _download_file(url)
+            if content:
+                out = tmp_dir / name
+                out.write_bytes(content)
+                paths.append(out)
+    elif file_type == "commands":
+        cmd_dir = tmp_dir / "commands"
+        cmd_dir.mkdir(exist_ok=True)
+        for name in TRACKED_FILES["commands"]:
+            url = f"{RAW_BASE}/commands/{name}"
+            content = _download_file(url)
+            if content:
+                out = cmd_dir / name
+                out.write_bytes(content)
+                paths.append(out)
+    return paths
 
 
 def compare_files(installed: list[Path], repo: list[Path]) -> dict:
@@ -239,7 +293,7 @@ def extract_version(skill_md_path: Path) -> str | None:
 
 
 def check_remote_updates() -> dict:
-    """Fetch from remote and check if local repo has newer commits available."""
+    """Check if local installation is behind remote. Works with or without git."""
     result = {
         "fetched": False,
         "behind": False,
@@ -247,43 +301,68 @@ def check_remote_updates() -> dict:
         "remote_version": None,
         "local_version": None,
         "error": None,
+        "has_git": False,
     }
 
-    result["local_version"] = extract_version(ROOT / "SKILL.md")
+    # Try git-based check first
+    if _is_git_repo():
+        result["has_git"] = True
+        result["local_version"] = extract_version(ROOT / "SKILL.md")
 
-    try:
-        proc = subprocess.run(
-            ["git", "fetch", "origin"],
-            cwd=str(ROOT), capture_output=True, text=True, check=False
-        )
-        if proc.returncode != 0:
-            result["error"] = f"git fetch failed: {proc.stderr.strip()}"
+        try:
+            proc = subprocess.run(
+                ["git", "fetch", "origin"],
+                cwd=str(ROOT), capture_output=True, text=True, check=False
+            )
+            if proc.returncode != 0:
+                result["error"] = f"git fetch failed: {proc.stderr.strip()}"
+                return result
+            result["fetched"] = True
+        except FileNotFoundError:
+            result["error"] = "git not found"
             return result
-        result["fetched"] = True
-    except FileNotFoundError:
-        result["error"] = "git not found"
-        return result
 
-    try:
-        upstream_ref = _get_upstream_ref()
-        proc = subprocess.run(
-            ["git", "rev-list", "--count", f"HEAD..{upstream_ref}"],
-            cwd=str(ROOT), capture_output=True, text=True, check=False
-        )
-        if proc.returncode == 0 and proc.stdout.strip().isdigit():
-            behind = int(proc.stdout.strip())
-            if behind > 0:
-                result["behind"] = True
-                result["behind_count"] = behind
+        try:
+            upstream_ref = _get_upstream_ref()
+            proc = subprocess.run(
+                ["git", "rev-list", "--count", f"HEAD..{upstream_ref}"],
+                cwd=str(ROOT), capture_output=True, text=True, check=False
+            )
+            if proc.returncode == 0 and proc.stdout.strip().isdigit():
+                behind = int(proc.stdout.strip())
+                if behind > 0:
+                    result["behind"] = True
+                    result["behind_count"] = behind
 
-                remote_skill = subprocess.run(
-                    ["git", "show", f"{upstream_ref}:SKILL.md"],
-                    cwd=str(ROOT), capture_output=True, text=True, check=False
-                )
-                if remote_skill.returncode == 0:
-                    result["remote_version"] = extract_version_str(remote_skill.stdout)
-    except Exception:
-        pass
+                    remote_skill = subprocess.run(
+                        ["git", "show", f"{upstream_ref}:SKILL.md"],
+                        cwd=str(ROOT), capture_output=True, text=True, check=False
+                    )
+                    if remote_skill.returncode == 0:
+                        result["remote_version"] = extract_version_str(remote_skill.stdout)
+        except Exception:
+            pass
+    else:
+        # No git repo — download SKILL.md from GitHub to check version
+        print("  No git repo found; checking remote version via GitHub...")
+        # Find installed SKILL.md
+        from paths import HOME
+        installed_skill = HOME / ".agents/skills/engineer-shovel/SKILL.md"
+        if not installed_skill.exists():
+            installed_skill = ROOT / "SKILL.md"
+        if installed_skill.exists():
+            result["local_version"] = extract_version(installed_skill)
+
+        remote_content = _download_file(f"{RAW_BASE}/SKILL.md")
+        if remote_content:
+            result["fetched"] = True
+            result["remote_version"] = extract_version_str(remote_content.decode("utf-8", errors="replace"))
+            if result["local_version"] and result["remote_version"]:
+                if result["local_version"] != result["remote_version"]:
+                    result["behind"] = True
+                    result["behind_count"] = 1  # unknown exact count
+        else:
+            result["error"] = "Could not fetch remote SKILL.md from GitHub"
 
     return result
 
@@ -406,8 +485,13 @@ def main() -> int:
     if args.command == "check":
         all_ok = True
         
-        if remote_status and remote_status["behind"]:
+        if remote_status and remote_status.get("error"):
+            print(f"  Remote check: {remote_status['error']}")
+        
+        if remote_status and remote_status.get("behind"):
             all_ok = False
+            if remote_status.get("remote_version"):
+                print(f"  Remote version: v{remote_status['remote_version']}")
         
         for target in targets:
             installed_version = extract_version(
@@ -434,7 +518,54 @@ def main() -> int:
             return 1
     
     elif args.command == "sync":
-        if remote_status and remote_status["behind"]:
+        use_download = remote_status and not remote_status.get("has_git", False)
+
+        if use_download:
+            # Path B: download from GitHub (no git repo)
+            if remote_status and remote_status.get("behind"):
+                print(f"\n⟳ Upgrading from v{remote_status['local_version']} to v{remote_status['remote_version']}...")
+            elif remote_status and remote_status.get("fetched"):
+                print(f"\n✔ Already up to date: v{remote_status['local_version']}")
+                if not args.skip_health:
+                    health_rc = run_health("sync", args.target, args.scope, dry_run=args.dry_run)
+                    return health_rc
+                return 0
+
+            total_updated = 0
+            with tempfile.TemporaryDirectory(prefix="es-sync-") as tmp:
+                tmp_dir = Path(tmp)
+                for target in targets:
+                    print(f"\nSyncing {target.upper()} ({args.scope})...")
+                    for file_type in ["skill", "commands"]:
+                        installed = get_installed_files(target, args.scope, file_type)
+                        remote = _download_remote_files(file_type, tmp_dir)
+                        if not remote:
+                            print(f"  Warning: Could not download {file_type} files")
+                            continue
+                        comparison = compare_files(installed, remote)
+                        updated = sync_files(comparison, target=target, scope=args.scope, dry_run=args.dry_run)
+                        total_updated += updated
+
+            if args.dry_run:
+                print(f"\nDRY-RUN: Would update {total_updated} file(s)")
+            else:
+                print(f"\n✔ Updated {total_updated} file(s)")
+                for target in targets:
+                    paths = INSTALL_PATHS[target][args.scope]
+                    skill_path = paths.get("skill")
+                    if skill_path:
+                        new_ver = extract_version(skill_path / "SKILL.md")
+                        if new_ver:
+                            print(f"  {target.upper()} now at v{new_ver}")
+
+            if not args.skip_health:
+                health_rc = run_health("sync", args.target, args.scope, dry_run=args.dry_run)
+                if health_rc != 0:
+                    return health_rc
+            return 0
+
+        # Path A: git-based sync
+        if remote_status and remote_status.get("behind"):
             print("\n⟳ Pulling latest from remote...")
             if not args.dry_run:
                 if pull_repo():
@@ -445,24 +576,24 @@ def main() -> int:
                     return 1
             else:
                 print("  DRY-RUN: Would pull latest from remote")
-        
+
         total_updated = 0
         for target in targets:
             print(f"\nSyncing {target.upper()} ({args.scope})...")
-            
+
             for file_type in ["skill", "commands"]:
                 installed = get_installed_files(target, args.scope, file_type)
                 repo = get_repo_files(file_type)
                 comparison = compare_files(installed, repo)
-                
+
                 updated = sync_files(comparison, target=target, scope=args.scope, dry_run=args.dry_run)
                 total_updated += updated
-        
+
         if args.dry_run:
             print(f"\nDRY-RUN: Would update {total_updated} file(s)")
         else:
             print(f"\n✔ Updated {total_updated} file(s)")
-            
+
             if total_updated > 0:
                 for target in targets:
                     new_ver = extract_version(
@@ -470,12 +601,12 @@ def main() -> int:
                     )
                     if new_ver:
                         print(f"  {target.upper()} now at v{new_ver}")
-        
+
         if not args.skip_health:
             health_rc = run_health("sync", args.target, args.scope, dry_run=args.dry_run)
             if health_rc != 0:
                 return health_rc
-        
+
         return 0
     
     return 0

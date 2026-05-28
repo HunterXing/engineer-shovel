@@ -37,6 +37,20 @@ Minimal 설치는 의도적으로 작게 유지됩니다. 워크플로에서 GSD
 
 ## 빠른 시작
 
+### 원클릭 설치 (권장)
+
+```bash
+# macOS / Linux — 한 줄, 프롬프트 없음
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows PowerShell
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+OpenCode용 전체 스택(skill + 명령 + 모든 선택적 구성요소)이 설치됩니다. 프롬프트 없음.
+
+### macOS / Linux (대화형)
+
 ```bash
 # 다운로드, 검사, 실행(기본: 모든 구성요소의 전체 모드)
 curl -fsSL -o install.sh https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh
@@ -48,9 +62,6 @@ bash install.sh --target opencode
 
 # 비대화형: OpenCode 및 Claude Code 모두에 설치
 bash install.sh --target all
-
-# 이미 소스를 신뢰하는 경우 바로가기:
-# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
 
 # 기타 모드
 ./install.sh --target opencode --recommended  # Core stack: Caveman + RTK + CRG + superpowers + OpenSpec

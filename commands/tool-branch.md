@@ -62,6 +62,13 @@ Run `scripts/branch-workflow.sh` with the subcommand:
 bash scripts/branch-workflow.sh <subcommand> [args...]
 ```
 
+Subcommand details:
+- `create [type] <description>` — Create feature branch (type auto-detected from description)
+- `status` — Show branch info and diff stats
+- `review` — Show full diff for review
+- `merge [commit-message]` — Squash merge to source (commit message optional, defaults to prompt or auto-generated)
+- `abort [--force]` — Abandon branch and return to source (`--force` skips confirmation prompt, useful for non-interactive/agent use)
+
 ## Compression
 
 Use `/caveman lite` (L2) for branch operations output (per SKILL.md mapping for `--fast`-equivalent operations). Use `/caveman-commit` (L2) for merge commit messages.

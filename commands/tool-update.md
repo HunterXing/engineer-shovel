@@ -31,18 +31,36 @@ Single user-facing entry point for keeping Engineer Shovel current. It checks ro
 
 ## Flow
 
-1. Detect installed locations based on target(s) and scope.
-2. Compare local installed router files (`SKILL.md`, `/tool-*`) with latest repo versions.
-3. Report router drift explicitly as: current, missing, outdated, or extra.
-4. Check component health for base tools and recommended/full integrations.
+### Router Sync (step 1-3)
+
+There are two sync paths depending on the installation method:
+
+**Path A: Git-based sync** (developer install, has `.git`)
+1. Run `python3 scripts/sync.py check --target <target> --scope <scope>` to detect drift.
+2. If `--full`: run `python3 scripts/sync.py sync --target <target> --scope <scope>` to update files.
+
+**Path B: Direct download sync** (normal user install via `curl | bash`, no `.git`)
+1. Detect installed skill file: `~/.agents/skills/engineer-shovel/SKILL.md` (global) or `./.agents/skills/engineer-shovel/SKILL.md` (local).
+2. Read installed version from the `version:` field in SKILL.md frontmatter.
+3. Fetch latest version: `curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/SKILL.md` — extract version from frontmatter.
+4. If versions differ (or `--full`): download each file from GitHub raw URL and overwrite installed files:
+   - `SKILL.md` → skill directory
+   - `commands/tool-{branch,feat,fix,plan,refactor,review,quick,research,graph,update,alias}.md` → commands directory
+5. Report: `Upgraded: v<old> → v<new>` or `Already up to date: v<current>`.
+
+**Fallback**: If Path A fails (no git, scripts missing), automatically use Path B.
+
+### Component Health (step 4-7)
+
+6. Check component health for base tools and recommended/full integrations.
    - When checking each component, announce: `🚀 **<component>** → checking health`
-5. Classify component results as:
+7. Classify component results as:
    - repairable automatically
    - blocked by scope/runtime/platform limits
    - manual upgrade recommended
-6. If `--full`: sync router files first, then repair missing or unconfigured components.
+8. If `--full`: repair missing or unconfigured components.
    - When repairing, announce: `🚀 **<component>** → repairing...`
-7. Verify router integrity and component health after update.
+9. Verify router integrity and component health after update.
 
 ### Toolchain Announcements
 
@@ -127,6 +145,7 @@ When automatic repair is not supported, say that directly and report the manual 
 - Remember this command as the only update entry point.
 - Use `--check` for status, drift, and repair guidance.
 - Use `--full` when you want router sync plus component repair/upgrade in one pass.
+- Works for both git-based installs (developers) and curl-based installs (normal users). Path A uses `scripts/sync.py`; Path B downloads directly from GitHub.
 - The underlying scripts present one mental model: router layer first, component layer second, with scope called out explicitly.
 
 ## Compression

@@ -11,6 +11,7 @@ param(
   [string]$Scope = "global",
   [switch]$DryRun = $false,
   [switch]$WithGraphBuild = $false,
+  [switch]$Yes = $false,
   [switch]$Help = $false
 )
 
@@ -117,7 +118,7 @@ function Install-Skill {
 
 function Install-Commands {
   param([string]$cmdDir)
-  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update")
+  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update","alias")
   if ($DryRun) { Info "DRY-RUN: install commands -> $cmdDir"; return }
   New-Item -ItemType Directory -Force -Path $cmdDir | Out-Null
   $count = 0
@@ -467,7 +468,7 @@ function Verify-Install {
   if ($DryRun) { Ok "Dry-run completed"; return }
   $missing = 0
   if (-not (Test-Path (Join-Path $SKILL_DIR "engineer-shovel\SKILL.md"))) { $missing = 1 }
-  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update")
+  $names = @("branch","feat","fix","plan","refactor","review","quick","research","graph","update","alias")
   foreach ($name in $names) {
     if (-not (Test-Path (Join-Path $COMMAND_DIR "tool-${name}.md"))) { $missing = 1 }
   }
@@ -480,7 +481,10 @@ function Verify-Install {
 function Main {
   if ($Help) {
     @"
-Usage: install.ps1 [-Mode minimal|recommended|full] [-Target opencode|claude|all|auto] [-Scope global|local] [-DryRun] [-WithGraphBuild]
+Usage: install.ps1 [-Mode minimal|recommended|full] [-Target opencode|claude|all|auto] [-Scope global|local] [-DryRun] [-WithGraphBuild] [-Yes]
+
+One-click install:
+  powershell -c "iex (iwr -useb <url>/install.ps1)" -- -Yes
 
 Modes:
   --minimal      Skill + commands only
@@ -488,8 +492,16 @@ Modes:
   --full         Recommended + ECC + GSD (default)
   --dry-run      Preview without installing
   --with-graph-build  Build initial code-review-graph index
+  --yes          Non-interactive: full install for OpenCode global (no prompts)
 "@ | Out-Host
     return
+  }
+
+  # --yes flag: non-interactive full install for OpenCode
+  if ($Yes) {
+    $script:Mode = "full"
+    $script:Target = "opencode"
+    $script:Scope = "global"
   }
 
   Check-Prereqs
@@ -499,6 +511,7 @@ Modes:
   # Install components by mode
   switch ($Mode) {
     "minimal" { # no extras
+    }
     "recommended" {
       Install-Superpowers $script:TARGETS
       Install-CodeReviewGraph

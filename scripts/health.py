@@ -533,16 +533,14 @@ Follow its instructions exactly.
 
 
 def repair_caveman(runner: CommandRunner, targets: list[str]) -> None:
-    command = ["bash", "-lc", "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash"]
-    if len(targets) == 1:
-        agent = "opencode" if targets[0] == "opencode" else "claude"
-        command = ["bash", "-lc", f"curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash -s -- --only {agent}"]
-    runner.run(command)
+    for target in targets:
+        agent = "opencode" if target == "opencode" else "claude"
+        runner.run(["bash", "-lc", f"curl -fsSL --retry 3 --retry-delay 2 --max-time 120 https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash -s -- --only {agent}"])
 
 
 def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
     if not which("rtk"):
-        runner.run(["bash", "-lc", "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"])
+        runner.run(["bash", "-lc", "curl -fsSL --retry 3 --retry-delay 2 --max-time 120 https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"])
     for target in targets:
         if target == "opencode":
             runner.run(["rtk", "init", "-g", "--opencode"])
@@ -553,7 +551,7 @@ def repair_rtk(runner: CommandRunner, targets: list[str]) -> None:
 def repair_claude_mem(runner: CommandRunner, targets: list[str]) -> None:
     # Auto-install Bun if missing
     if not which("bun"):
-        runner.run(["bash", "-lc", "curl -fsSL https://bun.sh/install | bash"])
+        runner.run(["bash", "-lc", "curl -fsSL --retry 3 --retry-delay 2 --max-time 60 https://bun.sh/install | bash"])
     for target in targets:
         ide = "opencode" if target == "opencode" else "claude"
         runner.run(["npx", "-y", "claude-mem", "install", "--ide", ide])
@@ -647,6 +645,9 @@ def _repair_args(comp: ComponentDef, targets: list[str], runner: CommandRunner, 
 
 
 def check_components(targets: list[str], runner: CommandRunner, scope: str) -> list[CheckResult]:
+    # Normalize: ensure targets is always a list of strings
+    if isinstance(targets, str):
+        targets = expand_targets(targets)
     checks: list[CheckResult] = []
     for comp in COMPONENTS:
         if comp.needs_target:
@@ -658,6 +659,9 @@ def check_components(targets: list[str], runner: CommandRunner, scope: str) -> l
 
 
 def repair_components(checks: list[CheckResult], targets: list[str], runner: CommandRunner, scope: str) -> None:
+    # Normalize: ensure targets is always a list of strings
+    if isinstance(targets, str):
+        targets = expand_targets(targets)
     names = {check.name for check in checks if check.can_auto_repair}
     if "pipx" in names and not which("pipx"):
         if which("python3"):

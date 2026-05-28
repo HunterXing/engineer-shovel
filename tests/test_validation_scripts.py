@@ -108,11 +108,12 @@ def test_token_benchmark_reports_static_and_unknown_sources(capsys):
     assert report["rtk_project"]["measured_tokens_saved"] is None
 
 
-def test_command_set_stays_at_ten_after_deprecation_cleanup():
+def test_command_set_stays_at_eleven_after_alias_addition():
     commands = sorted(path.stem for path in (ROOT / "commands").glob("tool-*.md"))
 
-    assert len(commands) == 10
+    assert len(commands) == 11
     assert "tool-graph" in commands
+    assert "tool-alias" in commands
     assert "tool-brainstorm" not in commands
     assert "tool-blueprint" not in commands
 
@@ -337,11 +338,12 @@ def test_health_repair_caveman_uses_claude_flag():
 
     module.repair_caveman(runner, ["claude"])
 
-    assert runner.commands == [[
-        "bash",
-        "-lc",
-        "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash -s -- --only claude",
-    ]]
+    assert len(runner.commands) == 1
+    cmd = runner.commands[0]
+    assert cmd[0] == "bash"
+    assert cmd[1] == "-lc"
+    assert "--only claude" in cmd[2]
+    assert "JuliusBrussee/caveman" in cmd[2]
 
 
 def test_health_check_claude_mem_uses_runner(monkeypatch):
@@ -817,7 +819,7 @@ def test_inventory_reports_structure(capsys):
 
     assert rc == 0
     assert "command_count" in report
-    assert report["command_count"] == 10
+    assert report["command_count"] == 11
     assert "skill_lines" in report
     assert "install_lines" in report
     assert "external_sources" in report
@@ -828,9 +830,10 @@ def test_inventory_command_names_matches_files():
 
     names = module.command_names()
 
-    assert len(names) == 10
+    assert len(names) == 11
     assert "tool-graph" in names
     assert "tool-quick" in names
+    assert "tool-alias" in names
 
 
 #

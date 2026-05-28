@@ -17,14 +17,15 @@ standalone: true
 
 Build the smallest feature slice that can be verified. This command assumes the feature is already clear enough to implement.
 
-## Shared Policies
+## Cost Modes
 
-See `commands/_shared.md` for:
-- **Cost Modes** — fast/standard/deep with smart mode auto-detection
-- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
-- **Toolchain Announcements** — 🚀 format for external tools
-- **Completion Pipeline** — standard/deep verification steps
-- **Error Recovery** — fallback and escalation strategies
+| Mode | Caveman | When |
+|------|---------|------|
+| `--fast` | `/caveman lite` | Single file, obvious feature |
+| `--standard` | `/caveman full` | Multiple files, clear scope (default) |
+| `--deep` | `/caveman full` → `ultra` | Cross-module/security/ambiguous |
+
+**Security Gate**: If change touches auth/network/SQL/secrets → auto-promote to `--deep` + `/tool-review --deep`.
 
 ## Command-Specific Logic
 

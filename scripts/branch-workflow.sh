@@ -39,13 +39,21 @@ is_feature_branch() {
 slugify() {
     local input="$1"
     local slug
-    slug=$(python3 -c "
+    if command -v python3 >/dev/null 2>&1; then
+        slug=$(python3 -c "
 import sys
 s = sys.argv[1].lower()
 slug = ''.join('-' if not (c.isalnum() and ord(c) < 128) else c for c in s)
 slug = slug.replace('--', '-').strip('-')[:50]
 print(slug if slug else 'branch-' + str(int(__import__('time').time())))
 " "$input")
+    else
+        # Fallback: basic slugify without python3
+        slug=$(echo "$input" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//' | cut -c1-50)
+        if [[ -z "$slug" ]]; then
+            slug="branch-$(date +%s)"
+        fi
+    fi
     echo "$slug"
 }
 
@@ -217,11 +225,17 @@ cmd_merge() {
     echo "Staged changes:"
     git diff --cached --stat
     echo ""
-    echo -e "${YELLOW}Please provide a commit message (or press Enter for default):${NC}"
-    read -r commit_msg
     
+    # Accept commit message from argument or prompt
+    local commit_msg="${1:-}"
     if [[ -z "$commit_msg" ]]; then
-        commit_msg="Merge $current_branch into $source_branch"
+        if [[ -t 0 ]]; then
+            echo -e "${YELLOW}Please provide a commit message (or press Enter for default):${NC}"
+            read -r commit_msg
+        fi
+        if [[ -z "$commit_msg" ]]; then
+            commit_msg="Merge $current_branch into $source_branch"
+        fi
     fi
     
     git commit -m "$commit_msg"
@@ -239,6 +253,7 @@ cmd_abort() {
     current_branch=$(get_current_branch)
     local source_branch
     source_branch=$(get_source_branch)
+    local force="${1:-}"
     
     if ! is_feature_branch "$current_branch"; then
         echo -e "${RED}Error: Not on a feature branch${NC}"
@@ -253,12 +268,15 @@ cmd_abort() {
     echo -e "${YELLOW}Abandoning branch: $current_branch${NC}"
     echo -e "Returning to: $source_branch"
     echo ""
-    read -p "Are you sure? (y/N) " -n 1 -r
-    echo ""
     
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Abort cancelled"
-        exit 0
+    # Auto-confirm if force flag set or non-interactive
+    if [[ "$force" != "--force" && -t 0 ]]; then
+        read -p "Are you sure? (y/N) " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Abort cancelled"
+            exit 0
+        fi
     fi
     
     # Switch to source
@@ -290,10 +308,12 @@ case "${1:-}" in
         cmd_review
         ;;
     merge)
-        cmd_merge
+        shift
+        cmd_merge "$@"
         ;;
     abort)
-        cmd_abort
+        shift
+        cmd_abort "$@"
         ;;
     *)
         echo "Usage: branch-workflow.sh <create|status|review|merge|abort> [args...]"
@@ -302,8 +322,8 @@ case "${1:-}" in
         echo "  create [type] <description>  Create feature branch"
         echo "  status                        Show branch status"
         echo "  review                        Show diff for review"
-        echo "  merge                         Squash merge to source"
-        echo "  abort                         Abandon branch"
+        echo "  merge [commit-message]        Squash merge to source"
+        echo "  abort [--force]               Abandon branch"
         exit 1
         ;;
 esac

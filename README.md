@@ -16,7 +16,7 @@
   <a href="https://github.com/HunterXing/engineer-shovel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="https://github.com/HunterXing/engineer-shovel/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/HunterXing/engineer-shovel?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-  <img alt="Commands" src="https://img.shields.io/badge/commands-10_active-5865F2?style=flat-square">
+  <img alt="Commands" src="https://img.shields.io/badge/commands-11_active-5865F2?style=flat-square">
   <img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2ea44f?style=flat-square">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-6f42c1?style=flat-square">
 </p>
@@ -72,7 +72,19 @@ Security-sensitive work should not stay on a routine path: promote it to the mat
 
 ## Quick Start
 
-### macOS / Linux
+### One-Click Install (Recommended)
+
+```bash
+# macOS / Linux — one-liner, no prompts
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows PowerShell
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+This installs the full stack (skill + commands + all optional components) for OpenCode with global scope. No interactive prompts.
+
+### macOS / Linux (Interactive)
 
 ```bash
 # Download, inspect, then run (default: full mode with all components)
@@ -86,9 +98,6 @@ bash install.sh --target opencode
 # Non-interactive: full install for both OpenCode and Claude Code
 bash install.sh --target all
 
-# Shortcut if you already trust the source:
-# curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash
-
 # Other modes
 ./install.sh --target opencode --recommended  # Core stack: Caveman, RTK, CRG, superpowers, OpenSpec
 ./install.sh --target opencode --minimal      # Skill + commands only
@@ -98,7 +107,7 @@ bash install.sh --target all
 ### Windows (PowerShell 5+ / PowerShell Core)
 
 ```powershell
-# Download and run (default: full mode with all components)
+# Interactive: full mode with all components
 powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)"
 
 # With explicit parameters
@@ -106,6 +115,20 @@ powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engin
 ```
 
 The installer verifies pinned external repository SHAs before staging optional dependencies. Download-first installation is safer than piping directly into Bash because it lets you inspect the script and avoids server-side pipe detection differences.
+
+## Upgrade
+
+Re-run the same install command to upgrade to the latest version. It overwrites existing files safely.
+
+```bash
+# macOS / Linux — one-click upgrade
+curl -fsSL https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.sh | bash -s -- --yes
+
+# Windows
+powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engineer-shovel/main/install.ps1)" -- -Yes
+```
+
+The installer shows the version change (e.g. `Upgraded: v1.7.5 → v1.8.0`) when an older version is detected.
 
 ## Compatibility Notes
 

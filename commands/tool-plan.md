@@ -17,14 +17,15 @@ standalone: true
 
 Unified planning entry point. Use this command when the work is not yet executable because scope, order, ownership, or acceptance is unclear.
 
-## Shared Policies
+## Cost Modes
 
-See `commands/_shared.md` for:
-- **Cost Modes** — fast/standard/deep with smart mode auto-detection
-- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
-- **Toolchain Announcements** — 🚀 format for external tools
-- **Completion Pipeline** — standard/deep verification steps
-- **Error Recovery** — fallback and escalation strategies
+| Mode | Caveman | When |
+|------|---------|------|
+| `--fast` | `/caveman lite` | Clear scope, small task |
+| `--standard` | `/caveman full` | Normal planning (default) |
+| `--deep` | `/caveman full` → `ultra` | Complex, cross-system, security |
+
+**Security Gate**: If change touches auth/network/SQL/secrets → auto-promote to `--deep` + `/tool-review --deep`.
 
 ## Command-Specific Logic
 

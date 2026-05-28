@@ -17,14 +17,14 @@ standalone: true
 
 Use this for obvious, low-risk work. This is a primary workflow command, not a gateway into heavier process.
 
-## Shared Policies
+## Cost Modes
 
-See `commands/_shared.md` for:
-- **Cost Modes** — fast/standard/deep with smart mode auto-detection
-- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
-- **Toolchain Announcements** — 🚀 format for external tools
-- **Completion Pipeline** — standard/deep verification steps
-- **Error Recovery** — fallback and escalation strategies
+| Mode | Caveman | When |
+|------|---------|------|
+| `--fast` | `/caveman lite` | Small, obvious changes (default) |
+| `--standard` | `/caveman full` | Normal development |
+
+**Security Gate**: If change touches auth/network/SQL/secrets → auto-promote to `--deep` + `/tool-review --deep`.
 
 ## Command-Specific Logic
 

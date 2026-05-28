@@ -17,14 +17,15 @@ standalone: true
 
 Start with the cheapest path that can prove the bug is fixed. This is a main workflow command; escalate only when reproduction or root cause is unclear.
 
-## Shared Policies
+## Cost Modes
 
-See `commands/_shared.md` for:
-- **Cost Modes** — fast/standard/deep with smart mode auto-detection
-- **Security Gate** — auth/network/SQL/secrets → auto-promote to --deep
-- **Toolchain Announcements** — 🚀 format for external tools
-- **Completion Pipeline** — standard/deep verification steps
-- **Error Recovery** — fallback and escalation strategies
+| Mode | Caveman | When |
+|------|---------|------|
+| `--fast` | `/caveman lite` | Bug with clear repro |
+| `--standard` | `/caveman full` | Normal bug fixing (default) |
+| `--deep` | `/caveman full` → `ultra` | Cross-module/security/unclear root cause |
+
+**Security Gate**: If change touches auth/network/SQL/secrets → auto-promote to `--deep` + `/tool-review --deep`.
 
 ## Command-Specific Logic
 
