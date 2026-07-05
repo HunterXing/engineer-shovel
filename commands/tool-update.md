@@ -98,6 +98,20 @@ OpenSpec policy:
 - Do not run `openspec init` automatically because it writes project files.
 - If Node.js is older than 20.19.0, report an actionable warning and skip repair.
 
+### Version Drift Detection (auto-upgrade on `--full`)
+
+Every component above is also probed for **version drift**: the installed version is compared to whatever is currently published upstream (live `npm view` / GitHub `package.json` / Cargo.toml query, with a hardcoded `LATEST_KNOWN` fallback in `scripts/health.py`). When drift is detected, status flips from `OK` to `outdated`, and `/tool-update --full` triggers an auto-repair that re-runs the install path (`npm install -g @latest`, `git clone + node install.js`, `curl | bash -s -- --force`, etc.) — these paths already use the latest-installer strategy, so the upgrade is real, not a no-op.
+
+Status flow:
+
+```
+OK            ── drift detected ──▶ outdated ── /tool-update --full ──▶ repair ──▶ OK
+MISSING       ── /tool-update --full ──▶ repair ──▶ OK
+UNCONFIGURED  ── /tool-update --full ──▶ repair ──▶ OK
+```
+
+Components where version detection is hard (caveman SKILL.md has no version metadata; claude-mem npm package doesn't expose `--version` reliably) stay at `OK` until they go missing — the install path itself still uses the upstream tag URL, so a fresh install of those is always latest.
+
 ### Component Detection Details
 
 | Component | Detection method | Repair path | Notes |
@@ -105,7 +119,7 @@ OpenSpec policy:
 | **RTK** | `which rtk` | `curl ... install.sh` | System binary, always global |
 | **Caveman** | filesystem markers / `claude plugin list` | upstream installer | Per-target check |
 | **code-review-graph** | `which code-review-graph` or `which uvx` + MCP config check | `pipx install` + write MCP config | OpenCode: writes `.opencode/opencode.json` `mcp` key (new format). Claude Code: `code-review-graph install --platform claude-code`. Accepts `uvx` on-demand as alternative to local install. MCP config checked in both global and local locations. |
-| **superpowers** | `opencode plugin superpowers` / config file string match | `opencode plugin superpowers -g` | OpenCode 1.15+: uses `opencode plugin` command. Falls back to git URL in config. |
+| **superpowers** | `opencode plugin "superpowers@github:obra/superpowers"` / config file string match | `opencode plugin "superpowers@github:obra/superpowers" -g` | OpenCode 1.15+: uses `opencode plugin` command with github source spec; bare `superpowers` resolves to npm placeholder v0.0.2. Falls back to git URL in config. |
 | **claude-mem** | config string match / `claude plugin list` | `npx claude-mem install --ide ...` | Requires Bun. Blocked if Bun missing. |
 | **GSD** | filesystem presence of `gsd-*.md` | `npx get-shit-done-cc@latest` | Respects scope and target. |
 | **ECC** | filesystem markers / `claude plugin list` | upstream installer | Blocked for local scope. OpenCode repair is manual-only. |

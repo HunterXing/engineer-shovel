@@ -113,7 +113,7 @@ Use upstream tools directly:
 - OpenSpec: `openspec --version`; initialize per project with `openspec init` only when specs are needed.
 - Cache: check cache hit rate with `/tool-graph status`.
 - RTK hook audit: `rtk hook-audit` (requires `RTK_HOOK_AUDIT=1`).
-- Avoid `rtk gain --history` (may panic on non-ASCII paths in RTK 0.37.2).
+- Avoid `rtk gain --history` on RTK ≤ 0.37.2 (panics on non-ASCII paths; fixed in ≥ 0.43.0).
 
 ---
 

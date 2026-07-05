@@ -11,20 +11,21 @@
     "scope_model": "effectively-global",
     "auto_repair": true,
     "repair_hint": {
-      "opencode": "add plugin entry to opencode.json",
-      "claude": "claude plugin install superpowers@claude-plugins-official"
+      "opencode": "opencode plugin 'superpowers@github:obra/superpowers' -g",
+      "claude": "claude plugin marketplace add https://github.com/obra/superpowers --scope user && claude plugin install superpowers@superpowers-dev --scope user",
+      "both": "opencode plugin superpowers -g && claude plugin marketplace add https://github.com/obra/superpowers --scope user && claude plugin install superpowers@superpowers-dev --scope user"
     },
-    "notes": "Method layer for clarification, TDD, debugging, and execution discipline."
+    "notes": "Method layer for clarification, TDD, debugging, and execution discipline. v6 is published via the obra/superpowers marketplace; claude-plugins-official marketplace only carries the v5 line."
   },
   "caveman": {
     "strategy": "latest-installer",
     "scope_model": "effectively-global",
     "auto_repair": true,
     "repair_hint": {
-      "opencode": "npx skills add JuliusBrussee/caveman -a opencode",
-      "claude": "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman"
+      "opencode": "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/v1.9.1/install.sh | bash -s -- --only opencode --force",
+      "claude": "curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/v1.9.1/install.sh | bash -s -- --only claude --force"
     },
-    "notes": "Communication compression layer; keep separate from planning and code intelligence."
+    "notes": "Communication compression layer. v1.9.1 install.sh is a Node wrapper around bin/install.js (requires Node ≥18). v1.9.1 changed the install layout — files now land in ~/.config/opencode/{plugins,commands,skills,agents}/ and rules are appended to AGENTS.md; the legacy ~/.agents/skills/caveman/SKILL.md path is no longer created. Trailing empty args are not safe to forward — install.js treats them as unknown flags. Pin tracks the v1.9.1 release tag; bump on upstream changelog warrant."
   },
   "rtk": {
     "strategy": "mixed",
@@ -45,21 +46,22 @@
     "scope_model": "global-and-local",
     "auto_repair": true,
     "repair_hint": {
-      "opencode": "npx -y get-shit-done-cc@latest --opencode --global",
-      "claude": "npx -y get-shit-done-cc@latest --claude --global",
-      "both": "npx -y get-shit-done-cc@latest --all --global"
+      "opencode": "git clone --depth=1 --no-tags --filter=blob:none https://github.com/gsd-build/get-shit-done /tmp/gsd && (cd /tmp/gsd && npm install --no-audit --no-fund --loglevel=error) && (cd /tmp/gsd/sdk && npm install --no-audit --no-fund --loglevel=error && npm run build) && node /tmp/gsd/bin/install.js --opencode --global",
+      "claude": "git clone --depth=1 --no-tags --filter=blob:none https://github.com/gsd-build/get-shit-done /tmp/gsd && (cd /tmp/gsd && npm install --no-audit --no-fund --loglevel=error) && (cd /tmp/gsd/sdk && npm install --no-audit --no-fund --loglevel=error && npm run build) && node /tmp/gsd/bin/install.js --claude --global",
+      "both": "git clone --depth=1 --no-tags --filter=blob:none https://github.com/gsd-build/get-shit-done /tmp/gsd && (cd /tmp/gsd && npm install --no-audit --no-fund --loglevel=error) && (cd /tmp/gsd/sdk && npm install --no-audit --no-fund --loglevel=error && npm run build) && node /tmp/gsd/bin/install.js --all --global"
     },
-    "notes": "Use for phased, cross-session, or parallelized delivery instead of standard one-session work."
+    "notes": "Use for phased, cross-session, or parallelized delivery. Upstream main is 1.50.0-canary.0 (rewritten by TÂCHES); the npm `get-shit-done-cc` package is deprecated. Install via git clone so the canary build is reachable; v1.42.3 still works as fallback if git fetch is unavailable."
   },
   "ecc": {
-    "strategy": "pinned",
+    "strategy": "latest-installer",
     "scope_model": "global-only",
-    "auto_repair": false,
+    "auto_repair": true,
     "repair_hint": {
-      "opencode": "run the ECC installer manually for OpenCode",
-      "claude": "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code"
+      "opencode": "npm install -g ecc-universal@latest && ecc-install --target opencode --profile opencode",
+      "claude": "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code",
+      "both": "claude plugin marketplace add https://github.com/affaan-m/everything-claude-code && claude plugin install everything-claude-code@everything-claude-code"
     },
-    "notes": "Use for framework, security, research, and integration depth; local scope is not supported."
+    "notes": "Use for framework, security, research, and integration depth; local scope is not supported. ECC v2+ ships as the npm-published `ecc-universal@latest` package which exposes an `ecc-install` bin (symlink to scripts/install-apply.js) for OpenCode/Claude targets. The publish path includes pre-built artifacts so no separate `npm run build:opencode` is required for the npm route; the git clone fallback still needs that build step. latest-installer strategy tracks upstream HEAD at repair time; first-install determinism is no longer guaranteed."
   },
   "claude-mem": {
     "strategy": "latest-installer",

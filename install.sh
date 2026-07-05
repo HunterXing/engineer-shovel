@@ -38,11 +38,14 @@ fi
 ECC_REPO="https://github.com/affaan-m/everything-claude-code"
 RTK_REPO="https://github.com/rtk-ai/rtk"
 CODE_REVIEW_GRAPH_REPO="https://github.com/tirth8205/code-review-graph"
+GSD_REPO="https://github.com/gsd-build/get-shit-done"
 OPENSPEC_REPO="https://github.com/Fission-AI/OpenSpec"
 CLAUDE_MEM_REPO="https://github.com/thedotmack/claude-mem"
 
-ECC_SHA="841beea45cb25ba51f29fa45b7e272938d19b80a"
 RTK_SHA="4338f029ec43b69eb959748ec02cd7885200c264"
+# ECC follows latest-installer strategy: the pinned SHA is intentionally
+# dropped so users benefit from upstream bug fixes without manual bumps.
+# Resolved against $ECC_REPO HEAD at install time.
 
 MODE="full"
 MODE_SET=0
@@ -485,17 +488,23 @@ install_commands() {
 
 # ---------- Caveman: Official installer ----------
 
-CAVEMAN_INSTALLER_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+# Caveman v1.9.1 is the published tag; install.sh is a Node wrapper that
+# forwards flags to bin/install.js. Pin the tag so first-install is
+# deterministic; bump via /tool-update or manual edit when upstream changelog
+# warrants it.
+CAVEMAN_INSTALLER_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/v1.9.1/install.sh"
 
 _caveman_installed() {
   local target="$1"
   case "$target" in
     opencode)
-      # Check multiple possible locations for caveman skill
+      # v1.9.1 install drops a plugin dir at ~/.config/opencode/plugins/caveman/
+      # plus commands/caveman.md; legacy v1.7 left a SKILL.md at
+      # ~/.agents/skills/caveman/SKILL.md. Either is enough evidence.
+      [[ -d "$HOME/.config/opencode/plugins/caveman" ]] && return 0
+      [[ -f "$HOME/.config/opencode/commands/caveman.md" ]] && return 0
       [[ -d "$HOME/.agents/skills/caveman" ]] && return 0
       [[ -d "$HOME/.agents/skills/JuliusBrussee-caveman" ]] && return 0
-      # Check if caveman command exists in OpenCode commands
-      [[ -f "$HOME/.config/opencode/commands/caveman.md" ]] && return 0
       # Try npx skills list as fallback
       local out
       out="$(npx -y skills list 2>/dev/null)" || true
@@ -519,23 +528,27 @@ _caveman_installed() {
 
 install_caveman_for_target() {
   local target="$1"
-  local agent_flag=""
 
-  # Map target to Caveman's --only flag
+  # Map target to Caveman's --only <agent-id> flag. Use an ARRAY so the
+  # two words are forwarded as separate argv entries — otherwise
+  # `bash -s -- "--only opencode"` would hand npx a single token
+  # "--only opencode" which caveman v1.9.1 install.js then parses as one
+  # unknown flag.
+  local -a agent_args=()
   case "$target" in
-    opencode) agent_flag="--only opencode" ;;
-    claude-code) agent_flag="--only claude" ;;
+    opencode) agent_args=(--only opencode) ;;
+    claude-code) agent_args=(--only claude) ;;
     *) record_failure "Unknown target for Caveman: ${target}"; return 1 ;;
   esac
 
-  local mode_flag=""
+  local -a upstream_args=("${agent_args[@]}" --force)
   if [[ "$MODE" == "recommended" ]]; then
-    mode_flag="--minimal"
+    upstream_args+=(--minimal)
   fi
 
   if [[ "$DRY_RUN" -eq 1 ]]; then
     info "DRY-RUN: Caveman official installer for ${target}"
-    info "  curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} ${mode_flag}"
+    info "  curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${upstream_args[*]}"
     if [[ "$SCOPE" == "local" ]]; then
       warn "DRY-RUN: Caveman does not support project-scoped installation."
       warn "  Will install globally. Agent discovers skills from home directory."
@@ -543,6 +556,10 @@ install_caveman_for_target() {
     return 0
   fi
 
+  # v1.9.1 install layout moves files into ~/.config/opencode/{plugins,
+  # commands,skills,agents} and patches AGENTS.md; the legacy ~/.agents/
+  # skills/caveman/SKILL.md is no longer created. Detection looks at the
+  # v1.9.1 markers (plugin/ + commands/caveman.md).
   if _caveman_installed "$target"; then
     ok "Caveman already installed for ${target}"
     return 0
@@ -553,15 +570,15 @@ install_caveman_for_target() {
     warn "  Installing globally. Agent discovers skills from home directory."
   fi
 
-  info "Installing Caveman for ${target} via official installer..."
+  info "Installing Caveman for ${target} via official installer (v1.9.1)..."
   local caveman_output
-  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- "${agent_flag}" "${mode_flag}" 2>&1)"; then
+  if caveman_output="$(curl -fsSL "$CAVEMAN_INSTALLER_URL" | bash -s -- "${upstream_args[@]}" 2>&1)"; then
     printf '%s\n' "$caveman_output"
     ok "Caveman installed for ${target}"
   else
     local rc=$?
     printf '%s\n' "$caveman_output" >&2
-    record_failure "Caveman install failed for ${target} (exit ${rc}). Install manually: curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${agent_flag} ${mode_flag}"
+    record_failure "Caveman install failed for ${target} (exit ${rc}). Install manually: curl -fsSL ${CAVEMAN_INSTALLER_URL} | bash -s -- ${upstream_args[*]}"
   fi
 }
 
@@ -588,31 +605,77 @@ install_ecc() {
 
   ensure_tmp_root
   local checkout_dir="$TMP_ROOT/ecc"
-  if clone_pinned_repo "$ECC_REPO" "$ECC_SHA" "$checkout_dir"; then
-    if [[ -f "$checkout_dir/install.sh" ]]; then
-      if [[ "$DRY_RUN" -eq 1 ]]; then
-        info "DRY-RUN: timeout 600 bash ${checkout_dir}/install.sh"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    info "DRY-RUN: clone ${ECC_REPO} (latest) -> ${checkout_dir}"
+    link_ecc_commands
+    return 0
+  fi
+  local ecc_target_flag=""
+  local ecc_profile_flag=""
+  if [[ ${#TARGETS[@]} -ge 1 ]]; then
+    case "${TARGETS[0]}" in
+      opencode)
+        ecc_target_flag="--target opencode"
+        ecc_profile_flag="--profile opencode"
+        ;;
+      claude-code)
+        ecc_target_flag="--target claude"
+        ecc_profile_flag=""
+        ;;
+      *)
+        ecc_target_flag=""
+        ecc_profile_flag=""
+        ;;
+    esac
+  fi
+
+  # ECC v2 install path: prefer the npm-published `ecc-universal@latest`
+  # package which is pre-built and exposes an `ecc-install` bin via
+  # scripts/install-apply.js. The git clone path falls back when npm
+  # access is unavailable or when an upstream-mainspecifed tag must be
+  # installed.
+  if command -v npm >/dev/null 2>&1; then
+    info "Installing ECC v2 via npm-published ecc-universal@latest (pre-built)..."
+    local ecc_npm_output
+    if ecc_npm_output="$(npx -y ecc-install ${ecc_target_flag} ${ecc_profile_flag} 2>&1)"; then
+      printf '%s\n' "$ecc_npm_output"
+      ok "ECC installed via npm"
+      link_ecc_commands
+      return 0
+    fi
+    local ecc_npm_rc=$?
+    printf '%s\n' "$ecc_npm_output" >&2
+    warn "ecc-install failed (exit ${ecc_npm_rc}); falling back to git clone"
+  fi
+
+  ensure_tmp_root
+  local checkout_dir="$TMP_ROOT/ecc"
+  local clone_err
+  clone_err="$(git clone --no-tags --filter=blob:none "$ECC_REPO" "$checkout_dir" 2>&1)" || {
+    err "Clone failed for ${ECC_REPO}: ${clone_err}"
+    record_failure "Could not clone ECC source. Install manually: npm install -g ecc-universal && ecc-install ${ecc_target_flag} ${ecc_profile_flag}"
+    return 1
+  }
+  local actual_sha
+  actual_sha="$(git -C "$checkout_dir" rev-parse HEAD)"
+  info "ECC checkout: ${actual_sha} (git-clone fallback path)"
+  if [[ -f "$checkout_dir/install.sh" ]]; then
+    local ecc_output
+    local ecc_rc
+    if ecc_output="$(timeout 600 bash "$checkout_dir/install.sh" ${ecc_target_flag} ${ecc_profile_flag} 2>&1)"; then
+      printf '%s\n' "$ecc_output"
+    else
+      ecc_rc=$?
+      printf '%s\n' "$ecc_output" >&2
+      if [[ "$ecc_rc" -eq 124 ]]; then
+        record_failure "ECC installer timed out after 600 seconds; retry manually if needed"
       else
-        local ecc_output
-        local ecc_rc
-        if ecc_output="$(timeout 600 bash "$checkout_dir/install.sh" 2>&1)"; then
-          printf '%s\n' "$ecc_output"
-        else
-          ecc_rc=$?
-          printf '%s\n' "$ecc_output" >&2
-          if [[ "$ecc_rc" -eq 124 ]]; then
-            record_failure "ECC installer timed out after 600 seconds; retry manually if needed"
-          else
-            record_failure "ECC installer exited with code ${ecc_rc}; run manually to diagnose"
-          fi
-        fi
+        record_failure "ECC installer exited with code ${ecc_rc}; check log or retry: cd <ecc> && npm run build:opencode && bash install.sh ${ecc_target_flag} ${ecc_profile_flag}"
       fi
     fi
-    ok "ECC install attempted"
-    link_ecc_commands
-  else
-    record_failure "Could not clone pinned ECC source. Install manually: /plugin install ecc@ecc"
   fi
+  ok "ECC install attempted"
+  link_ecc_commands
 }
 
 # ---------- ECC command symlinks ----------
@@ -678,7 +741,10 @@ _gen_superpowers_commands() {
 
   # Each entry: cmd_name skill_name description
   _gen_sp_cmd() {
-    local cmd_name="$1" skill_name="$2" desc="$3" target="$cmd_dir/superpowers:${cmd_name}.md"
+    local cmd_name="$1"
+    local skill_name="$2"
+    local desc="$3"
+    local target="$cmd_dir/superpowers:${cmd_name}.md"
     [[ -f "$target" ]] && return
     if [[ "$DRY_RUN" -eq 1 ]]; then
       info "DRY-RUN: create command /superpowers:${cmd_name} → skill(${skill_name})"
@@ -742,7 +808,8 @@ _gsd_provisioned() {
         if [[ "$SCOPE" == "local" ]]; then
           check_dir="./.opencode/commands"
         else
-          check_dir="$HOME/.config/opencode/commands"
+          # v1.50 dropped the trailing 's'; accept both layouts.
+          check_dir="$HOME/.config/opencode"
         fi
         ;;
       claude-code)
@@ -754,13 +821,22 @@ _gsd_provisioned() {
         ;;
       *) return 1 ;;
     esac
-    ls "$check_dir"/gsd-*.md >/dev/null 2>&1 || return 1
+    # Probe both 'commands/' and 'command/' under check_dir; a hit in either
+    # is enough evidence that GSD has been provisioned on this target/scope.
+    if [[ "$target" == "opencode" && "$SCOPE" != "local" ]]; then
+      ls "$check_dir/commands"/gsd-*.md >/dev/null 2>&1 \
+        || ls "$check_dir/command"/gsd-*.md >/dev/null 2>&1 \
+        || return 1
+    else
+      ls "$check_dir"/gsd-*.md >/dev/null 2>&1 || return 1
+    fi
   done
   return 0
 }
 
 install_gsd() {
-  # Resolve GSD target flag from the already-resolved TARGETS array
+  # Resolve GSD target flag from the already-resolved TARGETS array.
+  # v1.50+ uses dash-form per-runtime flags: --opencode, --claude, --all, etc.
   if [[ ${#TARGETS[@]} -eq 2 ]]; then
     gsd_target="--all"
   elif [[ ${#TARGETS[@]} -eq 1 ]]; then
@@ -777,7 +853,7 @@ install_gsd() {
   esac
 
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "DRY-RUN: npx -y get-shit-done-cc@latest ${gsd_target} ${gsd_scope}"
+    info "DRY-RUN: git clone --depth=1 $GSD_REPO → /tmp/gsd; (cd /tmp/gsd && npm install --no-audit --no-fund --loglevel=error); (cd /tmp/gsd/sdk && npm install --no-audit --no-fund --loglevel=error && npm run build); node /tmp/gsd/bin/install.js ${gsd_target} ${gsd_scope}"
     return 0
   fi
 
@@ -786,15 +862,57 @@ install_gsd() {
     return 0
   fi
 
-  info "Installing GSD via official installer (npx get-shit-done-cc@latest)..."
+  # GSD upstream main is now 1.50.0-canary.0; the npm package
+  # `get-shit-done-cc` is deprecated. Install via git clone so we get the
+  # canary build that upstream actually ships. Upstream's bin/install.js
+  # requires a pre-built sdk/dist that lives outside the install.js path,
+  # so we explicitly run `cd sdk && npm install && npm run build` first.
+  info "Installing GSD via git clone + node bin/install.js (latest-installer strategy)..."
+  ensure_tmp_root
+  local gsd_checkout_dir="$TMP_ROOT/gsd"
+  local clone_err
+  clone_err="$(git clone --depth=1 --no-tags --filter=blob:none "$GSD_REPO" "$gsd_checkout_dir" 2>&1)" || {
+    err "GSD clone failed: ${clone_err}"
+    record_failure "Could not clone GSD source. Install manually: git clone https://github.com/gsd-build/get-shit-done && cd get-shit-done/sdk && npm install && npm run build && cd .. && node bin/install.js ${gsd_target} ${gsd_scope}"
+    return 1
+  }
+  local gsd_sha
+  gsd_sha="$(git -C "$gsd_checkout_dir" rev-parse HEAD)"
+  info "GSD checkout: ${gsd_sha} (latest-installer strategy)"
+
+  if [[ ! -d "$gsd_checkout_dir/node_modules" ]]; then
+    info "Running npm install for GSD root (one-time)..."
+    if ! (cd "$gsd_checkout_dir" && npm install --no-audit --no-fund --loglevel=error 2>&1); then
+      record_failure "GSD root npm install failed; check Node ≥22 and retry"
+      return 1
+    fi
+  fi
+
+  # GSD SDK must be built before bin/install.js can dispatch slash-command
+  # definitions; upstream explicitly tells the user to run `cd sdk &&
+  # npm install && npm run build`. Mirror that.
+  info "Building GSD SDK (sdk/dist)..."
+  if [[ -d "$gsd_checkout_dir/sdk" ]]; then
+    if ! (cd "$gsd_checkout_dir/sdk" \
+        && npm install --no-audit --no-fund --loglevel=error \
+        && npm run build 2>&1); then
+      record_failure "GSD SDK build failed; retry manually: cd $gsd_checkout_dir/sdk && npm install && npm run build"
+      return 1
+    fi
+  fi
+
   local gsd_output
-  if gsd_output="$(npx -y get-shit-done-cc@latest "${gsd_target}" "${gsd_scope}" 2>&1)"; then
+  if gsd_output="$(timeout 600 node "$gsd_checkout_dir/bin/install.js" ${gsd_target} ${gsd_scope} 2>&1)"; then
     printf '%s\n' "$gsd_output"
-    ok "GSD installed"
+    ok "GSD installed (build ${gsd_sha})"
   else
     local gsd_rc=$?
     printf '%s\n' "$gsd_output" >&2
-    record_failure "GSD installer exited with code ${gsd_rc}; run manually: npx -y get-shit-done-cc@latest ${gsd_target} ${gsd_scope}"
+    if [[ "$gsd_rc" -eq 124 ]]; then
+      record_failure "GSD installer timed out after 600 seconds; retry manually if needed"
+    else
+      record_failure "GSD installer exited with code ${gsd_rc}; run: cd $gsd_checkout_dir/sdk && npm install && npm run build && cd .. && node bin/install.js ${gsd_target} ${gsd_scope}"
+    fi
   fi
 }
 
@@ -802,7 +920,7 @@ _superpowers_opencode_installed() {
   # Check via opencode plugin command (preferred)
   if command -v opencode >/dev/null 2>&1; then
     local out
-    out="$(opencode plugin superpowers 2>&1)" || true
+    out="$(opencode plugin "superpowers@github:obra/superpowers" 2>&1)" || true
     echo "$out" | grep -qi "installed\|already" && return 0
   fi
   # Fallback: check config file
@@ -812,7 +930,7 @@ _superpowers_opencode_installed() {
 
 install_superpowers_opencode() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "DRY-RUN: opencode plugin superpowers -g"
+    info "DRY-RUN: opencode plugin "superpowers@github:obra/superpowers" -g"
     info "DRY-RUN: generate superpowers command wrappers"
     return 0
   fi
@@ -825,12 +943,12 @@ install_superpowers_opencode() {
 
   if command -v opencode >/dev/null 2>&1; then
     info "Installing superpowers via opencode plugin..."
-    opencode plugin superpowers -g 2>&1 && {
+    opencode plugin "superpowers@github:obra/superpowers" -g 2>&1 && {
       ok "Superpowers installed for OpenCode"
       _gen_superpowers_commands
       return 0
     }
-    warn "opencode plugin superpowers failed; falling back to config edit"
+    warn "opencode plugin "superpowers@github:obra/superpowers" failed; falling back to config edit"
   fi
 
   # Fallback: manually write plugin entry to opencode.json (legacy)
@@ -872,16 +990,18 @@ if entry not in data['plugin']:
 with open(path, 'w') as f:
     json.dump(data, f, indent=2)
     f.write('\n')
-" "$config_file" || warn "Could not add superpowers. Add manually: opencode plugin superpowers -g"
+" "$config_file" || warn "Could not add superpowers. Add manually: opencode plugin "superpowers@github:obra/superpowers" -g"
   else
-    warn "No node or python3 found. Install manually: opencode plugin superpowers -g"
+    warn "No node or python3 found. Install manually: opencode plugin "superpowers@github:obra/superpowers" -g"
   fi
   _gen_superpowers_commands
 }
 
 install_superpowers_claude() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "DRY-RUN: claude plugin install superpowers@claude-plugins-official"
+    info "DRY-RUN: claude plugin marketplace add https://github.com/obra/superpowers"
+    info "DRY-RUN: claude plugin install superpowers@superpowers-dev"
+    info "DRY-RUN: fallback: claude plugin install superpowers@claude-plugins-official"
     return 0
   fi
 
@@ -892,12 +1012,24 @@ install_superpowers_claude() {
     return 0
   fi
 
-  info "Installing superpowers for Claude Code..."
+  info "Installing superpowers v6 (obra marketplace) for Claude Code..."
+  # v6 is published via the obra/superpowers marketplace (declared in
+  # .claude-plugin/marketplace.json as version 6.x). claude-plugins-official
+  # marketplace only carries the older v5 line, so we register obra's
+  # marketplace first; claude-plugins-official remains the fallback for
+  # offline / older setups where v5 is the only reachable option.
+  if claude plugin marketplace add https://github.com/obra/superpowers --scope user >/dev/null 2>&1 \
+    && claude plugin install superpowers@superpowers-dev --scope user 2>&1; then
+    ok "Superpowers v6 installed (obra marketplace) for Claude Code"
+    return 0
+  fi
+  warn "obra marketplace install failed; falling back to claude-plugins-official (v5)"
+
   if claude plugin install superpowers@claude-plugins-official 2>&1; then
-    ok "Superpowers installed for Claude Code"
+    ok "Superpowers (fallback v5) installed for Claude Code"
   else
     local rc=$?
-    record_failure "Superpowers Claude install failed (exit ${rc}). Manually: claude plugin install superpowers@claude-plugins-official"
+    record_failure "Superpowers Claude install failed (exit ${rc}). Manually: claude plugin marketplace add https://github.com/obra/superpowers && claude plugin install superpowers@superpowers-dev"
   fi
 }
 

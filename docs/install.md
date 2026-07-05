@@ -136,8 +136,8 @@ Dry-run note:
 
 ## Supply Chain
 
-- External helper repos pinned to explicit commit SHAs in `install.sh`.
-- `--full` invokes upstream installers after pinned checkout verification.
+- Helper repos (RTK) pinned to explicit commit SHAs in `install.sh`; ECC follows upstream HEAD at install time.
+- `--full` invokes upstream installers after verifying pinned checkout where applicable.
 - `--dry-run` preview recommended before bootstrapping unfamiliar machines.
 - Dependency lock strategy is documented in `docs/dependency-policy.md`.
 - Component strategy metadata is also recorded in `scripts/dependency_manifest.json` to reduce drift between docs and health reporting.

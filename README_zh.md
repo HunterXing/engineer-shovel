@@ -144,7 +144,7 @@ powershell -c "iex (iwr -useb https://raw.githubusercontent.com/HunterXing/engin
 - 文档层面默认推荐"先下载、检查、再执行"。
 - 安装器保留 SHA 校验，并对外部 installer 失败给出更清晰的边界。
 - Python 校验脚本新增了轻量 pytest 回归测试。
-- superpowers 通过 `opencode plugin superpowers` 安装，兼容 OpenCode 1.15+，不再手工编辑配置文件。
+- superpowers 通过 `opencode plugin "superpowers@github:obra/superpowers"` 安装，兼容 OpenCode 1.15+，不再手工编辑配置文件。直接写 `superpowers` 名字会被解析为 npm 上的占位包 `superpowers@0.0.2`，必须用 github 源 spec。
 - code-review-graph MCP 使用 OpenCode 1.15 新版 `mcp` 配置格式（`.opencode/opencode.json`），废弃旧版 `.opencode.json` 文件。
 - `install.sh` 自动检测 macOS/Linux/Windows 环境，Windows 下引导到 `install.ps1`。
 
@@ -243,10 +243,11 @@ Engineer Shovel 在 `--full` 模式下会安装并配置这些上游工具。
 
 | 工具 | 仓库 | 当前参考版本 | 作用 |
 |---|---|---:|---|
-| OpenSpec | https://github.com/Fission-AI/OpenSpec | latest | 规格驱动产物：proposal、specs、design、tasks、verify、archive |
-| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | 深度项目编排、阶段执行、验证和上下文工程 |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | 方法层：澄清、TDD、调试与验证纪律 |
-| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | 本地代码知识图谱、MCP review context、影响面分析 |
-| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 输出 token 压缩、精简 review/commit、MCP shrink |
-| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell/tool 输出压缩代理和命令 rewrite hooks |
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0 | AI agent harness 性能系统：skills、rules、hooks、MCP、安全与 research-first 工作流 |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.50.0-canary.0 | 深度项目编排、阶段执行、验证和上下文工程 |
+| superpowers | https://github.com/obra/superpowers | v6.1.1 | 方法层：澄清、TDD、调试与验证纪律 |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.6 | 本地代码知识图谱、MCP review context、影响面分析 |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.9.1 | 输出 token 压缩、精简 review/commit、MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.43.0 | Shell/tool 输出压缩代理和命令 rewrite hooks |
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | @fission-ai/openspec@latest | 主工作流之外的持久化 spec 制品（proposal/spec/design/tasks） |
+| claude-mem | https://github.com/thedotmack/claude-mem | v13.10.0 | 跨会话记忆层（自动捕获、渐进式披露） |

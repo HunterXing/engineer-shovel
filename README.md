@@ -145,7 +145,7 @@ New guardrails added:
 - Download-first installation is now the recommended documented path.
 - The installer keeps SHA pin verification and now surfaces clearer failure behavior around external installer execution.
 - Validation scripts now have lightweight pytest regression coverage.
-- Superpowers is now installed via `opencode plugin superpowers` instead of manual config editing, compatible with OpenCode 1.15+.
+- Superpowers is now installed via `opencode plugin "superpowers@github:obra/superpowers"` instead of manual config editing, compatible with OpenCode 1.15+. The bare name `superpowers` resolves to an unrelated npm placeholder (`superpowers@0.0.2`), so the github source spec is required.
 - code-review-graph MCP now uses the OpenCode 1.15 `mcp` key format (`.opencode/opencode.json`) instead of the deprecated `.opencode.json` file.
 
 Then use either:
@@ -259,10 +259,11 @@ Engineer Shovel integrates and configures these upstream tools in `--full` mode.
 
 | Tool | Repository | Current referenced version | Role |
 |---|---|---:|---|
-| OpenSpec | https://github.com/Fission-AI/OpenSpec | latest | Spec-driven artifacts: proposal, specs, design, tasks, verify, archive |
-| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Deep project orchestration, phase execution, verification, and context engineering |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | Method layer for clarification, TDD, debugging, and verification discipline |
-| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | Local code knowledge graph, MCP review context, blast-radius analysis |
-| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | Output-token compression, terse review/commit helpers, MCP shrink |
-| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | Shell and tool output compression proxy plus command rewrite hooks |
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0 | AI agent harness performance system: skills, rules, hooks, MCP, security, research-first workflows |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.50.0-canary.0 | Deep project orchestration, phase execution, verification, and context engineering |
+| superpowers | https://github.com/obra/superpowers | v6.1.1 | Method layer for clarification, TDD, debugging, and verification discipline |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.6 | Local code knowledge graph, MCP review context, blast-radius analysis |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.9.1 | Output-token compression, terse review/commit helpers, MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.43.0 | Shell and tool output compression proxy plus command rewrite hooks |
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | @fission-ai/openspec@latest | Durable spec artifacts (proposal/spec/design/tasks) outside the main workflow |
+| claude-mem | https://github.com/thedotmack/claude-mem | v13.10.0 | Cross-session memory layer (auto-capture, progressive disclosure) |

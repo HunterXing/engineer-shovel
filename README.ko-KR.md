@@ -157,9 +157,11 @@ Engineer Shovel은 `--full` 모드에서 이러한 상위 도구를 통합하고
 
 | 도구 | 리포지토리 | 현재 참조 버전 | 역할 |
 |---|---|---:|---|
-| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI 에이전트 하네스 성능 시스템: 스킬, 규칙, 훅, MCP, 보안, 리서치 우선 워크플로 |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec 기반 계획, 단계 실행, 검증 및 컨텍스트 엔지니어링 |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | 필수 스킬 워크플로: 브레인스토밍, TDD, 계획, 리뷰, 브랜치 완료 |
-| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | 로컬 코드 지식 그래프, MCP 리뷰 컨텍스트, 폭발 반경 분석 |
-| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 출력 토큰 압축, 간결한 리뷰/커밋, MCP 압축 |
-| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | 셸 및 도구 출력 압축 프록시 및 명령어 재작성 훅 |
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0 | AI 에이전트 하네스 성능 시스템: 스킬, 규칙, 훅, MCP, 보안, 리서치 우선 워크플로 |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.50.0-canary.0 | Spec 기반 계획, 단계 실행, 검증 및 컨텍스트 엔지니어링 |
+| superpowers | https://github.com/obra/superpowers | v6.1.1 | 필수 스킬 워크플로: 브레인스토밍, TDD, 계획, 리뷰, 브랜치 완료 |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.6 | 로컬 코드 지식 그래프, MCP 리뷰 컨텍스트, 폭발 반경 분석 |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.9.1 | 출력 토큰 압축, 간결한 리뷰/커밋, MCP 압축 |
+| RTK | https://github.com/rtk-ai/rtk | v0.43.0 | 셸 및 도구 출력 압축 프록시 및 명령어 재작성 훅 |
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | @fission-ai/openspec@latest | 주요 워크플로 외부에서 영속화되는 spec 산출물 (proposal/spec/design/tasks) |
+| claude-mem | https://github.com/thedotmack/claude-mem | v13.10.0 | 세션 간 메모리 레이어 (자동 캡처, 점진적 공개) |

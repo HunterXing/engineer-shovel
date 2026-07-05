@@ -157,9 +157,11 @@ Engineer Shovel は `--full` モードでこれらの上流ツールを統合お
 
 | ツール | リポジトリ | 現在の参照バージョン | 役割 |
 |---|---|---:|---|
-| ECC | https://github.com/affaan-m/everything-claude-code | v1.10.0 | AI エージェントハーネス性能システム：スキル、ルール、フック、MCP、セキュリティ、research-first ワークフロー |
-| GSD | https://github.com/gsd-build/get-shit-done | v1.39.0 | Spec駆動の計画、フェーズ実行、検証、コンテキストエンジニアリング |
-| superpowers | https://github.com/obra/superpowers | v5.0.7 | 必須スキルワークフロー：ブレインストーミング、TDD、計画、レビュー、ブランチ終結 |
-| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.2 | ローカルコード知識グラフ、MCP レビューコンテキスト、ブラスト半径分析 |
-| Caveman | https://github.com/JuliusBrussee/caveman | v1.7.0 | 出力トークン圧縮、簡潔なレビュー/コミット、MCP shrink |
-| RTK | https://github.com/rtk-ai/rtk | v0.38.0 | シェルとツール出力圧縮プロキシおよびコマンド書き換えフック |
+| ECC | https://github.com/affaan-m/everything-claude-code | v2.0.0 | AI エージェントハーネス性能システム：スキル、ルール、フック、MCP、セキュリティ、research-first ワークフロー |
+| GSD | https://github.com/gsd-build/get-shit-done | v1.50.0-canary.0 | Spec駆動の計画、フェーズ実行、検証、コンテキストエンジニアリング |
+| superpowers | https://github.com/obra/superpowers | v6.1.1 | 必須スキルワークフロー：ブレインストーミング、TDD、計画、レビュー、ブランチ終結 |
+| code-review-graph | https://github.com/tirth8205/code-review-graph | v2.3.6 | ローカルコード知識グラフ、MCP レビューコンテキスト、ブラスト半径分析 |
+| Caveman | https://github.com/JuliusBrussee/caveman | v1.9.1 | 出力トークン圧縮、簡潔なレビュー/コミット、MCP shrink |
+| RTK | https://github.com/rtk-ai/rtk | v0.43.0 | シェルとツール出力圧縮プロキシおよびコマンド書き換えフック |
+| OpenSpec | https://github.com/Fission-AI/OpenSpec | @fission-ai/openspec@latest | メインのワークフロー外に永続化する spec 成果物（proposal/spec/design/tasks） |
+| claude-mem | https://github.com/thedotmack/claude-mem | v13.10.0 | セッション横断メモリレイヤー（自動キャプチャ、段階的開示） |

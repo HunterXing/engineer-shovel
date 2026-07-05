@@ -21,7 +21,7 @@ Engineer Shovel installs a router plus optional external capability layers. This
 | Component | Install path | Repair path | Scope model | Current strategy | Why |
 |---|---|---|---|---|---|
 | Engineer Shovel router | repo files / sync | `scripts/sync.py` via `/tool-update` | `global` + `local` | repo version | Router files should match the checked-out repository state |
-| ECC | pinned checkout in `install.sh` | limited checks in `scripts/health.py` | `global` only | pinned SHA | High-surface dependency; pin for reproducibility |
+| ECC | upstream installer (cloned at repair time) | supported in `scripts/health.py` | `global` only | latest-installer | ECC v2 install.sh is a Node wrapper requiring `--target <opencode|claude>`; tracks upstream bug fixes |
 | RTK | official installer, fallback cargo pinned rev | `scripts/health.py` | effectively global | mixed: installer + pinned fallback | Prefer upstream path, keep deterministic fallback |
 | code-review-graph | `pipx` or `pip` | `scripts/health.py` | mixed: global MCP + repo-local graph build | latest package | Fast-moving tool with clear standalone install path |
 | Caveman | official installer | `scripts/health.py` | effectively global | latest installer | Plugin-style tool with upstream-managed install flow |

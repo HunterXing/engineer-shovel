@@ -185,13 +185,13 @@ Follow its instructions exactly.
 }
 
 function Install-Superpowers-OpenCode {
-  if ($DryRun) { Info "DRY-RUN: opencode plugin superpowers -g"; Info "DRY-RUN: generate superpowers command wrappers"; return }
+  if ($DryRun) { Info "DRY-RUN: opencode plugin "superpowers@github:obra/superpowers" -g"; Info "DRY-RUN: generate superpowers command wrappers"; return }
 
   if (Get-Command opencode -ErrorAction SilentlyContinue) {
     Info "Installing superpowers via opencode plugin..."
-    $result = & opencode plugin superpowers -g 2>&1
+    $result = & opencode plugin "superpowers@github:obra/superpowers" -g 2>&1
     if ($LASTEXITCODE -eq 0) { Ok "Superpowers installed for OpenCode"; Gen-SuperpowersCommands; return }
-    Warn "opencode plugin superpowers failed; using legacy config method"
+    Warn "opencode plugin "superpowers@github:obra/superpowers" failed; using legacy config method"
   }
 
   $configDir = if ($Scope -eq "local") { ".\.opencode" } else { "$env:APPDATA\opencode" }

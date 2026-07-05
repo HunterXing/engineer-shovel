@@ -1,20 +1,34 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["superpowers"],
+  "plugin": [
+    "superpowers@github:obra/superpowers"
+  ],
   "mcp": {
     "code-review-graph": {
       "type": "local",
-      "command": ["uvx", "code-review-graph", "serve"],
+      "command": [
+        "uvx",
+        "code-review-graph",
+        "serve"
+      ],
       "enabled": true
     },
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
       "enabled": true
     },
     "sequential-thinking": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "enabled": true
     }
   }

@@ -120,12 +120,14 @@ def test_command_set_stays_at_eleven_after_alias_addition():
 
 def test_readmes_list_upstream_tool_versions():
     expected = {
-        "ECC": "v1.10.0",
-        "GSD": "v1.39.0",
-        "superpowers": "v5.0.7",
-        "code-review-graph": "v2.3.2",
-        "Caveman": "v1.7.0",
-        "RTK": "v0.38.0",
+        "ECC": "v2.0.0",
+        "GSD": "v1.50.0-canary.0",
+        "superpowers": "v6.1.1",
+        "code-review-graph": "v2.3.6",
+        "Caveman": "v1.9.1",
+        "RTK": "v0.43.0",
+        "OpenSpec": "@fission-ai/openspec@latest",
+        "claude-mem": "v13.10.0",
     }
 
     for readme_name in ("README.md", "README_zh.md"):
@@ -310,7 +312,13 @@ def test_health_repair_gsd_uses_all_for_both_targets():
 
     module.repair_gsd(runner, ["opencode", "claude"], "global")
 
-    assert ["npx", "-y", "get-shit-done-cc@latest", "--all", "--global"] in runner.commands
+    # v1.50+ canary install path: git clone + npm install + npm run build on
+    # `sdk` + node bin/install.js. The `get-shit-done-cc@latest` npx form is
+    # deprecated and would only yield v1.42.3.
+    bash_cmds = [c[2] for c in runner.commands if c and len(c) >= 3 and c[0] == "bash" and c[1] == "-c"]
+    assert any("git clone" in cmd and "--all --global" in cmd for cmd in bash_cmds)
+    assert any("--all --global" in cmd and "install.js" in cmd for cmd in bash_cmds)
+    assert any("sdk" in cmd and "npm run build" in cmd for cmd in bash_cmds)
 
 
 def test_health_repair_gsd_uses_local_scope_flag():
@@ -319,7 +327,10 @@ def test_health_repair_gsd_uses_local_scope_flag():
 
     module.repair_gsd(runner, ["opencode"], "local")
 
-    assert ["npx", "-y", "get-shit-done-cc@latest", "--opencode", "--local"] in runner.commands
+    bash_cmds = [c[2] for c in runner.commands if c and len(c) >= 3 and c[0] == "bash" and c[1] == "-c"]
+    assert any("git clone" in cmd and "--opencode --local" in cmd for cmd in bash_cmds)
+    assert any("--opencode --local" in cmd and "install.js" in cmd for cmd in bash_cmds)
+    assert any("sdk" in cmd and "npm run build" in cmd for cmd in bash_cmds)
 
 
 def test_health_repair_claude_mem_splits_argv():
@@ -588,7 +599,8 @@ def test_health_check_ecc_opencode_missing(monkeypatch):
     result = module.check_ecc("opencode", runner, "global")
 
     assert result.name == "ecc"
-    assert result.status == module.STATUS_MANUAL_UPGRADE
+    assert result.status == module.STATUS_MISSING
+    assert result.can_auto_repair, "missing ECC for OpenCode must be auto-repairable under latest-installer strategy"
 
 
 def test_health_repair_openspec(monkeypatch):
@@ -638,7 +650,12 @@ def test_health_repair_superpowers_claude(monkeypatch):
 
     module.repair_superpowers(runner, "claude")
 
-    assert ["claude", "plugin", "install", "superpowers@claude-plugins-official"] in runner.commands
+    # v6 install prefers obra marketplace; claude-plugins-official (v5) is fallback.
+    bash_cmd = next(c for c in runner.commands if c and c[0] == "bash")
+    rendered = " ".join(bash_cmd)
+    assert "obra/superpowers" in rendered
+    assert "superpowers-dev" in rendered
+    assert "claude-plugins-official" in rendered  # fallback still present
 
 
 def test_health_check_components_includes_all(monkeypatch):
