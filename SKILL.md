@@ -6,7 +6,7 @@ description: |
   This is the LEVEL 1 lightweight router. Load full details on demand.
 license: MIT
 metadata:
-  version: "1.7.5"
+  version: "1.8.0"
   category: workflow
   token_profile: ultra-lightweight
   level: 1

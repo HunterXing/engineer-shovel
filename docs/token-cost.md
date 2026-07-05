@@ -117,4 +117,4 @@ Use upstream tools directly:
 
 ---
 
-*Last updated: 2026-05-27 — v1.7.5*
+*Last updated: 2026-07-05 — v1.8.0*

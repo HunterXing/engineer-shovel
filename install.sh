@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-VERSION="1.7.5"
+VERSION="1.8.0"
 REPO_RAW="https://raw.githubusercontent.com"
 REPO_OWNER="HunterXing"
 REPO_NAME="engineer-shovel"

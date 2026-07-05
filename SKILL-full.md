@@ -6,7 +6,7 @@ description: |
   Load this when Level 1 (SKILL.md) is insufficient.
 license: MIT
 metadata:
-  version: "1.7.5"
+  version: "1.8.0"
   category: workflow
   token_profile: full-router
   level: 2

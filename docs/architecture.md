@@ -240,4 +240,4 @@ RTK notes:
 ---
 
 *Based on claude-mem + OpenSpec + ECC + GSD + superpowers + code-review-graph + Caveman + RTK + Cache + Smart Mode integration*
-*Last updated: 2026-05-27 — v1.7.5*
+*Last updated: 2026-07-05 — v1.8.0*
