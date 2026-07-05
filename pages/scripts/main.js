@@ -1,11 +1,11 @@
 /* ================================================
    ENGINEER SHOVEL — GITHUB PAGES JAVASCRIPT
-   v1.7.4 · Mode tabs · CRG-aware · claude-mem · OpenSpec-aware
+   v1.7.5 · Drift detection · Upstream version sync
    ================================================ */
 
 const i18n = {
   en: {
-    'hero.badge': 'v1.7.4 · MIT License',
+    'hero.badge': 'v1.7.5 · MIT License',
     'hero.subtitle': 'Lightweight AI development workflow router for OpenCode / Claude Code',
     'hero.desc': 'Start with the main workflow commands. Keep review, research, and external tooling as deliberate upgrades instead of mandatory ceremony.',
     'hero.note': 'Default route: quick / fix / feat / plan. Support routes: review / refactor / research. Platform routes: branch / graph / update.',
@@ -42,7 +42,7 @@ const i18n = {
     'hero.stats.modes': '安装模式',
     'hero.stats.langs': '语言文档',
     'hero.scroll': '向下滚动探索',
-    'hero.badge': 'v1.7.4 · MIT License',
+    'hero.badge': 'v1.7.5 · MIT License',
     'hero.subtitle': '面向 OpenCode / Claude Code 的轻量 AI 开发工作流路由器',
     'hero.desc': '先走主工作流命令。把 review、research 和外部工具保留为按需升级，而不是默认仪式。',
     'hero.note': '默认路线：quick / fix / feat / plan。辅助路线：review / refactor / research。平台路线：branch / graph / update。',
@@ -92,13 +92,13 @@ const i18n = {
     'upstream.col.ver': '版本',
     'upstream.col.role': '作用',
     'upstream.openspec': '规格驱动产物：proposal、specs、design、tasks、verify、archive。只安装 CLI，不自动初始化项目。',
-    'upstream.ecc': '按需能力库：skills、rules、hooks、MCP、安全与 research-first 工作流 (L4)',
-    'upstream.gsd': '深度项目编排：阶段执行、结构化验证闭环 (verify-work / code-review / ship) (L5)',
-    'upstream.sp': '方法层：澄清、TDD、调试与验证纪律 (L3)',
-    'upstream.crg': '本地代码知识图谱、MCP review context、影响面分析 (L2, auto-refreshed)',
-    'upstream.cmem': '自动捕获跨会话记忆: 决策、偏好、bug 历史。渐进式披露。SQLite + Chroma 双存储 (L1.5)',
-    'upstream.caveman': 'LLM 输出 token 压缩 (lite/full/ultra 三模式强制映射) (L1)',
-    'upstream.rtk': 'Shell/tool 输出压缩代理，智能触发策略 (输出 >500 行) (L1)',
+    'upstream.ecc': 'Harness-native agent 操作系统：skills、rules、hooks、MCP、安全与 research-first 工作流。v2 install 是 Node 封装，需要 --target opencode --profile opencode；npm 上的 ecc-universal@latest 已预编译。',
+    'upstream.gsd': '规格驱动的项目编排 (TÂCHES 上游)：阶段执行、结构化验证闭环。通过 git clone + `npm run build` 装 sdk/dist；npm 上的 get-shit-done-cc 包已 deprecated。',
+    'upstream.sp': 'v6 subagent-driven 开发：brainstorming、TDD、plan → execute → review → ship。OpenCode 端注册为 `superpowers@github:obra/superpowers`（裸名会解析为不相关的 npm placeholder）。',
+    'upstream.crg': '本地代码知识图谱、MCP review context、影响面分析。Git hooks 自动刷新；单次查询 ~100-500 tokens。',
+    'upstream.cmem': '自动捕获跨会话记忆：决策、偏好、bug 历史。渐进式披露 (search → timeline → get_observations)。SQLite + Chroma。Web UI: http://localhost:37777。',
+    'upstream.caveman': '通信压缩层。v1.9 实测 ~65% 输出 token 缩减（vs 老版本 ~75% 声称），新增 3 个 wenyan-* 模式、多语保留、完整 /caveman-help 命令面。',
+    'upstream.rtk': 'Shell/tool 输出压缩代理 + 智能触发策略 (仅 >500 行)。v0.43 修复了 0.37 中 `rtk gain --history` 在非 ASCII 路径上的 panic bug。',
     'boundary.title': '能力边界',
     'boundary.core.title': '原生安装（最小模式）',
     'boundary.core.desc': 'Engineer Shovel 原生安装的是轻量路由器、10 个活跃 /tool-* 命令和 legacy 重定向。',

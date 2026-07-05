@@ -335,7 +335,7 @@ bash install.sh --target all">
           </div>
         </div>
       </div>
-      <div class="step-item" data-step="3">
+<div class="step-item" data-step="3">
         <div class="step-num">03</div>
         <div class="step-content">
           <h3 class="step-title" data-i18n="start.step3.title">Start Using</h3>
@@ -362,6 +362,37 @@ skill(name="engineer-shovel")
           </div>
         </div>
       </div>
+      <div class="step-item" data-step="4">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3 class="step-title" data-i18n="start.step4.title">Stay on Latest</h3>
+          <p class="step-desc" data-i18n="start.step4.desc">Run <code>/tool-update --full</code> periodically. It syncs the router files and probes each upstream tool against current upstream versions; drift flips status from <code>ok</code> to <code>outdated</code>, and the auto-repair path re-runs the install command to pull whatever is current upstream.</p>
+          <div class="code-block os-block unix-block">
+            <div class="code-lang">bash</div>
+            <pre><code># Show drift status without modifying anything
+/tool-update --check
+
+# Sync router files + repair any drift
+/tool-update --full</code></pre>
+            <button class="copy-btn" data-copy="/tool-update --check
+/tool-update --full">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="code-block os-block windows-block" style="display:none">
+            <div class="code-lang">powershell</div>
+            <pre><code>/tool-update --check
+/tool-update --full</code></pre>
+            <button class="copy-btn" data-copy="/tool-update --check
+/tool-update --full">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="step-tip" data-i18n="start.step4.tip">End-to-end verified: forcing GSD VERSION to 0.0.0 then running <code>/tool-update --full</code> restored it to 1.50.0-canary.0. Drift detection also covers openspec, claude-mem, rtk, code-review-graph, ecc, and superpowers-claude.</div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -379,43 +410,43 @@ skill(name="engineer-shovel")
       </div>
       <div class="ut-row" data-tool="OpenSpec">
         <span class="ut-name">OpenSpec</span>
-        <span class="ut-ver">latest</span>
+        <span class="ut-ver">@fission-ai/openspec@latest</span>
         <span class="ut-desc" data-i18n="upstream.openspec">Spec-driven artifacts: proposal, specs, design, tasks, verify, archive. CLI installed; project init stays explicit.</span>
       </div>
       <div class="ut-row" data-tool="ECC">
         <span class="ut-name">ECC</span>
-        <span class="ut-ver">v1.10.0</span>
-        <span class="ut-desc" data-i18n="upstream.ecc">On-demand capability guidance: architecture tradeoffs, security-focused research, integration patterns, and specialized workflows.</span>
+        <span class="ut-ver">v2.0.0</span>
+        <span class="ut-desc" data-i18n="upstream.ecc">Harness-native agent operating system: skills, rules, hooks, MCP conventions, security, and research-first workflows. v2 install is a Node wrapper that takes `--target opencode --profile opencode`; the npm-published `ecc-universal@latest` ships pre-built artifacts.</span>
       </div>
       <div class="ut-row" data-tool="GSD">
         <span class="ut-name">GSD</span>
-        <span class="ut-ver">v1.39.0</span>
-        <span class="ut-desc" data-i18n="upstream.gsd">Deep project orchestration: phase execution, structured verification pipeline (verify-work → code-review → ship)</span>
+        <span class="ut-ver">v1.50.0-canary.0</span>
+        <span class="ut-desc" data-i18n="upstream.gsd">Spec-driven project orchestration (TÂCHES upstream): phase execution, structured verification pipeline. Install via git clone + `npm run build` for sdk/dist; the npm `get-shit-done-cc` package is deprecated.</span>
       </div>
       <div class="ut-row" data-tool="superpowers">
         <span class="ut-name">superpowers</span>
-        <span class="ut-ver">v5.0.7</span>
-        <span class="ut-desc" data-i18n="upstream.sp">Method layer for clarification, TDD, debugging, and verification discipline.</span>
+        <span class="ut-ver">v6.1.1</span>
+        <span class="ut-desc" data-i18n="upstream.sp">v6 subagent-driven development: brainstorming, TDD, plan → execute → review → ship. OpenCode side registers as `superpowers@github:obra/superpowers` (the bare name resolves to an unrelated npm placeholder).</span>
       </div>
       <div class="ut-row" data-tool="code-review-graph">
         <span class="ut-name">code-review-graph</span>
-        <span class="ut-ver">v2.3.2</span>
-        <span class="ut-desc" data-i18n="upstream.crg">Local code knowledge graph, MCP review context, impact analysis</span>
+        <span class="ut-ver">v2.3.6</span>
+        <span class="ut-desc" data-i18n="upstream.crg">Local code knowledge graph, MCP review context, impact analysis. Auto-refreshed via git hooks; queries return ~100-500 tokens.</span>
       </div>
       <div class="ut-row" data-tool="claude-mem">
         <span class="ut-name">claude-mem</span>
-        <span class="ut-ver">v12.6.0</span>
-        <span class="ut-desc" data-i18n="upstream.cmem">Auto-capture cross-session memory: decisions, preferences, bug history. Progressive disclosure (search → timeline → get_observations). SQLite + Chroma.</span>
+        <span class="ut-ver">v13.10.0</span>
+        <span class="ut-desc" data-i18n="upstream.cmem">Auto-capture cross-session memory: decisions, preferences, bug history. Progressive disclosure (search → timeline → get_observations). SQLite + Chroma. Web UI at http://localhost:37777.</span>
       </div>
       <div class="ut-row" data-tool="Caveman">
         <span class="ut-name">Caveman</span>
-        <span class="ut-ver">v1.7.0</span>
-        <span class="ut-desc" data-i18n="upstream.caveman">LLM output token compression with enforced 3-tier mode mapping (lite/full/ultra per cost mode)</span>
+        <span class="ut-ver">v1.9.1</span>
+        <span class="ut-desc" data-i18n="upstream.caveman">Communication compression layer. v1.9 measures ~65% output-token reduction (vs the older ~75% claim), adds 3 wenyan-* modes, multi-language preservation, and a full `/caveman-help` command surface.</span>
       </div>
       <div class="ut-row" data-tool="RTK">
         <span class="ut-name">RTK</span>
-        <span class="ut-ver">v0.38.0</span>
-        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression with smart trigger (output >500 lines only)</span>
+        <span class="ut-ver">v0.43.0</span>
+        <span class="ut-desc" data-i18n="upstream.rtk">Shell/tool output compression proxy with smart trigger (output &gt;500 lines only). v0.43 fixes the `rtk gain --history` panic on non-ASCII paths that existed in 0.37.</span>
       </div>
     </div>
   </section>

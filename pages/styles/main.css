@@ -733,6 +733,24 @@ body {
   margin-bottom: 16px;
 }
 
+.step-tip {
+  margin-top: 14px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  background: rgba(99, 102, 241, 0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  line-height: 1.55;
+}
+
+.step-tip code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.78em;
+}
+
 /* ---- Code Blocks ---- */
 .code-block {
   background: var(--bg-code);
